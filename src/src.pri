@@ -1,5 +1,3 @@
-QT += xml
-
 INCLUDEPATH *= $$PWD/../include
 DEPENDPATH  *= $$PWD
 

@@ -64,7 +64,8 @@ void BaseMimeTypeParser::addGlobPattern(const QString &pattern, const QString &w
     d->assignSuffix(pattern);
 }
 
-BaseMimeTypeParser::ParseStage BaseMimeTypeParser::nextStage(ParseStage currentStage, const QStringRef &startElement)
+BaseMimeTypeParser::ParseStage BaseMimeTypeParser::nextStage(ParseStage currentStage,
+                                                             const QStringRef &startElement)
 {
     switch (currentStage) {
     case ParseBeginning:

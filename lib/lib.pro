@@ -4,8 +4,6 @@
 #
 #-------------------------------------------------
 
-QT       += xml
-
 TARGET = qmimetype
 TEMPLATE = lib
 

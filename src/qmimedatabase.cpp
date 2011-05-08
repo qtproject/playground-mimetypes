@@ -291,7 +291,6 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data) const
     return rc;
 }
 
-// Returns a mime type or Null one if none found
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
 {
     // Is the hierarchy set up in case we find several matches?
