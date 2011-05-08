@@ -56,13 +56,6 @@ public:
     QMimeType findByFile(const QFileInfo &fileInfo) const;
     QMimeType findByData(const QByteArray &data) const;
 
-    // Convenience that mutex-locks the DB and calls a function
-    // of the signature 'void f(const MimeType &, const QFileInfo &, const QString &)'
-    // for each filename of a sequence. This avoids locking the DB for each
-    // single file.
-    template <class Iterator, typename Function>
-    inline void findByFile(Iterator i1, const Iterator &i2, Function f) const;
-
     // Return all known suffixes
     QStringList suffixes() const;
     bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
@@ -95,22 +88,8 @@ public:
     friend QDebug operator<<(QDebug d, const QMimeDatabase &mt);
 
 private:
-    QMimeType findByFileUnlocked(const QFileInfo &f) const;
-
     QMimeDatabasePrivate *m_d;
-    mutable QMutex m_mutex;
 };
-
-template <class Iterator, typename Function>
-    void QMimeDatabase::findByFile(Iterator i1, const Iterator &i2, Function f) const
-{
-    m_mutex.lock();
-    for ( ; i1 != i2; ++i1) {
-        const QFileInfo fi(*i1);
-        f(findByFileUnlocked(fi), fi, *i1);
-    }
-    m_mutex.unlock();
-}
 
 QT_END_NAMESPACE
 

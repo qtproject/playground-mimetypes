@@ -50,6 +50,7 @@ struct MimeMapEntry
 class QMimeDatabasePrivate
 {
     Q_DISABLE_COPY(QMimeDatabasePrivate)
+    friend class QMimeDatabase;
 public:
     QMimeDatabasePrivate();
 
@@ -86,6 +87,8 @@ public:
 
     void debug(QTextStream &str) const;
 
+//    QMimeType findByFileUnlocked(const QFileInfo &f) const;
+
 private:
     typedef QHash<QString, MimeMapEntry> TypeMimeTypeMap;
     typedef QHash<QString, QString> AliasMap;
@@ -107,6 +110,7 @@ private:
     AliasMap m_aliasMap;
     ParentChildrenMap m_parentChildrenMap;
     int m_maxLevel;
+    QMutex m_mutex;
 };
 
 //namespace Internal {

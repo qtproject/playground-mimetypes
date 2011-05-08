@@ -626,9 +626,9 @@ QMimeDatabase::~QMimeDatabase()
 */
 QMimeType QMimeDatabase::findByType(const QString &typeOrAlias) const
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const QMimeType rc = m_d->findByType(typeOrAlias);
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
@@ -639,9 +639,9 @@ QMimeType QMimeDatabase::findByType(const QString &typeOrAlias) const
 */
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
-    m_mutex.lock();
-    const QMimeType rc = findByFileUnlocked(fileInfo);
-    m_mutex.unlock();
+    m_d->m_mutex.lock();
+    const QMimeType rc = m_d->findByFile(fileInfo);
+    m_d->m_mutex.unlock();
     return rc;
 }
 
@@ -653,49 +653,49 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 */
 QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const QMimeType rc = m_d->findByData(data);
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
 bool QMimeDatabase::addMimeType(const  QMimeType &mt)
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const bool rc = m_d->addMimeType(mt);
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
 bool QMimeDatabase::addMimeTypes(const QString &fileName, QString *errorMessage)
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const bool rc = m_d->addMimeTypes(fileName, errorMessage);
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
 bool QMimeDatabase::addMimeTypes(QIODevice *device, QString *errorMessage)
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const bool rc = m_d->addMimeTypes(device, errorMessage);
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
 QStringList QMimeDatabase::suffixes() const
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const QStringList rc = m_d->suffixes();
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
 QStringList QMimeDatabase::filterStrings() const
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const QStringList rc = m_d->filterStrings();
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
@@ -724,56 +724,56 @@ QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
 
 QList<MimeGlobPattern> QMimeDatabase::globPatterns() const
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const QList<MimeGlobPattern> rc = m_d->globPatterns();
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
 void QMimeDatabase::setGlobPatterns(const QString &typeOrAlias,
                                    const QList<MimeGlobPattern> &globPatterns)
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     m_d->setGlobPatterns(typeOrAlias, globPatterns);
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
 }
 
 QMimeDatabase::IMagicMatcherList QMimeDatabase::magicMatchers() const
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const IMagicMatcherList rc = m_d->magicMatchers();
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
 void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias,
                                     const IMagicMatcherList &matchers)
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     m_d->setMagicMatchers(typeOrAlias, matchers);
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
 }
 
 QList<QMimeType> QMimeDatabase::mimeTypes() const
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const QList<QMimeType> &mimeTypes = m_d->mimeTypes();
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return mimeTypes;
 }
 
 void QMimeDatabase::syncUserModifiedMimeTypes()
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     m_d->syncUserModifiedMimeTypes();
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
 }
 
 void QMimeDatabase::clearUserModifiedMimeTypes()
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     m_d->clearUserModifiedMimeTypes();
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
 }
 
 QList<QMimeType> QMimeDatabase::readUserModifiedMimeTypes()
@@ -802,9 +802,9 @@ QString QMimeDatabase::preferredSuffixByFile(const QFileInfo &f) const
 
 bool QMimeDatabase::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
 {
-    m_mutex.lock();
+    m_d->m_mutex.lock();
     const bool rc = m_d->setPreferredSuffix(typeOrAlias, suffix);
-    m_mutex.unlock();
+    m_d->m_mutex.unlock();
     return rc;
 }
 
@@ -827,11 +827,6 @@ QDebug operator<<(QDebug d, const QMimeDatabase &mt)
     }
     d << s;
     return d;
-}
-
-QMimeType QMimeDatabase::findByFileUnlocked(const QFileInfo &f) const
-{
-    return m_d->findByFile(f);
 }
 
 QT_END_NAMESPACE
