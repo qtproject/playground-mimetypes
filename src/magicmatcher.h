@@ -21,7 +21,7 @@
 #ifndef MAGICMATCHER_H
 #define MAGICMATCHER_H
 
-#include "qmimetype_global.h"
+#include "qmime_global.h"
 
 #include <QtCore/QByteArray>
 #include <QtCore/QPair>
@@ -30,7 +30,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class QMIMETYPE_EXPORT IMagicMatcher
+class QMIME_EXPORT IMagicMatcher
 {
     Q_DISABLE_COPY(IMagicMatcher)
 protected:
@@ -46,7 +46,7 @@ public:
     virtual ~IMagicMatcher() {}
 };
 
-class QMIMETYPE_EXPORT MagicRule
+class QMIME_EXPORT MagicRule
 {
     Q_DISABLE_COPY(MagicRule)
 public:
@@ -70,7 +70,7 @@ private:
     const int m_endPos;
 };
 
-class QMIMETYPE_EXPORT MagicStringRule : public MagicRule
+class QMIME_EXPORT MagicStringRule : public MagicRule
 {
 public:
     MagicStringRule(const QString &s, int startPos, int endPos);
@@ -86,7 +86,7 @@ private:
     const QByteArray m_pattern;
 };
 
-class QMIMETYPE_EXPORT MagicByteRule : public MagicRule
+class QMIME_EXPORT MagicByteRule : public MagicRule
 {
 public:
     MagicByteRule(const QString &s, int startPos, int endPos);
@@ -105,7 +105,7 @@ private:
     QList<int> m_bytes;
 };
 
-class QMIMETYPE_EXPORT MagicRuleMatcher : public IMagicMatcher
+class QMIME_EXPORT MagicRuleMatcher : public IMagicMatcher
 {
     Q_DISABLE_COPY(MagicRuleMatcher)
 public:

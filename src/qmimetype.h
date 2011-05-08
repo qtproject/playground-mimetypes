@@ -21,7 +21,7 @@
 #ifndef QMIMETYPE_H
 #define QMIMETYPE_H
 
-#include "qmimetype_global.h"
+#include "qmime_global.h"
 
 #include "magicmatcher.h"
 
@@ -33,7 +33,7 @@ QT_BEGIN_NAMESPACE
 
 class QFileInfo;
 
-class QMIMETYPE_EXPORT MimeGlobPattern
+class QMIME_EXPORT MimeGlobPattern
 {
 public:
     static const unsigned MaxWeight = 100;
@@ -51,7 +51,7 @@ private:
 };
 
 class QMimeTypeData;
-class QMIMETYPE_EXPORT QMimeType
+class QMIME_EXPORT QMimeType
 {
 public:
     typedef IMagicMatcher::IMagicMatcherList IMagicMatcherList;

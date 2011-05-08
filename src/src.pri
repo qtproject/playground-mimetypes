@@ -8,8 +8,8 @@ SOURCES += qmimedatabase.cpp \
     magicmatcher.cpp \
     mimetypeparser.cpp
 
-HEADERS += qmimedatabase.h \
-        qmimetype_global.h \
+HEADERS += qmime_global.h \
+    qmimedatabase.h \
     qmimetype.h \
     magicmatcher.h \
     qmimetype_p.h \

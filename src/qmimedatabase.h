@@ -21,7 +21,7 @@
 #ifndef QMIMEDATABASE_H
 #define QMIMEDATABASE_H
 
-#include "qmimetype_global.h"
+#include "qmime_global.h"
 
 #include "qmimetype.h"
 
@@ -37,7 +37,7 @@ class QIODevice;
 class QDebug;
 
 class QMimeDatabasePrivate;
-class QMIMETYPE_EXPORT QMimeDatabase : public QObject
+class QMIME_EXPORT QMimeDatabase : public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY(QMimeDatabase)
