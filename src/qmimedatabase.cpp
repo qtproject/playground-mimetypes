@@ -23,20 +23,10 @@
 #include "magicmatcher_p.h"
 #include "qmimedatabase_p.h"
 
-//#include <QtCore/QByteArray>
-//#include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-//#include <QtCore/QLocale>
-//#include <QtCore/QMap>
-//#include <QtCore/QHash>
-//#include <QtCore/QRegExp>
-//#include <QtCore/QSharedData>
-//#include <QtCore/QSharedPointer>
-//#include <QtCore/QStringList>
-//#include <QtCore/QMutexLocker>
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 
@@ -145,12 +135,12 @@ void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
     // look them up in the type->mime type map
     const int nextLevel = level + 1;
     const TypeMimeTypeMap::iterator tm_end = m_typeMimeTypeMap.end();
-    const QStringList::const_iterator cend = childTypes.constEnd();
-    for (QStringList::const_iterator it = childTypes.constBegin(); it !=  cend; ++it) {
-        const TypeMimeTypeMap::iterator tm_it = m_typeMimeTypeMap.find(resolveAlias(*it));
+    for (int i = 0; i < childTypes.size(); i++) {
+        const QString &alias = childTypes.at(i);
+        const TypeMimeTypeMap::iterator tm_it = m_typeMimeTypeMap.find(resolveAlias(alias));
         if (tm_it == tm_end) {
             qWarning("%s: Inconsistent mime hierarchy detected, child %s of %s cannot be found.",
-                     Q_FUNC_INFO, it->toUtf8().constData(), e.type.type().toUtf8().constData());
+                     Q_FUNC_INFO, alias.toUtf8().constData(), e.type.type().toUtf8().constData());
         } else {
             raiseLevelRecursion(*tm_it, nextLevel);
         }
