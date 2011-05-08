@@ -9,7 +9,7 @@ QT       += xml
 TARGET = qmimetype
 TEMPLATE = lib
 
-DEFINES += QMIMETYPE_LIBRARY
+DEFINES += QMIME_LIBRARY
 
 include($$PWD/../src/src.pri)
 
