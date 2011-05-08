@@ -1,0 +1,1 @@
+#include "../src/qmimetype.h"
