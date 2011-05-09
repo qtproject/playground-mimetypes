@@ -93,24 +93,26 @@ bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
         if (type == QLatin1String(binaryTypeC))
             mt.addMagicMatcher(QSharedPointer<IMagicMatcher>(new BinaryMatcher));
     }
+
     // insert the type.
     m_typeMimeTypeMap.insert(type, MimeMapEntry(mt));
+
     // Register the children, resolved via alias map. Note that it is still
     // possible that aliases end up in the map if the parent classes are not inserted
     // at this point (thus their aliases not known).
     const QStringList subClassesOf = mt.subClassesOf();
     if (!subClassesOf.empty()) {
-        const QStringList::const_iterator socend = subClassesOf.constEnd();
-        for (QStringList::const_iterator soit = subClassesOf.constBegin(); soit !=  socend; ++soit)
-            m_parentChildrenMap.insert(resolveAlias(*soit), type);
+        for (int i = 0; i < subClassesOf.size(); i++)
+            m_parentChildrenMap.insert(resolveAlias(subClassesOf.at(i)), type);
     }
+
     // register aliasses
     const QStringList aliases = mt.aliases();
     if (!aliases.empty()) {
-        const QStringList::const_iterator cend = aliases.constEnd();
-        for (QStringList::const_iterator it = aliases.constBegin(); it !=  cend; ++it)
-            m_aliasMap.insert(*it, type);
+        for (int i = 0; i < aliases.size(); i++)
+            m_aliasMap.insert(aliases.at(i), type);
     }
+
     m_maxLevel = -1; // Mark as dirty
     return true;
 }
