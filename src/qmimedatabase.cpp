@@ -113,10 +113,9 @@ bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
     return true;
 }
 
-const QString &QMimeDatabasePrivate::resolveAlias(const  QString &name) const
+const QString &QMimeDatabasePrivate::resolveAlias(const QString &name) const
 {
-    const AliasMap::const_iterator aliasIt = m_aliasMap.constFind(name);
-    return aliasIt == m_aliasMap.constEnd() ? name : aliasIt.value();
+    return m_aliasMap.value(name, name);
 }
 
 void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
