@@ -113,7 +113,7 @@ bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
     return true;
 }
 
-const QString &QMimeDatabasePrivate::resolveAlias(const QString &name) const
+QString QMimeDatabasePrivate::resolveAlias(const QString &name) const
 {
     return m_aliasMap.value(name, name);
 }
@@ -122,6 +122,7 @@ void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
 {
     if (e.level == Dangling || e.level < level)
         e.level = level;
+
     if (m_maxLevel < level)
         m_maxLevel = level;
     // At all events recurse over children since nodes might have been
@@ -172,6 +173,14 @@ void QMimeDatabasePrivate::determineLevels()
                      Q_FUNC_INFO, tl_it->toUtf8().constData());
         } else {
             raiseLevelRecursion(tm_it.value(), 0);
+        }
+    }
+
+    // move all danglings to top level
+    TypeMimeTypeMap::iterator cend = m_typeMimeTypeMap.end();
+    for (TypeMimeTypeMap::iterator it = m_typeMimeTypeMap.begin(); it != cend; ++it) {
+        if (it.value().level == Dangling) {
+            it.value().level = 0;
         }
     }
 }
@@ -645,7 +654,7 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
     return rc;
 }
 
-bool QMimeDatabase::addMimeType(const  QMimeType &mt)
+bool QMimeDatabase::addMimeType(const QMimeType &mt)
 {
     m_d->m_mutex.lock();
     const bool rc = m_d->addMimeType(mt);

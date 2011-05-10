@@ -105,6 +105,32 @@ private:
     QList<int> m_bytes;
 };
 
+class QMIME_EXPORT MagicNumberRule : public MagicRule
+{
+public:
+    enum Size { Size16 = 16, Size32 = 32 };
+    enum Endianness { LittleEndian = 1, BigEndian = 2, Host = 3 };
+
+    MagicNumberRule(const QString &s, int startPos, int endPos,
+                    Size size/* = Size16*/, Endianness endianness/* = LittleEndian*/);
+    virtual ~MagicNumberRule();
+
+    virtual QString matchType() const;
+    virtual QString matchValue() const;
+    virtual bool matches(const QByteArray &data) const;
+
+    static const QString kMatchType;
+
+private:
+    QString m_stringValue;
+    Size m_size;
+    Endianness m_endiannes;
+    union {
+        quint16 m_value16;
+        quint32 m_value32;
+    };
+};
+
 class QMIME_EXPORT MagicRuleMatcher : public IMagicMatcher
 {
     Q_DISABLE_COPY(MagicRuleMatcher)

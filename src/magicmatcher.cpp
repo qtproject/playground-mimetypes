@@ -211,11 +211,8 @@ bool MagicStringRule::matches(const QByteArray &data) const
     if (startPos() == 0 && startPos() == endPos())
         return data.startsWith(m_pattern);
     // Range
-    const int index = data.indexOf(m_pattern, startPos());
-    const bool rc = index != -1 && index <= endPos();
-    if (debugMimeDB)
-        qDebug() << "Checking " << m_pattern << startPos() << endPos() << " returns " << rc;
-    return rc;
+    return QByteArray::fromRawData(data.data() + startPos(),
+                                   endPos() - startPos() + m_pattern.size()).contains(m_pattern);
 }
 
 /*!
@@ -297,6 +294,86 @@ bool MagicByteRule::matches(const QByteArray &data) const
             return true;
     }
 
+    return false;
+}
+
+inline quint16 reverse16(quint16 value)
+{
+    return (quint16)((value & 0x00ff) << 8) + (quint16)((value & 0xff00) >> 8);
+}
+
+inline quint32 reverse32(quint32 value)
+{
+    return (quint32)((value & 0xff000000) >> 24) +
+            (quint32)((value & 0x00ff0000) >> 8) +
+            (quint32)((value & 0x0000ff00) << 8) +
+            (quint32)((value & 0x000000ff) << 24);
+}
+
+MagicNumberRule::MagicNumberRule(const QString &s, int startPos, int endPos,
+                                 Size size, Endianness endianness) :
+    MagicRule(startPos, endPos),
+    m_stringValue(s),
+    m_size(size),
+    m_endiannes(endianness)
+{
+    bool ok;
+    uint value = s.toUInt(&ok);
+    if (!ok) {
+        value = s.toUInt(&ok, 16);
+    }
+    if (!ok)
+        qWarning() << "Can't convert string to int";
+
+    if (size == Size16) {
+
+        if (endianness == LittleEndian)
+            m_value16 = value;
+        if (endianness == BigEndian)
+            m_value16 = reverse16((quint16)value);
+
+//        qDebug() << m_stringValue << QString::number(m_value16, 16);
+
+    } else if (size == Size32) {
+
+        if (endianness == LittleEndian)
+            m_value32 = value;
+        if (endianness == BigEndian)
+            m_value32 = reverse32(value);
+
+//        qDebug() << m_stringValue << QString::number(m_value32, 16);
+
+    }
+}
+
+MagicNumberRule::~MagicNumberRule()
+{
+}
+
+QString MagicNumberRule::matchType() const
+{
+    static const QString kMatchType(QLatin1String("big16"));
+    return kMatchType;
+}
+
+QString MagicNumberRule::matchValue() const
+{
+    return m_stringValue;
+}
+
+bool MagicNumberRule::matches(const QByteArray &data) const
+{
+    if (m_size == Size16) {
+        if (data.size() < startPos() + 2)
+            return false;
+
+        return *(reinterpret_cast<const quint16*>(data.data() + startPos())) == m_value16;
+    } else if (m_size == Size32) {
+        if (data.size() < startPos() + 4)
+            return false;
+
+        return *(reinterpret_cast<const quint32*>(data.data() + startPos())) == m_value32;
+    }
     return false;
 }
 
