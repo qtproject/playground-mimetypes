@@ -386,22 +386,22 @@ bool MagicNumberRule::matches(const QByteArray &data) const
 {
     if (m_size == Size16) {
 
-        for (int i = startPos(); i <= endPos(); i++) {
-            if (data.size() < i + 2)
-                return false;
-
-            if ( *(reinterpret_cast<const quint16*>(data.data() + i)) == m_value16 )
+        const char *p = data.constData() + startPos();
+        const char *e = data.constData() + qMin(data.size() - 2, endPos());
+        while (p <= e) {
+            if (*reinterpret_cast<const quint16*>(p) == m_value16)
                 return true;
+            p++;
         }
 
     } else if (m_size == Size32) {
 
-        for (int i = startPos(); i <= endPos(); i++) {
-            if (data.size() < i + 4)
-                return false;
-
-            if ( *(reinterpret_cast<const quint32*>(data.data() + i)) == m_value32 )
+        const char *p = data.constData() + startPos();
+        const char *e = data.constData() + qMin(data.size() - 4, endPos());
+        while (p <= e) {
+            if (*reinterpret_cast<const quint32*>(p) == m_value32)
                 return true;
+            p++;
         }
 
     }
