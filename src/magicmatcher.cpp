@@ -391,7 +391,7 @@ bool MagicNumberRule::matches(const QByteArray &data) const
         while (p <= e) {
             if (*reinterpret_cast<const quint16*>(p) == m_value16)
                 return true;
-            p++;
+            ++p;
         }
 
     } else if (m_size == Size32) {
@@ -401,7 +401,7 @@ bool MagicNumberRule::matches(const QByteArray &data) const
         while (p <= e) {
             if (*reinterpret_cast<const quint32*>(p) == m_value32)
                 return true;
-            p++;
+            ++p;
         }
 
     }
