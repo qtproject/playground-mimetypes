@@ -305,20 +305,26 @@ MagicNumberRule::MagicNumberRule(const QString &s, int startPos, int endPos,
     m_size(size),
     m_endiannes(endianness)
 {
-    bool ok;
-    uint value = s.toUInt(&ok, 8);
-    if (!ok) {
-        value = s.toUInt(&ok, 16);
+    bool ok = false;
+    uint value = 0;
+
+    if (!s.isEmpty()) {
+
+        if (s[0] == '0') {
+            if (s.size() > 1 && s[1] == 'x')
+                value = s.toUInt(&ok, 16);
+            else
+                value = s.toUInt(&ok, 8);
+        } else
+            value = s.toUInt(&ok, 10);
+
     }
-    if (!ok) {
-        value = s.toUInt(&ok, 10);
-    }
+
     if (!ok)
-        qWarning() << "MagicNumberRule::MagicNumberRule: Can't convert string to int";
+        qWarning() << QString("MagicNumberRule::MagicNumberRule: Can't convert %1 string to int").arg(s);
 
     if (size == Size16) {
 
-        m_value16 = value;
         if (endianness == LittleEndian)
             m_value16 = qFromLittleEndian<quint16>(value);
         else if (endianness == BigEndian)
@@ -328,7 +334,6 @@ MagicNumberRule::MagicNumberRule(const QString &s, int startPos, int endPos,
 
     } else if (size == Size32) {
 
-        m_value32 = value;
         if (endianness == LittleEndian)
              m_value32 = qFromLittleEndian<quint32>(value);
         else if (endianness == BigEndian)
