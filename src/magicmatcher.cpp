@@ -298,19 +298,6 @@ bool MagicByteRule::matches(const QByteArray &data) const
     return false;
 }
 
-inline quint16 reverse16(quint16 value)
-{
-    return (quint16)((value & 0x00ff) << 8) + (quint16)((value & 0xff00) >> 8);
-}
-
-inline quint32 reverse32(quint32 value)
-{
-    return (quint32)((value & 0xff000000) >> 24) +
-            (quint32)((value & 0x00ff0000) >> 8) +
-            (quint32)((value & 0x0000ff00) << 8) +
-            (quint32)((value & 0x000000ff) << 24);
-}
-
 MagicNumberRule::MagicNumberRule(const QString &s, int startPos, int endPos,
                                  Size size, Endianness endianness) :
     MagicRule(startPos, endPos),
