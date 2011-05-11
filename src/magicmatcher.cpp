@@ -212,8 +212,11 @@ bool MagicStringRule::matches(const QByteArray &data) const
     if (startPos() == 0 && startPos() == endPos())
         return data.startsWith(m_pattern);
     // Range
-    return QByteArray::fromRawData(data.data() + startPos(),
-                                   endPos() - startPos() + m_pattern.size()).contains(m_pattern);
+    if (data.size() <= startPos())
+        return false;
+
+    int end = endPos() - startPos() + m_pattern.size();
+    return QByteArray::fromRawData(data.data() + startPos(), qMin(end, data.size())).contains(m_pattern);
 }
 
 /*!
@@ -350,8 +353,28 @@ MagicNumberRule::~MagicNumberRule()
 
 QString MagicNumberRule::matchType() const
 {
-    static const QString kMatchType(QLatin1String("big16"));
-    return kMatchType;
+    static const QString kBig16(QLatin1String("big16"));
+    static const QString kBig32(QLatin1String("big32"));
+    static const QString kLittle16(QLatin1String("little16"));
+    static const QString kLittle32(QLatin1String("little32"));
+    static const QString kHost16(QLatin1String("host16"));
+    static const QString kHost32(QLatin1String("host32"));
+
+    if (m_size == Size16) {
+        if (m_endiannes == BigEndian)
+            return kBig16;
+        else if (m_endiannes == LittleEndian)
+            return kLittle16;
+        else
+            return kHost16;
+    } else {
+        if (m_endiannes == BigEndian)
+            return kBig32;
+        else if (m_endiannes == LittleEndian)
+            return kLittle32;
+        else
+            return kHost32;
+    }
 }
 
 QString MagicNumberRule::matchValue() const
