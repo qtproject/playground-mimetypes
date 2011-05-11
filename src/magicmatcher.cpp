@@ -24,6 +24,7 @@
 #include "qmimetype_p.h"
 
 #include <QtCore/QDebug>
+#include <qendian.h>
 
 // UTF16 byte order marks
 static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
@@ -318,30 +319,35 @@ MagicNumberRule::MagicNumberRule(const QString &s, int startPos, int endPos,
     m_endiannes(endianness)
 {
     bool ok;
-    uint value = s.toUInt(&ok);
+    uint value = s.toUInt(&ok, 8);
     if (!ok) {
         value = s.toUInt(&ok, 16);
     }
+    if (!ok) {
+        value = s.toUInt(&ok, 10);
+    }
     if (!ok)
-        qWarning() << "Can't convert string to int";
+        qWarning() << "MagicNumberRule::MagicNumberRule: Can't convert string to int";
 
     if (size == Size16) {
 
+        m_value16 = value;
         if (endianness == LittleEndian)
-            m_value16 = value;
-        if (endianness == BigEndian)
-            m_value16 = reverse16((quint16)value);
-
-//        qDebug() << m_stringValue << QString::number(m_value16, 16);
+            m_value16 = qFromLittleEndian<quint16>(value);
+        else if (endianness == BigEndian)
+            m_value16 = qFromBigEndian<quint16>(value);
+        else
+            m_value16 = qFromBigEndian<quint16>(value); // reverse on little-endians
 
     } else if (size == Size32) {
 
+        m_value32 = value;
         if (endianness == LittleEndian)
-            m_value32 = value;
-        if (endianness == BigEndian)
-            m_value32 = reverse32(value);
-
-//        qDebug() << m_stringValue << QString::number(m_value32, 16);
+             m_value32 = qFromLittleEndian<quint32>(value);
+        else if (endianness == BigEndian)
+            m_value32 = qFromBigEndian<quint32>(value);
+        else
+            m_value32 = qFromBigEndian<quint32>(value); // reverse on little-endians
 
     }
 }
@@ -364,16 +370,27 @@ QString MagicNumberRule::matchValue() const
 bool MagicNumberRule::matches(const QByteArray &data) const
 {
     if (m_size == Size16) {
-        if (data.size() < startPos() + 2)
-            return false;
 
-        return *(reinterpret_cast<const quint16*>(data.data() + startPos())) == m_value16;
+        for (int i = startPos(); i <= endPos(); i++) {
+            if (data.size() < i + 2)
+                return false;
+
+            if ( *(reinterpret_cast<const quint16*>(data.data() + i)) == m_value16 )
+                return true;
+        }
+
     } else if (m_size == Size32) {
-        if (data.size() < startPos() + 4)
-            return false;
 
-        return *(reinterpret_cast<const quint32*>(data.data() + startPos())) == m_value32;
+        for (int i = startPos(); i <= endPos(); i++) {
+            if (data.size() < i + 4)
+                return false;
+
+            if ( *(reinterpret_cast<const quint32*>(data.data() + i)) == m_value32 )
+                return true;
+        }
+
     }
+
     return false;
 }
 

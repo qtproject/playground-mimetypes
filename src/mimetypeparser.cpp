@@ -128,14 +128,15 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
                               QString *errorMessage)
 {
     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
+#warning TODO: remove hardcode
     if (type != QLatin1String(matchStringTypeValueC) &&
         type != QLatin1String(matchByteTypeValueC) &&
         type != QLatin1String(matchBig16TypeValueC) &&
         type != QLatin1String(matchBig32TypeValueC) &&
         type != QLatin1String(matchLittle16TypeValueC) &&
-        type != QLatin1String(matchLittle32TypeValueC)/* &&
+        type != QLatin1String(matchLittle32TypeValueC) &&
         type != QLatin1String(matchHost16TypeValueC) &&
-        type != QLatin1String(matchHost32TypeValueC)*/) {
+        type != QLatin1String(matchHost32TypeValueC)) {
         qWarning("%s: match type %s is not supported.", Q_FUNC_INFO, type.toUtf8().constData());
         return true;
     }
@@ -155,6 +156,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
     if (debugMimeDB)
         qDebug() << Q_FUNC_INFO << value << startPos << endPos;
 
+#warning TODO: remove hardcode
     if (type == QLatin1String(matchStringTypeValueC))
         ruleMatcher->add(QSharedPointer<MagicRule>(new MagicStringRule(value, startPos, endPos)));
     else if (type == QLatin1String(matchBig16TypeValueC)) {
@@ -177,16 +179,16 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
                                                         MagicNumberRule::Size32,
                                                         MagicNumberRule::LittleEndian);
             ruleMatcher->add(QSharedPointer<MagicRule>(rule));
-//    } else if (type == QLatin1String(matchHost16TypeValueC)) {
-//            MagicNumberRule *rule = new MagicNumberRule(value, startPos, endPos,
-//                                                        MagicNumberRule::Size16,
-//                                                        MagicNumberRule::Host);
-//            ruleMatcher->add(QSharedPointer<MagicRule>(rule));
-//    } else if (type == QLatin1String(matchHost32TypeValueC)) {
-//            MagicNumberRule *rule = new MagicNumberRule(value, startPos, endPos,
-//                                                        MagicNumberRule::Size32,
-//                                                        MagicNumberRule::Host);
-//            ruleMatcher->add(QSharedPointer<MagicRule>(rule));
+    } else if (type == QLatin1String(matchHost16TypeValueC)) {
+            MagicNumberRule *rule = new MagicNumberRule(value, startPos, endPos,
+                                                        MagicNumberRule::Size16,
+                                                        MagicNumberRule::Host);
+            ruleMatcher->add(QSharedPointer<MagicRule>(rule));
+    } else if (type == QLatin1String(matchHost32TypeValueC)) {
+            MagicNumberRule *rule = new MagicNumberRule(value, startPos, endPos,
+                                                        MagicNumberRule::Size32,
+                                                        MagicNumberRule::Host);
+            ruleMatcher->add(QSharedPointer<MagicRule>(rule));
     } else
         ruleMatcher->add(QSharedPointer<MagicRule>(new MagicByteRule(value, startPos, endPos)));
     return true;
