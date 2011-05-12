@@ -1,5 +1,4 @@
 #include <QtGui/QApplication>
-#include "mainwindow.h"
 #include "mimetypeviewer.h"
 
 int main(int argc, char *argv[])
