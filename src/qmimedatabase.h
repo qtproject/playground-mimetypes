@@ -37,15 +37,14 @@ class QIODevice;
 class QDebug;
 
 class QMimeDatabasePrivate;
-class QMIME_EXPORT QMimeDatabase : public QObject
+class QMIME_EXPORT QMimeDatabase
 {
-    Q_OBJECT
     Q_DISABLE_COPY(QMimeDatabase)
 public:
     typedef IMagicMatcher::IMagicMatcherList IMagicMatcherList;
     typedef IMagicMatcher::IMagicMatcherSharedPointer IMagicMatcherSharedPointer;
 
-    explicit QMimeDatabase(QObject *parent = 0);
+    QMimeDatabase();
     ~QMimeDatabase();
 
     bool addMimeTypes(const QString &fileName, QString *errorMessage);

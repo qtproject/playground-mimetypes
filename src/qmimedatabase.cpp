@@ -633,8 +633,7 @@ QT_BEGIN_NAMESPACE
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-QMimeDatabase::QMimeDatabase(QObject *parent) :
-    QObject(parent),
+QMimeDatabase::QMimeDatabase() :
     m_d(new QMimeDatabasePrivate)
 {
 }
@@ -752,7 +751,7 @@ QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
     filters.sort();
     filters.erase(std::unique(filters.begin(), filters.end()), filters.end());
 
-    static const QString allFiles = tr("All Files (*)", "QMimeDatabase");
+    static const QString allFiles = QObject::tr("All Files (*)", "QMimeDatabase");
     if (allFilesFilter)
         *allFilesFilter = allFiles;
 
