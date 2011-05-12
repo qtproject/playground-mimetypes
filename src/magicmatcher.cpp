@@ -309,19 +309,7 @@ MagicNumberRule::MagicNumberRule(const QString &s, int startPos, int endPos,
     m_endiannes(endianness)
 {
     bool ok = false;
-    uint value = 0;
-
-    if (!s.isEmpty()) {
-
-        if (s[0] == '0') {
-            if (s.size() > 1 && s[1] == 'x')
-                value = s.toUInt(&ok, 16);
-            else
-                value = s.toUInt(&ok, 8);
-        } else
-            value = s.toUInt(&ok, 10);
-
-    }
+    uint value = s.toUInt(&ok, 0);
 
     if (!ok)
         qWarning() << QString("MagicNumberRule::MagicNumberRule: Can't convert %1 string to int").arg(s);
