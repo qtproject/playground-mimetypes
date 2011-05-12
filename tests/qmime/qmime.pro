@@ -12,11 +12,15 @@ TARGET = tst_qmimetest
 CONFIG   += console
 CONFIG   -= app_bundle
 
+message($$PWD)
+
 TEMPLATE = app
 
 LIBS += -L$$OUT_PWD/../../lib -lqmimetype
 
 INCLUDEPATH *= $$PWD/../../include
 
+#DEFINES += SRC_DIR $$PWD
+
 SOURCES += tst_qmimetest.cpp
-#DEFINES += SRCDIR=\\\"$$PWD/\\\"
+DEFINES += SRCDIR='"\\"$$PWD/\\""'

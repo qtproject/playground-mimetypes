@@ -21,9 +21,9 @@ QmimeTest::QmimeTest()
 void QmimeTest::testFindByFile()
 {
     QMimeDatabase database;
-    QVERIFY(database.addMimeTypes("testfiles/freedesktop.org.xml", 0));
+    QVERIFY(database.addMimeTypes(SRCDIR"../../freedesktop.org.xml", 0));
 
-    QFile testList("testfiles/list");
+    QFile testList(SRCDIR"testfiles/list");
     QVERIFY(testList.open(QIODevice::ReadOnly));
 
     while (!testList.atEnd()) {
@@ -33,7 +33,6 @@ void QmimeTest::testFindByFile()
             continue;
 
         QStringList list = string.split(" ", QString::SkipEmptyParts);
-        qDebug() << list;
         QVERIFY(list.size() >= 2);
         bool failByFileData = false;
         if (list.size() == 3) {
@@ -44,7 +43,7 @@ void QmimeTest::testFindByFile()
         }
         QString file = list.at(0);
         QString mimetype = list.at(1);
-        file.prepend("testfiles/");
+        file.prepend(SRCDIR"testfiles/");
 
         if (failByFileData) {
             QEXPECT_FAIL("", "Should fail", Continue);
