@@ -11,11 +11,49 @@ public:
     QmimeTest();
 
 private Q_SLOTS:
+    void testFindByName();
     void testFindByFile();
 };
 
 QmimeTest::QmimeTest()
 {
+}
+
+void QmimeTest::testFindByName()
+{
+    QMimeDatabase database;
+    QVERIFY(database.addMimeTypes(SRCDIR"../../freedesktop.org.xml", 0));
+
+    QFile testList(SRCDIR"testfiles/list");
+    QVERIFY(testList.open(QIODevice::ReadOnly));
+
+    while (!testList.atEnd()) {
+        QString string = testList.readLine();
+        string = string.trimmed();
+        if (string.startsWith("#") || string.isEmpty())
+            continue;
+
+        QStringList list = string.split(" ", QString::SkipEmptyParts);
+        QVERIFY(list.size() >= 2);
+        bool failByFileName = false;
+        if (list.size() == 3) {
+            QString xxx = list.at(2);
+            if (xxx.length() >= 1) {
+                failByFileName = xxx.at(0) == 'x';
+            }
+        }
+        QString file = list.at(0);
+        QString mimetype = list.at(1);
+        file.prepend(SRCDIR"testfiles/");
+
+//        qDebug() << database.findByName(file).type() << database.findByType(mimetype).type() << failByFileName;
+        if (failByFileName) {
+            QEXPECT_FAIL("", "Should fail", Continue);
+            QCOMPARE(database.findByName(file).type(), database.findByType(mimetype).type());
+        } else
+            QCOMPARE(database.findByName(file).type(), database.findByType(mimetype).type());
+
+    }
 }
 
 void QmimeTest::testFindByFile()
