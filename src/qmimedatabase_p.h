@@ -66,6 +66,7 @@ public:
 
     QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &f) const;
+    QMimeType findByName(const QString &name) const;
     QMimeType findByData(const QByteArray &data) const;
 
     QStringList filterStrings() const;

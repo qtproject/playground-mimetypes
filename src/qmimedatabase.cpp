@@ -219,6 +219,36 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f) const
     return rc;
 }
 
+QMimeType QMimeDatabasePrivate::findByName(const QString &name) const
+{
+    // Is the hierarchy set up in case we find several matches?
+    if (m_maxLevel < 0) {
+        QMimeDatabasePrivate *db = const_cast<QMimeDatabasePrivate *>(this);
+        db->determineLevels();
+    }
+
+    QMimeType candidate;
+
+    unsigned priority = 0;
+
+    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
+    for (int level = m_maxLevel; level >= 0 && candidate.isNull(); level--) {
+        for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
+            if (it.value().level == level) {
+                const unsigned suffixPriority = it.value().type.m_d->matchesFileBySuffix(name);
+                if (suffixPriority && suffixPriority > priority) {
+                    priority = suffixPriority;
+                    candidate = it.value().type;
+                    if (suffixPriority >= MimeGlobPattern::MaxWeight)
+                        return candidate;
+                }
+            }
+        }
+    }
+
+    return candidate;
+}
+
 QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
 {
     // Is the hierarchy set up in case we find several matches?
@@ -636,6 +666,21 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
     m_d->m_mutex.lock();
     const QMimeType rc = m_d->findByFile(fileInfo);
+    m_d->m_mutex.unlock();
+    return rc;
+}
+
+/*!
+    \fn QMimeType QMimeDatabase::findByName(const QString &name) const
+
+    Returns a mime type for \a name or Null one if none found.
+    This function does not tries to open file to determine mime type by it's content, use
+    QMimeDatabase::findByFile instead.
+*/
+QMimeType QMimeDatabase::findByName(const QString &name) const
+{
+    m_d->m_mutex.lock();
+    const QMimeType rc = m_d->findByName(name);
     m_d->m_mutex.unlock();
     return rc;
 }

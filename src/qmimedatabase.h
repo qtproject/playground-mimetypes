@@ -54,6 +54,7 @@ public:
 
     QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &fileInfo) const;
+    QMimeType findByName(const QString &name) const;
     QMimeType findByData(const QByteArray &data) const;
 
     // Return all known suffixes

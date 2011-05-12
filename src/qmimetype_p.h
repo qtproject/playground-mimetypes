@@ -52,6 +52,7 @@ public:
     IMagicMatcher::IMagicMatcherList magicMatchers;
 
     unsigned matchesFileBySuffix(FileMatchContext &c) const;
+    unsigned matchesFileBySuffix(const QString &name) const;
     unsigned matchesFileByContent(FileMatchContext &c) const;
     unsigned matchesData(const QByteArray &data) const;
 };

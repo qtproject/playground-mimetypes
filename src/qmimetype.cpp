@@ -349,6 +349,16 @@ unsigned QMimeTypeData::matchesFileBySuffix(FileMatchContext &c) const
     return 0;
 }
 
+unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
+{
+    // check globs
+    foreach (const MimeGlobPattern &gp, globPatterns) {
+        if (gp.regExp().exactMatch(name))
+            return gp.weight();
+    }
+    return 0;
+}
+
 unsigned QMimeTypeData::matchesFileByContent(FileMatchContext &c) const
 {
     // Nope, try magic matchers on context data
