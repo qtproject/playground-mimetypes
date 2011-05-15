@@ -43,7 +43,7 @@ bool matchString(QMimeMagicRulePrivate* m_d, const QByteArray& data)
                                    qMin(end, data.size())).contains(m_d->pattern);
 }
 
-bool matchBytes(QMimeMagicRulePrivate* m_d, const QByteArray &data)
+bool matchBytes(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 {
     int bytesSize = m_d->bytes.size();
     if (bytesSize == 0)
@@ -67,7 +67,7 @@ bool matchBytes(QMimeMagicRulePrivate* m_d, const QByteArray &data)
     return false;
 }
 
-bool match16(QMimeMagicRulePrivate* m_d, const QByteArray& data)
+bool match16(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 {
     const char *p = data.constData() + m_d->startPos;
     const char *e = data.constData() + qMin(data.size() - 2, m_d->endPos);
@@ -79,15 +79,23 @@ bool match16(QMimeMagicRulePrivate* m_d, const QByteArray& data)
     return false;
 }
 
-bool match32(QMimeMagicRulePrivate* m_d, const QByteArray& data)
+bool match32(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 {
     const char *p = data.constData() + m_d->startPos;
     const char *e = data.constData() + qMin(data.size() - 4, m_d->endPos);
     while (p <= e) {
+        qDebug() << QString::number(*reinterpret_cast<const quint32*>(p), 16)
+                 << QString::number(m_d->value32, 16);
+
         if (*reinterpret_cast<const quint32*>(p) == m_d->value32)
             return true;
         ++p;
     }
+    return false;
+}
+
+bool unknown(QMimeMagicRulePrivate *, const QByteArray &)
+{
     return false;
 }
 
@@ -155,7 +163,7 @@ QMimeMagicRule::QMimeMagicRule(Type type, const QString &string, int startPos, i
         m_d->comparator = match32;
         break;
     default:
-        ;
+        m_d->comparator = unknown;
     }
 }
 
@@ -200,6 +208,7 @@ QString QMimeMagicRule::matchType() const
     case Little32: return kLittle32;
     case Host16: return kHost16;
     case Host32: return kHost32;
+    default: ;
     }
     return "";
 }

@@ -120,8 +120,6 @@ private:
     QMutex m_mutex;
 };
 
-//namespace Internal {
-
 class BaseMimeTypeParser {
     Q_DISABLE_COPY(BaseMimeTypeParser)
 public:
@@ -160,7 +158,5 @@ private:
 
     QMimeDatabasePrivate &m_db;
 };
-
-//} // namespace Internal
 
 #endif // QMIMEDATABASE_P_H

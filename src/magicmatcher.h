@@ -28,6 +28,8 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 
+#include "qmimemagicrule.h"
+
 QT_BEGIN_NAMESPACE
 
 class QMIME_EXPORT IMagicMatcher
@@ -46,103 +48,15 @@ public:
     virtual ~IMagicMatcher() {}
 };
 
-class QMIME_EXPORT MagicRule
-{
-    Q_DISABLE_COPY(MagicRule)
-public:
-    MagicRule(int startPos, int endPos);
-    virtual ~MagicRule();
-
-    virtual QString matchType() const = 0;
-    virtual QString matchValue() const = 0;
-    virtual bool matches(const QByteArray &data) const = 0;
-
-    int startPos() const;
-    int endPos() const;
-
-    static QString toOffset(const QPair<int, int> &startEnd);
-    static QPair<int, int> fromOffset(const QString &offset);
-
-private:
-    static const QChar kColon;
-
-    const int m_startPos;
-    const int m_endPos;
-};
-
-class QMIME_EXPORT MagicStringRule : public MagicRule
-{
-public:
-    MagicStringRule(const QString &s, int startPos, int endPos);
-    virtual ~MagicStringRule();
-
-    virtual QString matchType() const;
-    virtual QString matchValue() const;
-    virtual bool matches(const QByteArray &data) const;
-
-    static const QString kMatchType;
-
-private:
-    const QByteArray m_pattern;
-};
-
-class QMIME_EXPORT MagicByteRule : public MagicRule
-{
-public:
-    MagicByteRule(const QString &s, int startPos, int endPos);
-    virtual ~MagicByteRule();
-
-    virtual QString matchType() const;
-    virtual QString matchValue() const;
-    virtual bool matches(const QByteArray &data) const;
-
-    static bool validateByteSequence(const QString &sequence, QList<int> *bytes = 0);
-
-    static const QString kMatchType;
-
-private:
-    int m_bytesSize;
-    QList<int> m_bytes;
-};
-
-class QMIME_EXPORT MagicNumberRule : public MagicRule
-{
-public:
-    enum Size { Size16 = 16, Size32 = 32 };
-    enum Endianness { LittleEndian = 1, BigEndian = 2, Host = 3 };
-
-    MagicNumberRule(const QString &s, int startPos, int endPos,
-                    Size size/* = Size16*/, Endianness endianness/* = LittleEndian*/);
-    virtual ~MagicNumberRule();
-
-    virtual QString matchType() const;
-    virtual QString matchValue() const;
-    virtual bool matches(const QByteArray &data) const;
-
-    static const QString kMatchType;
-
-private:
-    QString m_stringValue;
-    Size m_size;
-    Endianness m_endiannes;
-    union {
-        quint16 m_value16;
-        quint32 m_value32;
-    };
-};
-
 class QMIME_EXPORT MagicRuleMatcher : public IMagicMatcher
 {
     Q_DISABLE_COPY(MagicRuleMatcher)
 public:
-    typedef QSharedPointer<MagicRule> MagicRuleSharedPointer;
-    typedef QList<MagicRuleSharedPointer> MagicRuleList;
-
     MagicRuleMatcher();
 
-    void add(const MagicRuleSharedPointer &rule);
-    void add(const MagicRuleList &ruleList);
-    MagicRuleList magicRules() const;
+    void add(const QMimeMagicRule &rule);
+    void add(const QList<QMimeMagicRule> &ruleList);
+    QMimeMagicRuleList magicRules() const;
 
     virtual bool matches(const QByteArray &data) const;
 
@@ -150,10 +64,10 @@ public:
     void setPriority(int p);
 
     // Create a list of MagicRuleMatchers from a hash of rules indexed by priorities.
-    static IMagicMatcher::IMagicMatcherList createMatchers(const QHash<int, MagicRuleList> &);
+    static IMagicMatcher::IMagicMatcherList createMatchers(const QHash<int, QList<QMimeMagicRule> > &);
 
 private:
-    MagicRuleList m_list;
+    QMimeMagicRuleList m_list;
     int m_priority;
 };
 

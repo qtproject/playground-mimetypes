@@ -125,278 +125,6 @@ bool HeuristicTextMagicMatcher::matches(const QByteArray &data) const
     return rc;
 }
 
-//} // namespace Internal
-
-/*!
-    \class MagicRule
-    \brief Base class for standard Magic match rules based on contents
-    and offset specification.
-
-    Stores the offset and provides conversion helpers.
-    Base class for implementations for "string" and "byte".
-    (Others like little16, big16, etc. can be created whenever there is a need.)
-
-    \sa MimeType, MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
-    \sa BaseMimeTypeParser, MimeTypeParser
- */
-
-const QChar MagicRule::kColon(QLatin1Char(':'));
-
-MagicRule::MagicRule(int startPos, int endPos) : m_startPos(startPos), m_endPos(endPos)
-{
-}
-
-MagicRule::~MagicRule()
-{
-}
-
-int MagicRule::startPos() const
-{
-    return m_startPos;
-}
-
-int MagicRule::endPos() const
-{
-    return m_endPos;
-}
-
-QString MagicRule::toOffset(const QPair<int, int> &startEnd)
-{
-    return QString(QLatin1String("%1:%2")).arg(startEnd.first).arg(startEnd.second);
-}
-
-QPair<int, int> MagicRule::fromOffset(const QString &offset)
-{
-    const QStringList &startEnd = offset.split(kColon);
-    Q_ASSERT(startEnd.size() == 2);
-    return qMakePair(startEnd.at(0).toInt(), startEnd.at(1).toInt());
-}
-
-/*!
-    \class MagicStringRule
-    \brief Match on a string.
-
-    \sa MimeType, MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
-    \sa BaseMimeTypeParser, MimeTypeParser
- */
-
-const QString MagicStringRule::kMatchType("string");
-
-MagicStringRule::MagicStringRule(const QString &s, int startPos, int endPos) :
-    MagicRule(startPos, endPos), m_pattern(s.toUtf8())
-{
-}
-
-MagicStringRule::~MagicStringRule()
-{
-}
-
-QString MagicStringRule::matchType() const
-{
-    return kMatchType;
-}
-
-QString MagicStringRule::matchValue() const
-{
-    return m_pattern;
-}
-
-bool MagicStringRule::matches(const QByteArray &data) const
-{
-    // Quick check
-    if ((startPos() + m_pattern.size()) > data.size())
-        return false;
-    // Most common: some string at position 0:
-    if (startPos() == 0 && startPos() == endPos())
-        return data.startsWith(m_pattern);
-    // Range
-    if (data.size() <= startPos())
-        return false;
-
-    int end = endPos() - startPos() + m_pattern.size();
-    return QByteArray::fromRawData(data.data() + startPos(), qMin(end, data.size())).contains(m_pattern);
-}
-
-/*!
-    \class MagicByteRule
-    \brief Match on a sequence of binary data.
-
-    Format:
-    \code
-    \0x7f\0x45\0x4c\0x46
-    \endcode
-
-    \sa MimeType, MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
-    \sa BaseMimeTypeParser, MimeTypeParser
- */
-
-const QString MagicByteRule::kMatchType(QLatin1String("byte"));
-
-MagicByteRule::MagicByteRule(const QString &s, int startPos, int endPos) :
-    MagicRule(startPos, endPos), m_bytesSize(0)
-{
-    if (validateByteSequence(s, &m_bytes))
-        m_bytesSize = m_bytes.size();
-    else
-        m_bytes.clear();
-}
-
-MagicByteRule::~MagicByteRule()
-{
-}
-
-bool MagicByteRule::validateByteSequence(const QString &sequence, QList<int> *bytes)
-{
-    // Expect an hex format value like this: \0x7f\0x45\0x4c\0x46
-    const QStringList &byteSequence = sequence.split(QLatin1Char('\\'), QString::SkipEmptyParts);
-    foreach (const QString &byte, byteSequence) {
-        bool ok;
-        const int hex = byte.toInt(&ok, 16);
-        if (ok) {
-            if (bytes)
-                bytes->push_back(hex);
-        } else {
-            return false;
-        }
-    }
-    return true;
-}
-
-QString MagicByteRule::matchType() const
-{
-    return kMatchType;
-}
-
-QString MagicByteRule::matchValue() const
-{
-    QString value;
-    foreach (int byte, m_bytes)
-        value.append(QString(QLatin1String("\\0x%1")).arg(byte, 0, 16));
-    return value;
-}
-
-bool MagicByteRule::matches(const QByteArray &data) const
-{
-    if (m_bytesSize == 0)
-        return false;
-
-    const int dataSize = data.size();
-    for (int start = startPos(); start <= endPos(); ++start) {
-        if ((start + m_bytesSize) > dataSize)
-            return false;
-
-        int matchAt = 0;
-        while (matchAt < m_bytesSize) {
-            if (data.at(start + matchAt) != m_bytes.at(matchAt))
-                break;
-            ++matchAt;
-        }
-        if (matchAt == m_bytesSize)
-            return true;
-    }
-
-    return false;
-}
-
-MagicNumberRule::MagicNumberRule(const QString &s, int startPos, int endPos,
-                                 Size size, Endianness endianness) :
-    MagicRule(startPos, endPos),
-    m_stringValue(s),
-    m_size(size),
-    m_endiannes(endianness)
-{
-    bool ok = false;
-    uint value = s.toUInt(&ok, 0);
-
-    if (!ok)
-        qWarning() << QString("MagicNumberRule::MagicNumberRule: Can't convert %1 string to int").arg(s);
-
-    if (size == Size16) {
-
-        if (endianness == LittleEndian)
-            m_value16 = qFromLittleEndian<quint16>(value);
-        else if (endianness == BigEndian)
-            m_value16 = qFromBigEndian<quint16>(value);
-        else
-            m_value16 = qFromBigEndian<quint16>(value); // reverse on little-endians
-
-    } else if (size == Size32) {
-
-        if (endianness == LittleEndian)
-             m_value32 = qFromLittleEndian<quint32>(value);
-        else if (endianness == BigEndian)
-            m_value32 = qFromBigEndian<quint32>(value);
-        else
-            m_value32 = qFromBigEndian<quint32>(value); // reverse on little-endians
-
-    }
-}
-
-MagicNumberRule::~MagicNumberRule()
-{
-}
-
-QString MagicNumberRule::matchType() const
-{
-    static const QString kBig16(QLatin1String("big16"));
-    static const QString kBig32(QLatin1String("big32"));
-    static const QString kLittle16(QLatin1String("little16"));
-    static const QString kLittle32(QLatin1String("little32"));
-    static const QString kHost16(QLatin1String("host16"));
-    static const QString kHost32(QLatin1String("host32"));
-
-    if (m_size == Size16) {
-        if (m_endiannes == BigEndian)
-            return kBig16;
-        else if (m_endiannes == LittleEndian)
-            return kLittle16;
-        else
-            return kHost16;
-    } else {
-        if (m_endiannes == BigEndian)
-            return kBig32;
-        else if (m_endiannes == LittleEndian)
-            return kLittle32;
-        else
-            return kHost32;
-    }
-}
-
-QString MagicNumberRule::matchValue() const
-{
-    return m_stringValue;
-}
-
-bool MagicNumberRule::matches(const QByteArray &data) const
-{
-    if (m_size == Size16) {
-
-        const char *p = data.constData() + startPos();
-        const char *e = data.constData() + qMin(data.size() - 2, endPos());
-        while (p <= e) {
-            if (*reinterpret_cast<const quint16*>(p) == m_value16)
-                return true;
-            ++p;
-        }
-
-    } else if (m_size == Size32) {
-
-        const char *p = data.constData() + startPos();
-        const char *e = data.constData() + qMin(data.size() - 4, endPos());
-        while (p <= e) {
-            if (*reinterpret_cast<const quint32*>(p) == m_value32)
-                return true;
-            ++p;
-        }
-
-    }
-
-    return false;
-}
-
 /*!
     \class MagicRuleMatcher
 
@@ -414,26 +142,25 @@ MagicRuleMatcher::MagicRuleMatcher() :
 {
 }
 
-void MagicRuleMatcher::add(const MagicRuleSharedPointer &rule)
+void MagicRuleMatcher::add(const QMimeMagicRule &rule)
 {
     m_list.append(rule);
 }
 
-void MagicRuleMatcher::add(const MagicRuleList &ruleList)
+void MagicRuleMatcher::add(const QList<QMimeMagicRule> &ruleList)
 {
     m_list.append(ruleList);
 }
 
-MagicRuleMatcher::MagicRuleList MagicRuleMatcher::magicRules() const
+QList<QMimeMagicRule> MagicRuleMatcher::magicRules() const
 {
     return m_list;
 }
 
 bool MagicRuleMatcher::matches(const QByteArray &data) const
 {
-    const MagicRuleList::const_iterator cend = m_list.constEnd();
-    for (MagicRuleList::const_iterator it = m_list.constBegin(); it != cend; ++it)
-        if ( (*it)->matches(data))
+    for (int i = 0; i < m_list.size(); i++)
+        if ( m_list.at(i).matches(data))
             return true;
     return false;
 }
@@ -449,10 +176,10 @@ void MagicRuleMatcher::setPriority(int p)
 }
 
 IMagicMatcher::IMagicMatcherList MagicRuleMatcher::createMatchers(
-    const QHash<int, MagicRuleList> &rulesByPriority)
+    const QHash<int, QList<QMimeMagicRule> > &rulesByPriority)
 {
     IMagicMatcher::IMagicMatcherList matchers;
-    QHash<int, MagicRuleList>::const_iterator ruleIt = rulesByPriority.begin();
+    QHash<int, QMimeMagicRuleList>::const_iterator ruleIt = rulesByPriority.begin();
     for (; ruleIt != rulesByPriority.end(); ++ruleIt) {
         MagicRuleMatcher *magicRuleMatcher = new MagicRuleMatcher();
         magicRuleMatcher->setPriority(ruleIt.key());
