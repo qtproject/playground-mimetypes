@@ -22,91 +22,74 @@ struct QMimeMagicRulePrivate
     quint16 value16; // *16
     quint32 value32; // *32
 
-    typedef bool (*MatchFunction)(QMimeMagicRulePrivate* m_d, const QByteArray &data);
+    typedef bool (*MatchFunction)(QMimeMagicRulePrivate* d, const QByteArray &data);
 
     MatchFunction matchFunction;
 };
 
-static bool matchStringOrBytes(QMimeMagicRulePrivate* m_d, const QByteArray& data)
+static bool matchBytes(QMimeMagicRulePrivate* d, const QByteArray& data)
 {
     // Quick check
-    if ((m_d->startPos + m_d->pattern.size()) > data.size())
+    if ((d->startPos + d->pattern.size()) > data.size())
         return false;
     // Most common: some string at position 0:
-    if (m_d->startPos == 0 && m_d->startPos == m_d->endPos)
-        return data.startsWith(m_d->pattern);
+    if (d->startPos == 0 && d->startPos == d->endPos)
+        return data.startsWith(d->pattern);
     // Range
-    if (data.size() <= m_d->startPos)
+    if (data.size() <= d->startPos)
         return false;
 
-    int end = m_d->endPos - m_d->startPos + m_d->pattern.size();
-    return QByteArray::fromRawData(data.constData() + m_d->startPos,
-                                   qMin(end, data.size())).contains(m_d->pattern);
+    int end = d->endPos - d->startPos + d->pattern.size();
+    return QByteArray::fromRawData(data.constData() + d->startPos,
+                                   qMin(end, data.size())).contains(d->pattern);
 }
 
-static bool match16(QMimeMagicRulePrivate *m_d, const QByteArray &data)
+static bool match16(QMimeMagicRulePrivate *d, const QByteArray &data)
 {
-    const char *p = data.constData() + m_d->startPos;
-    const char *e = data.constData() + qMin(data.size() - 2, m_d->endPos + 1);
+    const char *p = data.constData() + d->startPos;
+    const char *e = data.constData() + qMin(data.size() - 2, d->endPos + 1);
     while (p < e) {
-        if (*reinterpret_cast<const quint16*>(p) == m_d->value16)
+        if (*reinterpret_cast<const quint16*>(p) == d->value16)
             return true;
         ++p;
     }
     return false;
 }
 
-static bool match32(QMimeMagicRulePrivate *m_d, const QByteArray &data)
+static bool match32(QMimeMagicRulePrivate *d, const QByteArray &data)
 {
-    const char *p = data.constData() + m_d->startPos;
-    const char *e = data.constData() + qMin(data.size() - 4, m_d->endPos + 1);
+    const char *p = data.constData() + d->startPos;
+    const char *e = data.constData() + qMin(data.size() - 4, d->endPos + 1);
     while (p < e) {
-        if (*reinterpret_cast<const quint32*>(p) == m_d->value32)
+        if (*reinterpret_cast<const quint32*>(p) == d->value32)
             return true;
         ++p;
     }
     return false;
 }
 
-static bool unknown(QMimeMagicRulePrivate *, const QByteArray &)
+static bool matchInvalid(QMimeMagicRulePrivate *, const QByteArray &)
 {
     return false;
 }
 
-bool validateByteSequence(const QString &sequence, QList<int> *bytes)
+QByteArray bytesFromSequence(const QString &sequence)
 {
-    // Expect an hex format value like this: \0x7f\0x45\0x4c\0x46
-    const QStringList &byteSequence = sequence.split(QLatin1Char('\\'), QString::SkipEmptyParts);
-    foreach (const QString &byte, byteSequence) {
-        bool ok;
-        const int hex = byte.toInt(&ok, 16);
-        if (ok) {
-            if (bytes)
-                bytes->push_back(hex);
-        } else {
-            return false;
-        }
-    }
-    return true;
-}
-
-QByteArray getBytesFromSequence(const QString &sequence)
-{
-    if (!sequence.contains(QLatin1Char('\\')))
-        return QByteArray(1, (char)sequence.toInt());
-
     QByteArray result;
 
-    // Expect an hex format value like this: \0x7f\0x45\0x4c\0x46
-    const QStringList &byteSequence = sequence.split(QLatin1Char('\\'), QString::SkipEmptyParts);
-    foreach (const QString &byte, byteSequence) {
-        bool ok;
-        const int hex = byte.toInt(&ok, 16);
-        if (ok) {
-            result.push_back(hex);
-        } else {
+    bool ok;
+    if (!sequence.startsWith(QLatin1Char('\\'))) {
+        char c = sequence.toInt(&ok);
+        if (ok)
+            result += c;
+        return result;
+    }
+
+    // Expect hex format value like this: \0x7f\0x45\0x4c\0x46
+    foreach (const QString &byte, sequence.split(QLatin1Char('\\'))) {
+        result += char(byte.toInt(&ok, 16));
+        if (!ok)
             return QByteArray();
-        }
     }
 
     return result;
@@ -123,7 +106,7 @@ QMimeMagicRule::QMimeMagicRule(Type type, const QString &string, int startPos, i
     uint value = 0;
     if (type >= Big16 && type <= Host32) {
         bool ok;
-        value = string.toUInt(&ok, 0);
+        value = string.toUInt(&ok, 0); // autodetect
 
         if (!ok)
             qWarning() << QString("QMimeMagicRule::QMimeMagicRule: Can't convert %1 string to int").
@@ -133,14 +116,17 @@ QMimeMagicRule::QMimeMagicRule(Type type, const QString &string, int startPos, i
     switch (type) {
     case String:
         d->pattern = string.toUtf8();
-        d->matchFunction = matchStringOrBytes;
+        d->matchFunction = matchBytes;
         break;
     case Byte:
-        d->pattern = getBytesFromSequence(string);
+        d->pattern = bytesFromSequence(string);
         if (!d->pattern.isEmpty())
-            d->matchFunction = matchStringOrBytes;
-        else
-            d->matchFunction = unknown;
+            d->matchFunction = matchBytes;
+        else {
+            qWarning() << QString("QMimeMagicRule::QMimeMagicRule: Wrong byte sequence %1").
+                          arg(string);
+            d->matchFunction = matchInvalid;
+        }
         break;
     case Big16:
     case Host16: // reverse on little-endians
@@ -161,7 +147,7 @@ QMimeMagicRule::QMimeMagicRule(Type type, const QString &string, int startPos, i
         d->matchFunction = match32;
         break;
     default:
-        d->matchFunction = unknown;
+        d->matchFunction = matchInvalid;
     }
 }
 
