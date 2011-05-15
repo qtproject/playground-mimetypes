@@ -1,13 +1,15 @@
 #ifndef QMIMEMAGICRULE_H
 #define QMIMEMAGICRULE_H
 
-#include "qglobal.h"
+#include "qmime_global.h"
+
+#include <qglobal.h>
 #include <QPair>
 
 QT_BEGIN_NAMESPACE
 
 class QMimeMagicRulePrivate;
-class QMimeMagicRule
+class QMIME_EXPORT QMimeMagicRule
 {
 public:
     enum Type {String, Byte, Big16, Big32, Little16, Little32, Host16, Host32};
