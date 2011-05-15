@@ -147,12 +147,12 @@ void MagicRuleMatcher::add(const QMimeMagicRule &rule)
     m_list.append(rule);
 }
 
-void MagicRuleMatcher::add(const QList<QMimeMagicRule> &ruleList)
+void MagicRuleMatcher::add(const QMimeMagicRuleList &ruleList)
 {
     m_list.append(ruleList);
 }
 
-QList<QMimeMagicRule> MagicRuleMatcher::magicRules() const
+QMimeMagicRuleList MagicRuleMatcher::magicRules() const
 {
     return m_list;
 }
@@ -176,7 +176,7 @@ void MagicRuleMatcher::setPriority(int p)
 }
 
 IMagicMatcher::IMagicMatcherList MagicRuleMatcher::createMatchers(
-    const QHash<int, QList<QMimeMagicRule> > &rulesByPriority)
+    const QHash<int, QMimeMagicRuleList > &rulesByPriority)
 {
     IMagicMatcher::IMagicMatcherList matchers;
     QHash<int, QMimeMagicRuleList>::const_iterator ruleIt = rulesByPriority.begin();

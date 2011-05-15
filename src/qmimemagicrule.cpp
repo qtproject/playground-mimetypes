@@ -8,7 +8,7 @@
 
 QT_BEGIN_NAMESPACE
 
-typedef bool (*Comparator)(QMimeMagicRulePrivate* m_d, const QByteArray &data);
+typedef bool (*MatchFunction)(QMimeMagicRulePrivate* m_d, const QByteArray &data);
 
 class QMimeMagicRulePrivate
 {
@@ -23,7 +23,7 @@ public:
     quint16 value16; // *16
     quint32 value32; // *32
 
-    Comparator comparator;
+    MatchFunction matchFunction;
 };
 
 bool matchString(QMimeMagicRulePrivate* m_d, const QByteArray& data)
@@ -137,33 +137,33 @@ QMimeMagicRule::QMimeMagicRule(Type type, const QString &string, int startPos, i
     switch (type) {
     case String:
         m_d->pattern = string.toUtf8();
-        m_d->comparator = matchString;
+        m_d->matchFunction = matchString;
         break;
     case Byte:
         if (!validateByteSequence(string, &m_d->bytes))
             m_d->bytes.clear();
-        m_d->comparator = matchBytes;
+        m_d->matchFunction = matchBytes;
         break;
     case Big16:
     case Host16: // reverse on little-endians
         m_d->value16 = qFromBigEndian<quint16>(value);
-        m_d->comparator = match16;
+        m_d->matchFunction = match16;
         break;
     case Little16:
         m_d->value16 = qFromLittleEndian<quint16>(value);
-        m_d->comparator = match16;
+        m_d->matchFunction = match16;
         break;
     case Big32:
     case Host32: // reverse on little-endians
         m_d->value32 = qFromBigEndian<quint32>(value);
-        m_d->comparator = match32;
+        m_d->matchFunction = match32;
         break;
     case Little32:
         m_d->value32 = qFromLittleEndian<quint32>(value);
-        m_d->comparator = match32;
+        m_d->matchFunction = match32;
         break;
     default:
-        m_d->comparator = unknown;
+        m_d->matchFunction = unknown;
     }
 }
 
@@ -230,7 +230,7 @@ int QMimeMagicRule::endPos() const
 
 bool QMimeMagicRule::matches(const QByteArray &data) const
 {
-    return m_d->comparator(m_d, data);
+    return m_d->matchFunction(m_d, data);
 }
 
 QString QMimeMagicRule::toOffset(const QPair<int, int> &startEnd)

@@ -55,7 +55,7 @@ public:
     MagicRuleMatcher();
 
     void add(const QMimeMagicRule &rule);
-    void add(const QList<QMimeMagicRule> &ruleList);
+    void add(const QMimeMagicRuleList &ruleList);
     QMimeMagicRuleList magicRules() const;
 
     virtual bool matches(const QByteArray &data) const;
