@@ -461,7 +461,7 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
                     const int priority = atts.value(priorityAttributeC).toString().toInt();
 
                     QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type.toLatin1());
-                    if (magicType != QMimeMagicRule::Unknown)
+                    if (magicType != QMimeMagicRule::Invalid)
                         rules[priority].append(QMimeMagicRule(magicType, value, range.first, range.second));
                 }
                 break;

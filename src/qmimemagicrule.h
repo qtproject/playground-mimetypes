@@ -12,7 +12,7 @@ class QMimeMagicRulePrivate;
 class QMIME_EXPORT QMimeMagicRule
 {
 public:
-    enum Type {Unknown = 0, String, Byte, Big16, Big32, Little16, Little32, Host16, Host32};
+    enum Type {Invalid = 0, String, Byte, Big16, Big32, Little16, Little32, Host16, Host32};
 
     QMimeMagicRule(Type type, const QString &matchValue, int startPos, int endPos);
     ~QMimeMagicRule();
@@ -34,7 +34,7 @@ public:
     static Type stringToType(const QByteArray &type);
 
 private:
-    QMimeMagicRulePrivate *m_d;
+    QMimeMagicRulePrivate *d;
 };
 
 typedef QList<QMimeMagicRule> QMimeMagicRuleList;

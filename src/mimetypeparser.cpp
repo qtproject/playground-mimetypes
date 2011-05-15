@@ -129,7 +129,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
 {
     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
     QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type.toLatin1());
-    if (magicType == QMimeMagicRule::Unknown) {
+    if (magicType == QMimeMagicRule::Invalid) {
         qWarning("%s: match type %s is not supported.", Q_FUNC_INFO, type.toUtf8().constData());
         return true;
     }

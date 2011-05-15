@@ -11,25 +11,23 @@ QT_BEGIN_NAMESPACE
 static const char *kStrings[] = { "unknown", "string", "byte", "big16", "big32",
                                    "little16", "little32", "host16", "host32"};
 
-typedef bool (*MatchFunction)(QMimeMagicRulePrivate* m_d, const QByteArray &data);
-
-class QMimeMagicRulePrivate
+struct QMimeMagicRulePrivate
 {
-public:
     QMimeMagicRule::Type type;
     QString value;
     int startPos;
     int endPos;
 
     QByteArray pattern; // String
-    QList<int> bytes; // Byte
     quint16 value16; // *16
     quint32 value32; // *32
+
+    typedef bool (*MatchFunction)(QMimeMagicRulePrivate* m_d, const QByteArray &data);
 
     MatchFunction matchFunction;
 };
 
-bool matchString(QMimeMagicRulePrivate* m_d, const QByteArray& data)
+static bool matchStringOrBytes(QMimeMagicRulePrivate* m_d, const QByteArray& data)
 {
     // Quick check
     if ((m_d->startPos + m_d->pattern.size()) > data.size())
@@ -46,31 +44,7 @@ bool matchString(QMimeMagicRulePrivate* m_d, const QByteArray& data)
                                    qMin(end, data.size())).contains(m_d->pattern);
 }
 
-bool matchBytes(QMimeMagicRulePrivate *m_d, const QByteArray &data)
-{
-    int bytesSize = m_d->bytes.size();
-    if (bytesSize == 0)
-        return false;
-
-    const int dataSize = data.size();
-    for (int start = m_d->startPos; start <= m_d->endPos; ++start) {
-        if ((start + bytesSize) > dataSize)
-            return false;
-
-        int matchAt = 0;
-        while (matchAt < bytesSize) {
-            if (data.at(start + matchAt) != m_d->bytes.at(matchAt))
-                break;
-            ++matchAt;
-        }
-        if (matchAt == bytesSize)
-            return true;
-    }
-
-    return false;
-}
-
-bool match16(QMimeMagicRulePrivate *m_d, const QByteArray &data)
+static bool match16(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 {
     const char *p = data.constData() + m_d->startPos;
     const char *e = data.constData() + qMin(data.size() - 2, m_d->endPos + 1);
@@ -82,7 +56,7 @@ bool match16(QMimeMagicRulePrivate *m_d, const QByteArray &data)
     return false;
 }
 
-bool match32(QMimeMagicRulePrivate *m_d, const QByteArray &data)
+static bool match32(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 {
     const char *p = data.constData() + m_d->startPos;
     const char *e = data.constData() + qMin(data.size() - 4, m_d->endPos + 1);
@@ -94,7 +68,7 @@ bool match32(QMimeMagicRulePrivate *m_d, const QByteArray &data)
     return false;
 }
 
-bool unknown(QMimeMagicRulePrivate *, const QByteArray &)
+static bool unknown(QMimeMagicRulePrivate *, const QByteArray &)
 {
     return false;
 }
@@ -116,13 +90,35 @@ bool validateByteSequence(const QString &sequence, QList<int> *bytes)
     return true;
 }
 
-QMimeMagicRule::QMimeMagicRule(Type type, const QString &string, int startPos, int endPos) :
-    m_d(new QMimeMagicRulePrivate)
+QByteArray getBytesFromSequence(const QString &sequence)
 {
-    m_d->type = type;
-    m_d->value = string;
-    m_d->startPos = startPos;
-    m_d->endPos = endPos;
+    if (!sequence.contains(QLatin1Char('\\')))
+        return QByteArray(1, (char)sequence.toInt());
+
+    QByteArray result;
+
+    // Expect an hex format value like this: \0x7f\0x45\0x4c\0x46
+    const QStringList &byteSequence = sequence.split(QLatin1Char('\\'), QString::SkipEmptyParts);
+    foreach (const QString &byte, byteSequence) {
+        bool ok;
+        const int hex = byte.toInt(&ok, 16);
+        if (ok) {
+            result.push_back(hex);
+        } else {
+            return QByteArray();
+        }
+    }
+
+    return result;
+}
+
+QMimeMagicRule::QMimeMagicRule(Type type, const QString &string, int startPos, int endPos) :
+    d(new QMimeMagicRulePrivate)
+{
+    d->type = type;
+    d->value = string;
+    d->startPos = startPos;
+    d->endPos = endPos;
 
     uint value = 0;
     if (type >= Big16 && type <= Host32) {
@@ -136,81 +132,83 @@ QMimeMagicRule::QMimeMagicRule(Type type, const QString &string, int startPos, i
 
     switch (type) {
     case String:
-        m_d->pattern = string.toUtf8();
-        m_d->matchFunction = matchString;
+        d->pattern = string.toUtf8();
+        d->matchFunction = matchStringOrBytes;
         break;
     case Byte:
-        if (!validateByteSequence(string, &m_d->bytes))
-            m_d->bytes.clear();
-        m_d->matchFunction = matchBytes;
+        d->pattern = getBytesFromSequence(string);
+        if (!d->pattern.isEmpty())
+            d->matchFunction = matchStringOrBytes;
+        else
+            d->matchFunction = unknown;
         break;
     case Big16:
     case Host16: // reverse on little-endians
-        m_d->value16 = qFromBigEndian<quint16>(value);
-        m_d->matchFunction = match16;
+        d->value16 = qFromBigEndian<quint16>(value);
+        d->matchFunction = match16;
         break;
     case Little16:
-        m_d->value16 = qFromLittleEndian<quint16>(value);
-        m_d->matchFunction = match16;
+        d->value16 = qFromLittleEndian<quint16>(value);
+        d->matchFunction = match16;
         break;
     case Big32:
     case Host32: // reverse on little-endians
-        m_d->value32 = qFromBigEndian<quint32>(value);
-        m_d->matchFunction = match32;
+        d->value32 = qFromBigEndian<quint32>(value);
+        d->matchFunction = match32;
         break;
     case Little32:
-        m_d->value32 = qFromLittleEndian<quint32>(value);
-        m_d->matchFunction = match32;
+        d->value32 = qFromLittleEndian<quint32>(value);
+        d->matchFunction = match32;
         break;
     default:
-        m_d->matchFunction = unknown;
+        d->matchFunction = unknown;
     }
 }
 
 QMimeMagicRule::~QMimeMagicRule()
 {
-    delete m_d;
+    delete d;
 }
 
 QMimeMagicRule::QMimeMagicRule(const QMimeMagicRule &other) :
-    m_d(new QMimeMagicRulePrivate(*other.m_d))
+    d(new QMimeMagicRulePrivate(*other.d))
 {
 }
 
 QMimeMagicRule& QMimeMagicRule::operator=(const QMimeMagicRule &other)
 {
-    *m_d = *other.m_d;
+    *d = *other.d;
     return *this;
 }
 
 QMimeMagicRule::Type QMimeMagicRule::type() const
 {
-    return m_d->type;
+    return d->type;
 }
 
 QString QMimeMagicRule::matchType() const
 {
-    return QLatin1String(kStrings[m_d->type]);
+    return QLatin1String(kStrings[d->type]);
 }
 
 QString QMimeMagicRule::matchValue() const
 {
-    return m_d->value;
+    return d->value;
 }
 
 int QMimeMagicRule::startPos() const
 {
-    return m_d->startPos;
+    return d->startPos;
 }
 
 int QMimeMagicRule::endPos() const
 {
-    return m_d->endPos;
+    return d->endPos;
 }
 
 bool QMimeMagicRule::matches(const QByteArray &data) const
 {
-    return m_d->matchFunction(m_d, data);
+    return d->matchFunction(d, data);
 }
 
 QString QMimeMagicRule::toOffset(const QPair<int, int> &startEnd)
@@ -227,11 +225,11 @@ QPair<int, int> QMimeMagicRule::fromOffset(const QString &offset)
 
 QMimeMagicRule::Type QMimeMagicRule::stringToType(const QByteArray &type)
 {
-    for (int i = QMimeMagicRule::Unknown; i != QMimeMagicRule::Host32; i++) {
+    for (int i = QMimeMagicRule::Invalid; i != QMimeMagicRule::Host32; i++) {
         if (type == kStrings[i])
             return (QMimeMagicRule::Type)i;
     }
-    return QMimeMagicRule::Unknown;
+    return QMimeMagicRule::Invalid;
 }
 
 QT_END_NAMESPACE
