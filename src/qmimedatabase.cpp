@@ -33,8 +33,6 @@
 #include <algorithm>
 #include <functional>
 
-//using namespace Internal;
-
 const QChar QMimeDatabasePrivate::kSemiColon(QLatin1Char(';'));
 const QString QMimeDatabasePrivate::kModifiedMimeTypesFile(QLatin1String("modifiedmimetypes.xml"));
 QString QMimeDatabasePrivate::kModifiedMimeTypesPath;

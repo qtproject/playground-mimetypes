@@ -44,8 +44,6 @@ static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
 
 typedef QSharedPointer<MagicRuleMatcher> MagicRuleMatcherPtr;
 
-//namespace Internal {
-
 /*!
     \class FileMatchContext
 

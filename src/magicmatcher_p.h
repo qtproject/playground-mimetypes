@@ -14,8 +14,6 @@ enum {
 
 typedef QSharedPointer<MagicRuleMatcher> MagicRuleMatcherPtr;
 
-//namespace Internal {
-
 class FileMatchContext {
     Q_DISABLE_COPY(FileMatchContext)
 public:
@@ -42,10 +40,6 @@ private:
     QByteArray m_data;
 };
 
-//} // namespace Internal
-
-//namespace Internal {
-
 class BinaryMatcher : public IMagicMatcher {
     Q_DISABLE_COPY(BinaryMatcher)
 public:
@@ -63,7 +57,5 @@ public:
 
     static bool isTextFile(const QByteArray &data);
 };
-
-//} // namespace Internal
 
 #endif // MAGICMATCHER_P_H

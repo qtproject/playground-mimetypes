@@ -26,8 +26,6 @@
 
 #include <QtCore/QDebug>
 
-//using namespace Internal;
-
 QT_BEGIN_NAMESPACE
 
 /*!
@@ -35,8 +33,8 @@ QT_BEGIN_NAMESPACE
     \brief Glob pattern for file names for mime type matching.
 
     \sa MimeType, MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule
-    \sa Internal::FileMatchContext, Internal::BinaryMatcher, Internal::HeuristicTextMagicMatcher
-    \sa Internal::BaseMimeTypeParser, Internal::MimeTypeParser
+    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
+    \sa BaseMimeTypeParser, MimeTypeParser
 */
 
 MimeGlobPattern::MimeGlobPattern(const QRegExp &regExp, unsigned weight) :
@@ -86,8 +84,8 @@ unsigned MimeGlobPattern::weight() const
     \endcode
 
     \sa MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa Internal::FileMatchContext, Internal::BinaryMatcher, Internal::HeuristicTextMagicMatcher
-    \sa Internal::BaseMimeTypeParser, Internal::MimeTypeParser
+    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
+    \sa BaseMimeTypeParser, MimeTypeParser
 */
 
 QMimeTypeData::QMimeTypeData()

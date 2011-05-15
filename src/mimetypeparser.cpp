@@ -39,10 +39,6 @@
     \sa MimeTypeParser
 */
 
-//using namespace Internal;
-
-//namespace Internal {
-
 void BaseMimeTypeParser::addGlobPattern(const QString &pattern, const QString &weight, QMimeTypeData *d) const
 {
     if (pattern.isEmpty())
@@ -261,5 +257,3 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
     }
     return true;
 }
-
-//} // namespace Internal
