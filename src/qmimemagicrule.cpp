@@ -180,7 +180,31 @@ QMimeMagicRule::Type QMimeMagicRule::type() const
     return m_d->type;
 }
 
-QString QMimeMagicRule::value() const
+QString QMimeMagicRule::matchType() const
+{
+    static const QString kString(QLatin1String("string"));
+    static const QString kByte(QLatin1String("byte"));
+    static const QString kBig16(QLatin1String("big16"));
+    static const QString kBig32(QLatin1String("big32"));
+    static const QString kLittle16(QLatin1String("little16"));
+    static const QString kLittle32(QLatin1String("little32"));
+    static const QString kHost16(QLatin1String("host16"));
+    static const QString kHost32(QLatin1String("host32"));
+
+    switch (m_d->type) {
+    case String: return kString;
+    case Byte: return kByte;
+    case Big16: return kBig16;
+    case Big32: return kBig32;
+    case Little16: return kLittle16;
+    case Little32: return kLittle32;
+    case Host16: return kHost16;
+    case Host32: return kHost32;
+    }
+    return "";
+}
+
+QString QMimeMagicRule::matchValue() const
 {
     return m_d->value;
 }

@@ -12,13 +12,14 @@ class QMimeMagicRule
 public:
     enum Type {String, Byte, Big16, Big32, Little16, Little32, Host16, Host32};
 
-    QMimeMagicRule(Type type, const QString &value, int startPos, int endPos);
+    QMimeMagicRule(Type type, const QString &matchValue, int startPos, int endPos);
     ~QMimeMagicRule();
     QMimeMagicRule(const QMimeMagicRule &other);
     QMimeMagicRule & operator=(const QMimeMagicRule &other);
 
     Type type() const;
-    QString value() const;
+    QString matchType() const;
+    QString matchValue() const;
 
     int startPos() const;
     int endPos() const;
