@@ -39,7 +39,7 @@ bool matchString(QMimeMagicRulePrivate* m_d, const QByteArray& data)
         return false;
 
     int end = m_d->endPos - m_d->startPos + m_d->pattern.size();
-    return QByteArray::fromRawData(data.data() + m_d->startPos,
+    return QByteArray::fromRawData(data.constData() + m_d->startPos,
                                    qMin(end, data.size())).contains(m_d->pattern);
 }
 
@@ -84,9 +84,6 @@ bool match32(QMimeMagicRulePrivate *m_d, const QByteArray &data)
     const char *p = data.constData() + m_d->startPos;
     const char *e = data.constData() + qMin(data.size() - 4, m_d->endPos);
     while (p <= e) {
-        qDebug() << QString::number(*reinterpret_cast<const quint32*>(p), 16)
-                 << QString::number(m_d->value32, 16);
-
         if (*reinterpret_cast<const quint32*>(p) == m_d->value32)
             return true;
         ++p;
