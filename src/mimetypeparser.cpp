@@ -128,7 +128,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
                               QString *errorMessage)
 {
     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
-    QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type);
+    QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type.toLatin1());
     if (magicType == QMimeMagicRule::Unknown) {
         qWarning("%s: match type %s is not supported.", Q_FUNC_INFO, type.toUtf8().constData());
         return true;

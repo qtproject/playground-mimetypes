@@ -8,14 +8,8 @@
 
 QT_BEGIN_NAMESPACE
 
-static const QString kString(QLatin1String("string"));
-static const QString kByte(QLatin1String("byte"));
-static const QString kBig16(QLatin1String("big16"));
-static const QString kBig32(QLatin1String("big32"));
-static const QString kLittle16(QLatin1String("little16"));
-static const QString kLittle32(QLatin1String("little32"));
-static const QString kHost16(QLatin1String("host16"));
-static const QString kHost32(QLatin1String("host32"));
+static const char *kStrings[] = { "unknown", "string", "byte", "big16", "big32",
+                                   "little16", "little32", "host16", "host32"};
 
 typedef bool (*MatchFunction)(QMimeMagicRulePrivate* m_d, const QByteArray &data);
 
@@ -79,8 +73,8 @@ bool matchBytes(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 bool match16(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 {
     const char *p = data.constData() + m_d->startPos;
-    const char *e = data.constData() + qMin(data.size() - 2, m_d->endPos);
-    while (p <= e) {
+    const char *e = data.constData() + qMin(data.size() - 2, m_d->endPos + 1);
+    while (p < e) {
         if (*reinterpret_cast<const quint16*>(p) == m_d->value16)
             return true;
         ++p;
@@ -91,8 +85,8 @@ bool match16(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 bool match32(QMimeMagicRulePrivate *m_d, const QByteArray &data)
 {
     const char *p = data.constData() + m_d->startPos;
-    const char *e = data.constData() + qMin(data.size() - 4, m_d->endPos);
-    while (p <= e) {
+    const char *e = data.constData() + qMin(data.size() - 4, m_d->endPos + 1);
+    while (p < e) {
         if (*reinterpret_cast<const quint32*>(p) == m_d->value32)
             return true;
         ++p;
@@ -196,19 +190,7 @@ QMimeMagicRule::Type QMimeMagicRule::type() const
 
 QString QMimeMagicRule::matchType() const
 {
-    // TODO: discuss this awful code (use map + mutex?)
-    switch (m_d->type) {
-    case String: return kString;
-    case Byte: return kByte;
-    case Big16: return kBig16;
-    case Big32: return kBig32;
-    case Little16: return kLittle16;
-    case Little32: return kLittle32;
-    case Host16: return kHost16;
-    case Host32: return kHost32;
-    default: ;
-    }
-    return "";
+    return QLatin1String(kStrings[m_d->type]);
 }
 
 QString QMimeMagicRule::matchValue() const
@@ -243,27 +225,13 @@ QPair<int, int> QMimeMagicRule::fromOffset(const QString &offset)
     return qMakePair(startEnd.at(0).toInt(), startEnd.at(1).toInt());
 }
 
-QMimeMagicRule::Type QMimeMagicRule::stringToType(const QString &type)
+QMimeMagicRule::Type QMimeMagicRule::stringToType(const QByteArray &type)
 {
-    // TODO: discuss this awful code (use map + mutex?)
-    if (type == kString)
-        return QMimeMagicRule::String;
-    else if (type == kByte)
-        return QMimeMagicRule::Byte;
-    else if (type == kBig16)
-        return QMimeMagicRule::Big16;
-    else if (type == kBig32)
-        return QMimeMagicRule::Big32;
-    else if (type == kLittle16)
-        return QMimeMagicRule::Little16;
-    else if (type == kLittle32)
-        return QMimeMagicRule::Little32;
-    else if (type == kHost16)
-        return QMimeMagicRule::Host16;
-    else if (type == kHost32)
-        return QMimeMagicRule::Host32;
-    else
-        return QMimeMagicRule::Unknown;
+    for (int i = QMimeMagicRule::Unknown; i != QMimeMagicRule::Host32; i++) {
+        if (type == kStrings[i])
+            return (QMimeMagicRule::Type)i;
+    }
+    return QMimeMagicRule::Unknown;
 }
 
 QT_END_NAMESPACE
