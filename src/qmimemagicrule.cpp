@@ -8,6 +8,15 @@
 
 QT_BEGIN_NAMESPACE
 
+static const QString kString(QLatin1String("string"));
+static const QString kByte(QLatin1String("byte"));
+static const QString kBig16(QLatin1String("big16"));
+static const QString kBig32(QLatin1String("big32"));
+static const QString kLittle16(QLatin1String("little16"));
+static const QString kLittle32(QLatin1String("little32"));
+static const QString kHost16(QLatin1String("host16"));
+static const QString kHost32(QLatin1String("host32"));
+
 typedef bool (*MatchFunction)(QMimeMagicRulePrivate* m_d, const QByteArray &data);
 
 class QMimeMagicRulePrivate
@@ -187,15 +196,7 @@ QMimeMagicRule::Type QMimeMagicRule::type() const
 
 QString QMimeMagicRule::matchType() const
 {
-    static const QString kString(QLatin1String("string"));
-    static const QString kByte(QLatin1String("byte"));
-    static const QString kBig16(QLatin1String("big16"));
-    static const QString kBig32(QLatin1String("big32"));
-    static const QString kLittle16(QLatin1String("little16"));
-    static const QString kLittle32(QLatin1String("little32"));
-    static const QString kHost16(QLatin1String("host16"));
-    static const QString kHost32(QLatin1String("host32"));
-
+    // TODO: discuss this awful code (use map + mutex?)
     switch (m_d->type) {
     case String: return kString;
     case Byte: return kByte;
@@ -237,10 +238,32 @@ QString QMimeMagicRule::toOffset(const QPair<int, int> &startEnd)
 
 QPair<int, int> QMimeMagicRule::fromOffset(const QString &offset)
 {
-    static const QChar kColon(QLatin1Char(':'));
-    const QStringList &startEnd = offset.split(kColon);
+    const QStringList &startEnd = offset.split(QChar(QLatin1Char(':')));
     Q_ASSERT(startEnd.size() == 2);
     return qMakePair(startEnd.at(0).toInt(), startEnd.at(1).toInt());
+}
+
+QMimeMagicRule::Type QMimeMagicRule::stringToType(const QString &type)
+{
+    // TODO: discuss this awful code (use map + mutex?)
+    if (type == kString)
+        return QMimeMagicRule::String;
+    else if (type == kByte)
+        return QMimeMagicRule::Byte;
+    else if (type == kBig16)
+        return QMimeMagicRule::Big16;
+    else if (type == kBig32)
+        return QMimeMagicRule::Big32;
+    else if (type == kLittle16)
+        return QMimeMagicRule::Little16;
+    else if (type == kLittle32)
+        return QMimeMagicRule::Little32;
+    else if (type == kHost16)
+        return QMimeMagicRule::Host16;
+    else if (type == kHost32)
+        return QMimeMagicRule::Host32;
+    else
+        return QMimeMagicRule::Unknown;
 }
 
 QT_END_NAMESPACE

@@ -120,28 +120,6 @@ static bool parseNumber(const QString &n, int *target, QString *errorMessage)
     return true;
 }
 
-QMimeMagicRule::Type magicTypeForString(const QString &type)
-{
-    if (type == QLatin1String(matchStringTypeValueC))
-        return QMimeMagicRule::String;
-    else if (type == QLatin1String(matchBig16TypeValueC))
-        return QMimeMagicRule::Big16;
-    else if (type == QLatin1String(matchBig32TypeValueC))
-        return QMimeMagicRule::Big32;
-    else if (type == QLatin1String(matchLittle16TypeValueC))
-        return QMimeMagicRule::Little16;
-    else if (type == QLatin1String(matchLittle32TypeValueC))
-        return QMimeMagicRule::Little32;
-    else if (type == QLatin1String(matchHost16TypeValueC))
-        return QMimeMagicRule::Host16;
-    else if (type == QLatin1String(matchHost32TypeValueC))
-        return QMimeMagicRule::Host32;
-    else if (type == QLatin1String(matchByteTypeValueC))
-        return QMimeMagicRule::Byte;
-
-    return QMimeMagicRule::Unknown;
-}
-
 // Evaluate a magic match rule like
 //  <match value="must be converted with BinHex" type="string" offset="11"/>
 //  <match value="0x9501" type="big16" offset="0:64"/>
@@ -150,7 +128,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
                               QString *errorMessage)
 {
     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
-    QMimeMagicRule::Type magicType = magicTypeForString(type);
+    QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type);
     if (magicType == QMimeMagicRule::Unknown) {
         qWarning("%s: match type %s is not supported.", Q_FUNC_INFO, type.toUtf8().constData());
         return true;

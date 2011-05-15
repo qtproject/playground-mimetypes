@@ -31,6 +31,8 @@ public:
     static QString toOffset(const QPair<int, int> &startEnd);
     static QPair<int, int> fromOffset(const QString &offset);
 
+    static Type stringToType(const QString &type);
+
 private:
     QMimeMagicRulePrivate *m_d;
 };

@@ -23,14 +23,6 @@ const char * const priorityAttributeC = "priority";
 const char * const matchTagC = "match";
 const char * const matchValueAttributeC = "value";
 const char * const matchTypeAttributeC = "type";
-const char * const matchStringTypeValueC = "string";
-const char * const matchByteTypeValueC = "byte";
-const char * const matchBig16TypeValueC = "big16";
-const char * const matchBig32TypeValueC = "big32";
-const char * const matchLittle16TypeValueC = "little16";
-const char * const matchLittle32TypeValueC = "little32";
-const char * const matchHost16TypeValueC = "host16";
-const char * const matchHost32TypeValueC = "host32";
 const char * const matchOffsetAttributeC = "offset";
 
 // Types

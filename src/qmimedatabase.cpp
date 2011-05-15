@@ -460,14 +460,9 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
                     QPair<int, int> range = QMimeMagicRule::fromOffset(offset);
                     const int priority = atts.value(priorityAttributeC).toString().toInt();
 
-//                    MagicRule *magicRule;
-                    QMimeMagicRule::Type magicType;
-#warning TODO: implement
-                    if (type == "string")
-                        magicType = QMimeMagicRule::String;
-                    else
-                        magicType = QMimeMagicRule::Byte;
-                    rules[priority].append(QMimeMagicRule(magicType, value, range.first, range.second));
+                    QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type);
+                    if (magicType != QMimeMagicRule::Unknown)
+                        rules[priority].append(QMimeMagicRule(magicType, value, range.first, range.second));
                 }
                 break;
             case QXmlStreamReader::EndElement:
