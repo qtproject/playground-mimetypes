@@ -59,6 +59,10 @@ public:
 
     QMimeType();
     explicit QMimeType(const QString &type);
+    QMimeType(const QString &type,
+              const IMagicMatcherList &matchers,
+              const QList<QMimeGlobPattern> &globPatterns = QList<QMimeGlobPattern>(),
+              const QStringList &subClassOf = QStringList());
     QMimeType(const QMimeType&);
     QMimeType &operator=(const QMimeType&);
     ~QMimeType();
