@@ -79,7 +79,7 @@ QByteArray bytesFromSequence(const QString &sequence)
 
     bool ok;
     if (!sequence.startsWith(QLatin1Char('\\'))) {
-        char c = sequence.toInt(&ok);
+        char c = sequence.toInt(&ok, 0); // autodetect
         if (ok)
             result += c;
         return result;
