@@ -29,10 +29,10 @@
 QT_BEGIN_NAMESPACE
 
 /*!
-    \class GlobPattern
+    \class QMimeGlobPattern
     \brief Glob pattern for file names for mime type matching.
 
-    \sa MimeType, MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule
+    \sa QMimeType, QMimeDatabase, IMagicMatcher, MagicRuleMatcher, QMimeMagicRule
     \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
@@ -55,38 +55,6 @@ unsigned QMimeGlobPattern::weight() const
 {
     return m_weight;
 }
-
-/*!
-    \class MimeType
-
-    \brief Mime type data used in Qt Creator.
-
-    Contains most information from standard mime type XML database files.
-
-    Currently, magic of types "string", "bytes" is supported. In addition,
-    C++ classes, derived from IMagicMatcher can be added to check
-    on contents.
-
-    In addition, the class provides a list of suffixes and a concept of the
-    'preferred suffix' (derived from glob patterns). This is used for example
-    to be able to configure the suffix used for C++-files in Qt Creator.
-
-    Mime XML looks like:
-    \code
-    <?xml version="1.0" encoding="UTF-8"?>
-    <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-    <!-- Mime types must match the desktop file associations -->
-      <mime-type type="application/vnd.nokia.qt.qmakeprofile">
-        <comment xml:lang="en">Qt qmake Profile</comment>
-        <glob pattern="*.pro" weight="50"/>
-      </mime-type>
-    </mime-info>
-    \endcode
-
-    \sa MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
-    \sa BaseMimeTypeParser, MimeTypeParser
-*/
 
 QMimeTypeData::QMimeTypeData()
     // RE to match a suffix glob pattern: "*.ext" (and not sth like "Makefile" or
@@ -149,7 +117,80 @@ void QMimeTypeData::debug(QTextStream &str, int indent) const
     str << '\n';
 }
 
-// ---------------- MimeType
+unsigned QMimeTypeData::matchesFileBySuffix(FileMatchContext &c) const
+{
+    // check globs
+    foreach (const QMimeGlobPattern &gp, /*m_d->*/globPatterns) {
+        if (gp.regExp().exactMatch(c.fileName()))
+            return gp.weight();
+    }
+    return 0;
+}
+
+unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
+{
+    // check globs
+    foreach (const QMimeGlobPattern &gp, globPatterns) {
+        if (gp.regExp().exactMatch(name))
+            return gp.weight();
+    }
+    return 0;
+}
+
+unsigned QMimeTypeData::matchesFileByContent(FileMatchContext &c) const
+{
+    // Nope, try magic matchers on context data
+    if (/*m_d->*/magicMatchers.isEmpty())
+        return 0;
+
+    return matchesData(c.data());
+}
+
+unsigned QMimeTypeData::matchesData(const QByteArray &data) const
+{
+    unsigned priority = 0;
+    if (!data.isEmpty()) {
+        foreach (const IMagicMatcher::IMagicMatcherSharedPointer &matcher, /*m_d->*/magicMatchers) {
+            const unsigned magicPriority = matcher->priority();
+            if (magicPriority > priority && matcher->matches(data))
+                priority = magicPriority;
+        }
+    }
+    return priority;
+}
+
+/*!
+    \class MimeType
+
+    \brief Mime type data used in Qt Creator.
+
+    Contains most information from standard mime type XML database files.
+
+    Currently, all magic types are supported. In addition,
+    C++ classes, derived from IMagicMatcher can be added to check
+    on contents.
+
+    In addition, the class provides a list of suffixes and a concept of the
+    'preferred suffix' (derived from glob patterns). This is used for example
+    to be able to configure the suffix used for C++-files in Qt Creator.
+
+    Mime XML looks like:
+    \code
+    <?xml version="1.0" encoding="UTF-8"?>
+    <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <!-- Mime types must match the desktop file associations -->
+      <mime-type type="application/vnd.nokia.qt.qmakeprofile">
+        <comment xml:lang="en">Qt qmake Profile</comment>
+        <glob pattern="*.pro" weight="50"/>
+      </mime-type>
+    </mime-info>
+    \endcode
+
+    \sa QMimeDatabase, IMagicMatcher, MagicRuleMatcher, QMimeMagicRule, QMimeGlobPattern
+    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
+    \sa BaseMimeTypeParser, MimeTypeParser
+*/
+
 QMimeType::QMimeType() :
     m_d(new QMimeTypeData)
 {
@@ -337,48 +378,6 @@ unsigned QMimeType::matchesFile(const QFileInfo &file) const
     if (suffixPriority >= QMimeGlobPattern::MaxWeight)
         return suffixPriority;
     return qMax(suffixPriority, m_d->matchesFileByContent(context));
-}
-
-unsigned QMimeTypeData::matchesFileBySuffix(FileMatchContext &c) const
-{
-    // check globs
-    foreach (const QMimeGlobPattern &gp, /*m_d->*/globPatterns) {
-        if (gp.regExp().exactMatch(c.fileName()))
-            return gp.weight();
-    }
-    return 0;
-}
-
-unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
-{
-    // check globs
-    foreach (const QMimeGlobPattern &gp, globPatterns) {
-        if (gp.regExp().exactMatch(name))
-            return gp.weight();
-    }
-    return 0;
-}
-
-unsigned QMimeTypeData::matchesFileByContent(FileMatchContext &c) const
-{
-    // Nope, try magic matchers on context data
-    if (/*m_d->*/magicMatchers.isEmpty())
-        return 0;
-
-    return matchesData(c.data());
-}
-
-unsigned QMimeTypeData::matchesData(const QByteArray &data) const
-{
-    unsigned priority = 0;
-    if (!data.isEmpty()) {
-        foreach (const IMagicMatcher::IMagicMatcherSharedPointer &matcher, /*m_d->*/magicMatchers) {
-            const unsigned magicPriority = matcher->priority();
-            if (magicPriority > priority && matcher->matches(data))
-                priority = magicPriority;
-        }
-    }
-    return priority;
 }
 
 QStringList QMimeType::suffixes() const
