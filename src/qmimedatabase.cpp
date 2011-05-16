@@ -237,7 +237,7 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name) const
                 if (suffixPriority && suffixPriority > priority) {
                     priority = suffixPriority;
                     candidate = it.value().type;
-                    if (suffixPriority >= MimeGlobPattern::MaxWeight)
+                    if (suffixPriority >= QMimeGlobPattern::MaxWeight)
                         return candidate;
                 }
             }
@@ -273,7 +273,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
                 if (suffixPriority && suffixPriority > *priorityPtr) {
                     *priorityPtr = suffixPriority;
                     candidate = it.value().type;
-                    if (suffixPriority >= MimeGlobPattern::MaxWeight)
+                    if (suffixPriority >= QMimeGlobPattern::MaxWeight)
                         return candidate;
                 }
             }
@@ -366,9 +366,9 @@ QStringList QMimeDatabasePrivate::filterStrings() const
     return rc;
 }
 
-QList<MimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
+QList<QMimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
 {
-    QList<MimeGlobPattern> globPatterns;
+    QList<QMimeGlobPattern> globPatterns;
 
     const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
     for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it)
@@ -378,7 +378,7 @@ QList<MimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
 }
 
 void QMimeDatabasePrivate::setGlobPatterns(const QString &typeOrAlias,
-                                          const QList<MimeGlobPattern> &globPatterns)
+                                          const QList<QMimeGlobPattern> &globPatterns)
 {
     TypeMimeTypeMap::iterator tit = m_typeMimeTypeMap.find(resolveAlias(typeOrAlias));
     if (tit != m_typeMimeTypeMap.end())
@@ -545,23 +545,23 @@ void QMimeDatabasePrivate::clearUserModifiedMimeTypes()
     QFile::remove(kModifiedMimeTypesPath + kModifiedMimeTypesFile);
 }
 
-QList<MimeGlobPattern> QMimeDatabasePrivate::toGlobPatterns(const QStringList &patterns, int weight)
+QList<QMimeGlobPattern> QMimeDatabasePrivate::toGlobPatterns(const QStringList &patterns, int weight)
 {
-    QList<MimeGlobPattern> globPatterns;
+    QList<QMimeGlobPattern> globPatterns;
 
     foreach (const QString &pattern, patterns) {
         QRegExp regExp(pattern, Qt::CaseSensitive, QRegExp::Wildcard);
-        globPatterns.append(MimeGlobPattern(regExp, weight));
+        globPatterns.append(QMimeGlobPattern(regExp, weight));
     }
 
     return globPatterns;
 }
 
-QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<MimeGlobPattern> &globPatterns)
+QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
 {
     QStringList patterns;
 
-    foreach (const MimeGlobPattern &globPattern, globPatterns)
+    foreach (const QMimeGlobPattern &globPattern, globPatterns)
         patterns.append(globPattern.regExp().pattern());
 
     return patterns;
@@ -753,16 +753,16 @@ QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
     return filters.join(QLatin1String(";;"));
 }
 
-QList<MimeGlobPattern> QMimeDatabase::globPatterns() const
+QList<QMimeGlobPattern> QMimeDatabase::globPatterns() const
 {
     m_d->m_mutex.lock();
-    const QList<MimeGlobPattern> rc = m_d->globPatterns();
+    const QList<QMimeGlobPattern> rc = m_d->globPatterns();
     m_d->m_mutex.unlock();
     return rc;
 }
 
 void QMimeDatabase::setGlobPatterns(const QString &typeOrAlias,
-                                   const QList<MimeGlobPattern> &globPatterns)
+                                   const QList<QMimeGlobPattern> &globPatterns)
 {
     m_d->m_mutex.lock();
     m_d->setGlobPatterns(typeOrAlias, globPatterns);
@@ -841,12 +841,12 @@ bool QMimeDatabase::setPreferredSuffix(const QString &typeOrAlias, const QString
     return rc;
 }
 
-QList<MimeGlobPattern> QMimeDatabase::toGlobPatterns(const QStringList &patterns, int weight)
+QList<QMimeGlobPattern> QMimeDatabase::toGlobPatterns(const QStringList &patterns, int weight)
 {
     return QMimeDatabasePrivate::toGlobPatterns(patterns, weight);
 }
 
-QStringList QMimeDatabase::fromGlobPatterns(const QList<MimeGlobPattern> &globPatterns)
+QStringList QMimeDatabase::fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
 {
     return QMimeDatabasePrivate::fromGlobPatterns(globPatterns);
 }

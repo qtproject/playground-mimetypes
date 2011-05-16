@@ -66,8 +66,8 @@ public:
     QStringList suffixes() const;
     bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
 
-    QList<MimeGlobPattern> globPatterns() const;
-    void setGlobPatterns(const QString &typeOrAlias, const QList<MimeGlobPattern> &globPatterns);
+    QList<QMimeGlobPattern> globPatterns() const;
+    void setGlobPatterns(const QString &typeOrAlias, const QList<QMimeGlobPattern> &globPatterns);
 
     QList<QSharedPointer<IMagicMatcher> > magicMatchers() const;
     void setMagicMatchers(const QString &typeOrAlias,
@@ -80,9 +80,9 @@ public:
     static void writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes);
     void clearUserModifiedMimeTypes();
 
-    static QList<MimeGlobPattern> toGlobPatterns(const QStringList &patterns,
-                                                 int weight = MimeGlobPattern::MaxWeight);
-    static QStringList fromGlobPatterns(const QList<MimeGlobPattern> &globPatterns);
+    static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
+                                                 int weight = QMimeGlobPattern::MaxWeight);
+    static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
     void debug(QTextStream &str) const;
 

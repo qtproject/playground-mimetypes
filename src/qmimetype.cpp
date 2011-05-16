@@ -37,21 +37,21 @@ QT_BEGIN_NAMESPACE
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-MimeGlobPattern::MimeGlobPattern(const QRegExp &regExp, unsigned weight) :
+QMimeGlobPattern::QMimeGlobPattern(const QRegExp &regExp, unsigned weight) :
     m_regExp(regExp), m_weight(weight)
 {
 }
 
-MimeGlobPattern::~MimeGlobPattern()
+QMimeGlobPattern::~QMimeGlobPattern()
 {
 }
 
-const QRegExp &MimeGlobPattern::regExp() const
+const QRegExp &QMimeGlobPattern::regExp() const
 {
     return m_regExp;
 }
 
-unsigned MimeGlobPattern::weight() const
+unsigned QMimeGlobPattern::weight() const
 {
     return m_weight;
 }
@@ -138,7 +138,7 @@ void QMimeTypeData::debug(QTextStream &str, int indent) const
         str << indentS << "SubClassesOf: " << subClassesOf.join(comma) << '\n';
     if (!globPatterns.empty()) {
         str << indentS << "Glob: ";
-        foreach (const MimeGlobPattern &gp, globPatterns)
+        foreach (const QMimeGlobPattern &gp, globPatterns)
             str << gp.regExp().pattern() << '(' << gp.weight() << ')';
         str << '\n';
         if (!suffixes.empty()) {
@@ -252,12 +252,12 @@ void QMimeType::setAliases(const QStringList &a)
      m_d->aliases = a;
 }
 
-QList<MimeGlobPattern> QMimeType::globPatterns() const
+QList<QMimeGlobPattern> QMimeType::globPatterns() const
 {
     return m_d->globPatterns;
 }
 
-void QMimeType::setGlobPatterns(const QList<MimeGlobPattern> &g)
+void QMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &g)
 {
     m_d->globPatterns = g;
 
@@ -297,7 +297,7 @@ bool QMimeType::setPreferredSuffix(const QString &s)
     return true;
 }
 
-QString QMimeType::formatFilterString(const QString &description, const QList<MimeGlobPattern> &globs)
+QString QMimeType::formatFilterString(const QString &description, const QList<QMimeGlobPattern> &globs)
 {
     QString rc;
     if (globs.empty())  // Binary files
@@ -334,7 +334,7 @@ unsigned QMimeType::matchesFile(const QFileInfo &file) const
 {
     FileMatchContext context(file);
     const unsigned suffixPriority = m_d->matchesFileBySuffix(context);
-    if (suffixPriority >= MimeGlobPattern::MaxWeight)
+    if (suffixPriority >= QMimeGlobPattern::MaxWeight)
         return suffixPriority;
     return qMax(suffixPriority, m_d->matchesFileByContent(context));
 }
@@ -342,7 +342,7 @@ unsigned QMimeType::matchesFile(const QFileInfo &file) const
 unsigned QMimeTypeData::matchesFileBySuffix(FileMatchContext &c) const
 {
     // check globs
-    foreach (const MimeGlobPattern &gp, /*m_d->*/globPatterns) {
+    foreach (const QMimeGlobPattern &gp, /*m_d->*/globPatterns) {
         if (gp.regExp().exactMatch(c.fileName()))
             return gp.weight();
     }
@@ -352,7 +352,7 @@ unsigned QMimeTypeData::matchesFileBySuffix(FileMatchContext &c) const
 unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 {
     // check globs
-    foreach (const MimeGlobPattern &gp, globPatterns) {
+    foreach (const QMimeGlobPattern &gp, globPatterns) {
         if (gp.regExp().exactMatch(name))
             return gp.weight();
     }

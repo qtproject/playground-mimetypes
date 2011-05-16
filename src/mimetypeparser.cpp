@@ -53,9 +53,9 @@ void BaseMimeTypeParser::addGlobPattern(const QString &pattern, const QString &w
     }
 
     if (weight.isEmpty())
-        d->globPatterns.push_back(MimeGlobPattern(wildCard));
+        d->globPatterns.push_back(QMimeGlobPattern(wildCard));
     else
-        d->globPatterns.push_back(MimeGlobPattern(wildCard, weight.toInt()));
+        d->globPatterns.push_back(QMimeGlobPattern(wildCard, weight.toInt()));
 
     d->assignSuffix(pattern);
 }

@@ -8,7 +8,7 @@
 
 // Fallback priorities, must be low.
 enum {
-    BinaryMatchPriority = MimeGlobPattern::MinWeight + 1,
+    BinaryMatchPriority = QMimeGlobPattern::MinWeight + 1,
     TextMatchPriority
 };
 

@@ -33,14 +33,14 @@ QT_BEGIN_NAMESPACE
 
 class QFileInfo;
 
-class QMIME_EXPORT MimeGlobPattern
+class QMIME_EXPORT QMimeGlobPattern
 {
 public:
     static const unsigned MaxWeight = 100;
     static const unsigned MinWeight = 1;
 
-    explicit MimeGlobPattern(const QRegExp &regExp, unsigned weight = MaxWeight);
-    ~MimeGlobPattern();
+    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = MaxWeight);
+    ~QMimeGlobPattern();
 
     const QRegExp &regExp() const;
     unsigned weight() const;
@@ -80,8 +80,8 @@ public:
     QString localeComment(const QString &locale = QString() /* en, de...*/) const;
     void setLocaleComment(const QString &locale, const QString &comment);
 
-    QList<MimeGlobPattern> globPatterns() const;
-    void setGlobPatterns(const QList<MimeGlobPattern> &);
+    QList<QMimeGlobPattern> globPatterns() const;
+    void setGlobPatterns(const QList<QMimeGlobPattern> &);
 
     QStringList subClassOf() const;
     void setSubClassOf(const QStringList &);
@@ -113,7 +113,7 @@ public:
     friend QDebug operator<<(QDebug d, const QMimeType &mt);
 
     static QString formatFilterString(const QString &description,
-                                      const QList<MimeGlobPattern> &globs);
+                                      const QList<QMimeGlobPattern> &globs);
 
 private:
     explicit QMimeType(const QMimeTypeData &d);

@@ -45,7 +45,7 @@ public:
 
     LocaleHash localeComments;
     QStringList aliases;
-    QList<MimeGlobPattern> globPatterns;
+    QList<QMimeGlobPattern> globPatterns;
     QStringList subClassesOf;
     QString preferredSuffix;
     QStringList suffixes;

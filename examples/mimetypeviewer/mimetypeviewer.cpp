@@ -66,7 +66,7 @@ void MimeTypeViewer::setMimeType(const QMimeType &mime)
     ui->commentLabel->setText(mime.comment());
 
     QStringList list;
-    foreach (const MimeGlobPattern &pattern, mime.globPatterns()) {
+    foreach (const QMimeGlobPattern &pattern, mime.globPatterns()) {
         list.append(pattern.regExp().pattern());
     }
     ui->globPatternsLabel->setText(list.join(", "));
