@@ -186,11 +186,6 @@ bool QMimeType::isValid() const
     return !m_d->type.isEmpty();
 }
 
-QMimeType::operator bool() const
-{
-    return isValid();
-}
-
 bool QMimeType::isTopLevel() const
 {
     return m_d->subClassesOf.empty();

@@ -79,7 +79,7 @@ bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, QString *errorMessage
 
 bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
 {
-    if (!mt)
+    if (!mt.isValid())
         return false;
 
     const QString type = mt.type();
@@ -208,7 +208,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f) const
 
     const QMimeType rc = findByFile(f, &priority);
     if (debugMimeDB) {
-        if (rc) {
+        if (rc.isValid()) {
             qDebug() << "<MimeDatabase::findByFile: match prio=" << priority << rc.type();
         } else {
             qDebug() << "<MimeDatabase::findByFile: no match";
@@ -306,7 +306,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data) const
         qDebug() << '>' << Q_FUNC_INFO << data.left(20).toHex();
     const QMimeType rc = findByData(data, &priority);
     if (debugMimeDB) {
-        if (rc) {
+        if (rc.isValid()) {
             qDebug() << "<MimeDatabase::findByData: match prio=" << priority << rc.type();
         } else {
             qDebug() << "<MimeDatabase::findByData: no match";
@@ -819,14 +819,16 @@ void QMimeDatabase::writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes
 
 QString QMimeDatabase::preferredSuffixByType(const QString &type) const
 {
-    if (const QMimeType mt = findByType(type))
+    const QMimeType mt = findByType(type);
+    if (mt.isValid())
         return mt.preferredSuffix(); // already does Mutex locking
     return QString();
 }
 
 QString QMimeDatabase::preferredSuffixByFile(const QFileInfo &f) const
 {
-    if (const QMimeType mt = findByFile(f))
+    const QMimeType mt = findByFile(f);
+    if (mt.isValid())
         return mt.preferredSuffix(); // already does Mutex locking
     return QString();
 }

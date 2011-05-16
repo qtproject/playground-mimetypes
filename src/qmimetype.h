@@ -63,9 +63,8 @@ public:
     ~QMimeType();
 
     void clear();
-    bool isValid() const;
-    operator bool() const;
 
+    bool isValid() const;
     bool isTopLevel() const;
 
     QString type() const;
