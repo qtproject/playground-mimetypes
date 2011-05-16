@@ -46,7 +46,7 @@ void MimeTypeViewer::onOpenFileButtonClicked()
 
     ui->fileLineEdit->setText(file);
     QMimeType mime = dataBase->findByFile(QFileInfo(file));
-    if (mime)
+    if (mime.isValid())
         setMimeType(mime);
 }
 
@@ -70,5 +70,5 @@ void MimeTypeViewer::setMimeType(const QMimeType &mime)
         list.append(pattern.regExp().pattern());
     }
     ui->globPatternsLabel->setText(list.join(", "));
-    ui->subClassesOfLabel->setText(mime.subClassesOf().join(", "));
+    ui->subClassesOfLabel->setText(mime.subClassOf().join(", "));
 }
