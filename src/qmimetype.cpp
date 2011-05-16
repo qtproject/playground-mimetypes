@@ -419,35 +419,29 @@ void QMimeType::setMagicMatchers(const IMagicMatcherList &matchers)
     m_d->magicMatchers = matchers;
 }
 
-namespace {
-struct RemovePred : std::unary_function<QMimeType::IMagicMatcherSharedPointer, bool>
-{
-    RemovePred(bool keepRuleBased) : m_keepRuleBase(keepRuleBased) {}
-    bool m_keepRuleBase;
-
-    bool operator()(const QMimeType::IMagicMatcherSharedPointer &matcher) {
-        if ((m_keepRuleBase && !dynamic_cast<MagicRuleMatcher *>(matcher.data()))
-                || (!m_keepRuleBase && dynamic_cast<MagicRuleMatcher *>(matcher.data())))
-            return true;
-        return false;
-    }
-};
-} // Anonymous
-
 QMimeType::IMagicMatcherList QMimeType::magicRuleMatchers() const
 {
-    IMagicMatcherList ruleMatchers = m_d->magicMatchers;
-    ruleMatchers.erase(std::remove_if(ruleMatchers.begin(), ruleMatchers.end(), RemovePred(true)),
-                       ruleMatchers.end());
-    return ruleMatchers;
+    IMagicMatcherList result;
+
+    foreach (const IMagicMatcherSharedPointer &matcher, m_d->magicMatchers) {
+        if (matcher->type() == IMagicMatcher::RuleMatcher)
+            result.append(matcher);
+    }
+
+    return result;
 }
 
 void QMimeType::setMagicRuleMatchers(const IMagicMatcherList &matchers)
 {
-    m_d->magicMatchers.erase(std::remove_if(m_d->magicMatchers.begin(), m_d->magicMatchers.end(),
-                                            RemovePred(false)),
-                             m_d->magicMatchers.end());
-    m_d->magicMatchers.append(matchers);
+    IMagicMatcherList tmp;
+
+    tmp.append(matchers);
+    foreach (const IMagicMatcherSharedPointer &matcher, m_d->magicMatchers) {
+        if (matcher->type() != IMagicMatcher::RuleMatcher)
+            tmp.append(matcher);
+    }
+
+    m_d->magicMatchers = tmp;
 }
 
 QDebug operator<<(QDebug d, const QMimeType &mt)

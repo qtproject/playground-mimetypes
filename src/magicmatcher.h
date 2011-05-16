@@ -41,6 +41,9 @@ public:
     typedef QSharedPointer<IMagicMatcher> IMagicMatcherSharedPointer;
     typedef QList<IMagicMatcherSharedPointer> IMagicMatcherList;
 
+    enum Type { RuleMatcher, CustomMatcher };
+    virtual Type type() const { return CustomMatcher; }
+
     // Check for a match on contents of a file
     virtual bool matches(const QByteArray &data) const = 0;
     // Return a priority value from 1..100
@@ -57,6 +60,8 @@ public:
     void add(const QMimeMagicRule &rule);
     void add(const QMimeMagicRuleList &ruleList);
     QMimeMagicRuleList magicRules() const;
+
+    virtual Type type() const;
 
     virtual bool matches(const QByteArray &data) const;
 

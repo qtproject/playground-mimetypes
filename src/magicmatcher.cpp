@@ -155,6 +155,11 @@ QMimeMagicRuleList MagicRuleMatcher::magicRules() const
     return m_list;
 }
 
+IMagicMatcher::Type MagicRuleMatcher::type() const
+{
+    return RuleMatcher;
+}
+
 bool MagicRuleMatcher::matches(const QByteArray &data) const
 {
     for (int i = 0; i < m_list.size(); i++)
