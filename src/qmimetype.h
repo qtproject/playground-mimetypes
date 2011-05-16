@@ -63,7 +63,7 @@ public:
     ~QMimeType();
 
     void clear();
-    bool isNull() const;
+    bool isValid() const;
     operator bool() const;
 
     bool isTopLevel() const;
@@ -120,6 +120,7 @@ private:
 
     friend class BaseMimeTypeParser;
     friend class QMimeDatabasePrivate;
+
     QSharedDataPointer<QMimeTypeData> m_d;
 };
 

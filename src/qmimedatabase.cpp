@@ -230,7 +230,7 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name) const
     unsigned priority = 0;
 
     const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (int level = m_maxLevel; level >= 0 && candidate.isNull(); level--) {
+    for (int level = m_maxLevel; level >= 0 && !candidate.isValid(); level--) {
         for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
             if (it.value().level == level) {
                 const unsigned suffixPriority = it.value().type.m_d->matchesFileBySuffix(name);
@@ -266,7 +266,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
 
     // Pass 1) Try to match on suffix#type
     const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (int level = m_maxLevel; level >= 0 && candidate.isNull(); level--) {
+    for (int level = m_maxLevel; level >= 0 && !candidate.isValid(); level--) {
         for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
             if (it.value().level == level) {
                 const unsigned suffixPriority = it.value().type.m_d->matchesFileBySuffix(context);

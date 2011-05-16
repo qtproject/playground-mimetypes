@@ -181,14 +181,14 @@ void QMimeType::clear()
     m_d->clear();
 }
 
-bool QMimeType::isNull() const
+bool QMimeType::isValid() const
 {
-    return m_d->type.isEmpty();
+    return !m_d->type.isEmpty();
 }
 
 QMimeType::operator bool() const
 {
-    return !isNull();
+    return isValid();
 }
 
 bool QMimeType::isTopLevel() const
