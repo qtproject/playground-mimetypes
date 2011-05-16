@@ -211,7 +211,7 @@ QPair<int, int> QMimeMagicRule::fromOffset(const QString &offset)
 
 QMimeMagicRule::Type QMimeMagicRule::stringToType(const QByteArray &type)
 {
-    for (int i = QMimeMagicRule::Invalid; i != QMimeMagicRule::Host32; i++) {
+    for (int i = QMimeMagicRule::Invalid; i <= QMimeMagicRule::Host32; i++) {
         if (type == kStrings[i])
             return (QMimeMagicRule::Type)i;
     }
