@@ -46,7 +46,7 @@ public:
     LocaleHash localeComments;
     QStringList aliases;
     QList<QMimeGlobPattern> globPatterns;
-    QStringList subClassesOf;
+    QStringList subClassOf;
     QString preferredSuffix;
     QStringList suffixes;
     IMagicMatcher::IMagicMatcherList magicMatchers;

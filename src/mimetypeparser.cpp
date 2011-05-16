@@ -178,7 +178,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             case ParseSubClass: {
                 const QString inheritsFrom = atts.value(QLatin1String(mimeTypeAttributeC)).toString();
                 if (!inheritsFrom.isEmpty())
-                    data.subClassesOf.push_back(inheritsFrom);
+                    data.subClassOf.push_back(inheritsFrom);
             }
                 break;
             case ParseComment: {

@@ -103,7 +103,7 @@ void QMimeTypeData::clear()
     comment.clear();
     aliases.clear();
     globPatterns.clear();
-    subClassesOf.clear();
+    subClassOf.clear();
     preferredSuffix.clear();
     suffixes.clear();
     magicMatchers.clear();
@@ -134,8 +134,8 @@ void QMimeTypeData::debug(QTextStream &str, int indent) const
         str << " Aliases: " << aliases.join(comma);
     str << ", magic: " << magicMatchers.size() << '\n';
     str << indentS << "Comment: " << comment << '\n';
-    if (!subClassesOf.empty())
-        str << indentS << "SubClassesOf: " << subClassesOf.join(comma) << '\n';
+    if (!subClassOf.empty())
+        str << indentS << "SubClassesOf: " << subClassOf.join(comma) << '\n';
     if (!globPatterns.empty()) {
         str << indentS << "Glob: ";
         foreach (const QMimeGlobPattern &gp, globPatterns)
@@ -195,7 +195,7 @@ bool QMimeType::isValid() const
 
 bool QMimeType::isTopLevel() const
 {
-    return m_d->subClassesOf.empty();
+    return m_d->subClassOf.empty();
 }
 
 QString QMimeType::type() const
@@ -271,12 +271,12 @@ void QMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &g)
 
 QStringList QMimeType::subClassOf() const
 {
-    return m_d->subClassesOf;
+    return m_d->subClassOf;
 }
 
 void QMimeType::setSubClassOf(const QStringList &s)
 {
-    m_d->subClassesOf = s;
+    m_d->subClassOf = s;
 }
 
 QString QMimeType::preferredSuffix() const
