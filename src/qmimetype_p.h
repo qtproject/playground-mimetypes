@@ -38,6 +38,12 @@ public:
     void assignSuffixes(const QStringList &patterns);
     void debug(QTextStream &str, int indent = 0) const;
 
+    unsigned matchesFileBySuffix(const QString &name) const;
+    unsigned matchesData(const QByteArray &data) const;
+
+    static QString formatFilterString(const QString &description,
+                                      const QList<QMimeGlobPattern> &globs);
+
     const QRegExp suffixPattern;
 
     QString type;
@@ -51,11 +57,6 @@ public:
     QStringList suffixes;
     IMagicMatcher::IMagicMatcherList magicMatchers;
 
-    unsigned matchesFileBySuffix(const QString &name) const;
-    unsigned matchesData(const QByteArray &data) const;
-
-    static QString formatFilterString(const QString &description,
-                                      const QList<QMimeGlobPattern> &globs);
 };
 
 enum { debugMimeDB = 0 };
