@@ -159,6 +159,28 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     return priority;
 }
 
+QString QMimeTypeData::formatFilterString(const QString &description, const QList<QMimeGlobPattern> &globs)
+{
+    QString rc;
+    if (globs.empty())  // Binary files
+        return rc;
+    {
+        QTextStream str(&rc);
+        str << description;
+        if (!globs.empty()) {
+            str << " (";
+            const int size = globs.size();
+            for (int i = 0; i < size; i++) {
+                if (i)
+                    str << ' ';
+                str << globs.at(i).regExp().pattern();
+            }
+            str << ')';
+        }
+    }
+    return rc;
+}
+
 /*!
     \class MimeType
 
@@ -357,32 +379,10 @@ bool QMimeType::setPreferredSuffix(const QString &s)
     return true;
 }
 
-QString QMimeType::formatFilterString(const QString &description, const QList<QMimeGlobPattern> &globs)
-{
-    QString rc;
-    if (globs.empty())  // Binary files
-        return rc;
-    {
-        QTextStream str(&rc);
-        str << description;
-        if (!globs.empty()) {
-            str << " (";
-            const int size = globs.size();
-            for (int i = 0; i < size; i++) {
-                if (i)
-                    str << ' ';
-                str << globs.at(i).regExp().pattern();
-            }
-            str << ')';
-        }
-    }
-    return rc;
-}
-
 QString QMimeType::filterString() const
 {
     // @todo: Use localeComment() once creator is shipped with translations
-    return formatFilterString(comment(), m_d->globPatterns);
+    return QMimeTypeData::formatFilterString(comment(), m_d->globPatterns);
 }
 
 bool QMimeType::matchesType(const QString &type) const

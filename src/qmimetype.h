@@ -116,9 +116,6 @@ public:
 
     friend QDebug operator<<(QDebug d, const QMimeType &mt);
 
-    static QString formatFilterString(const QString &description,
-                                      const QList<QMimeGlobPattern> &globs);
-
 private:
     explicit QMimeType(const QMimeTypeData &d);
 
