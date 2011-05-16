@@ -117,16 +117,6 @@ void QMimeTypeData::debug(QTextStream &str, int indent) const
     str << '\n';
 }
 
-unsigned QMimeTypeData::matchesFileBySuffix(FileMatchContext &c) const
-{
-    // check globs
-    foreach (const QMimeGlobPattern &gp, /*m_d->*/globPatterns) {
-        if (gp.regExp().exactMatch(c.fileName()))
-            return gp.weight();
-    }
-    return 0;
-}
-
 unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 {
     // check globs
@@ -137,20 +127,11 @@ unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
     return 0;
 }
 
-unsigned QMimeTypeData::matchesFileByContent(FileMatchContext &c) const
-{
-    // Nope, try magic matchers on context data
-    if (/*m_d->*/magicMatchers.isEmpty())
-        return 0;
-
-    return matchesData(c.data());
-}
-
 unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 {
     unsigned priority = 0;
     if (!data.isEmpty()) {
-        foreach (const IMagicMatcher::IMagicMatcherSharedPointer &matcher, /*m_d->*/magicMatchers) {
+        foreach (const IMagicMatcher::IMagicMatcherSharedPointer &matcher, magicMatchers) {
             const unsigned magicPriority = matcher->priority();
             if (magicPriority > priority && matcher->matches(data))
                 priority = magicPriority;
@@ -393,10 +374,10 @@ bool QMimeType::matchesType(const QString &type) const
 unsigned QMimeType::matchesFile(const QFileInfo &file) const
 {
     FileMatchContext context(file);
-    const unsigned suffixPriority = m_d->matchesFileBySuffix(context);
+    const unsigned suffixPriority = m_d->matchesFileBySuffix(context.fileName());
     if (suffixPriority >= QMimeGlobPattern::MaxWeight)
         return suffixPriority;
-    return qMax(suffixPriority, m_d->matchesFileByContent(context));
+    return qMax(suffixPriority, m_d->matchesData(context.data()));
 }
 
 QStringList QMimeType::suffixes() const

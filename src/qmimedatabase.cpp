@@ -269,7 +269,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     for (int level = m_maxLevel; level >= 0 && !candidate.isValid(); level--) {
         for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
             if (it.value().level == level) {
-                const unsigned suffixPriority = it.value().type.m_d->matchesFileBySuffix(context);
+                const unsigned suffixPriority = it.value().type.m_d->matchesFileBySuffix(context.fileName());
                 if (suffixPriority && suffixPriority > *priorityPtr) {
                     *priorityPtr = suffixPriority;
                     candidate = it.value().type;
@@ -286,7 +286,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     for (int level = m_maxLevel; level >= 0; level--) {
         for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
             if (it.value().level == level) {
-                const unsigned contentPriority = it.value().type.m_d->matchesFileByContent(context);
+                const unsigned contentPriority = it.value().type.m_d->matchesData(context.data());
                 if (contentPriority && contentPriority > *priorityPtr) {
                     *priorityPtr = contentPriority;
                     candidate = it.value().type;
