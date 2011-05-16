@@ -313,14 +313,14 @@ static inline QString systemLanguage()
 QString QMimeType::localeComment(const QString &localeArg) const
 {
     const QString locale = localeArg.isEmpty() ? systemLanguage() : localeArg;
-    const QMimeTypeData::LocaleHash::const_iterator it = m_d->localeComments.constFind(locale);
-    if (it == m_d->localeComments.constEnd())
-        return m_d->comment;
-    return it.value();
+    return m_d->localeComments.value(locale, m_d->comment);
 }
 
 void QMimeType::setLocaleComment(const QString &locale, const QString &comment)
 {
+    if (locale.isEmpty())
+        return;
+
      m_d->localeComments[locale] = comment;
 }
 
