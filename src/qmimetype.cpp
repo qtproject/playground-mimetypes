@@ -150,6 +150,11 @@ void QMimeTypeData::debug(QTextStream &str, int indent) const
 }
 
 // ---------------- MimeType
+QMimeType::QMimeType() :
+    m_d(new QMimeTypeData)
+{
+}
+
 QMimeType::QMimeType(const QString &type) :
     m_d(new QMimeTypeData)
 {

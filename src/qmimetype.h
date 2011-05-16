@@ -57,7 +57,8 @@ public:
     typedef IMagicMatcher::IMagicMatcherList IMagicMatcherList;
     typedef IMagicMatcher::IMagicMatcherSharedPointer IMagicMatcherSharedPointer;
 
-    explicit QMimeType(const QString &type = QString());
+    QMimeType();
+    explicit QMimeType(const QString &type);
     QMimeType(const QMimeType&);
     QMimeType &operator=(const QMimeType&);
     ~QMimeType();
