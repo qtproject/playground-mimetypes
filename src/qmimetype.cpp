@@ -150,9 +150,11 @@ void QMimeTypeData::debug(QTextStream &str, int indent) const
 }
 
 // ---------------- MimeType
-QMimeType::QMimeType() :
+QMimeType::QMimeType(const QString &type) :
     m_d(new QMimeTypeData)
 {
+    if (!type.isEmpty())
+        setType(type);
 }
 
 QMimeType::QMimeType(const QMimeType &rhs) :
@@ -262,12 +264,12 @@ void QMimeType::setGlobPatterns(const QList<MimeGlobPattern> &g)
         m_d->preferredSuffix = oldPrefferedSuffix;
 }
 
-QStringList QMimeType::subClassesOf() const
+QStringList QMimeType::subClassOf() const
 {
     return m_d->subClassesOf;
 }
 
-void QMimeType::setSubClassesOf(const QStringList &s)
+void QMimeType::setSubClassOf(const QStringList &s)
 {
     m_d->subClassesOf = s;
 }

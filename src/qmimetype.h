@@ -57,7 +57,7 @@ public:
     typedef IMagicMatcher::IMagicMatcherList IMagicMatcherList;
     typedef IMagicMatcher::IMagicMatcherSharedPointer IMagicMatcherSharedPointer;
 
-    QMimeType();
+    explicit QMimeType(const QString &type = QString());
     QMimeType(const QMimeType&);
     QMimeType &operator=(const QMimeType&);
     ~QMimeType();
@@ -82,8 +82,8 @@ public:
     QList<MimeGlobPattern> globPatterns() const;
     void setGlobPatterns(const QList<MimeGlobPattern> &);
 
-    QStringList subClassesOf() const;
-    void setSubClassesOf(const QStringList &);
+    QStringList subClassOf() const;
+    void setSubClassOf(const QStringList &);
 
     // Extension over standard mime data
     QStringList suffixes() const;

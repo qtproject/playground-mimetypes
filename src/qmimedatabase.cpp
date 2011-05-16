@@ -98,7 +98,7 @@ bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
     // Register the children, resolved via alias map. Note that it is still
     // possible that aliases end up in the map if the parent classes are not inserted
     // at this point (thus their aliases not known).
-    const QStringList subClassesOf = mt.subClassesOf();
+    const QStringList subClassesOf = mt.subClassOf();
     for (int i = 0; i < subClassesOf.size(); i++)
         m_parentChildrenMap.insert(resolveAlias(subClassesOf.at(i)), type);
 
