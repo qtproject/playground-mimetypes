@@ -31,6 +31,8 @@ const char * const binaryTypeC = "application/octet-stream";
 
 // MimeMapEntry: Entry of a type map, consisting of type and level.
 
+#define MIN_MATCH_WEIGHT 50
+
 enum { Dangling = 32767 };
 
 struct MimeMapEntry

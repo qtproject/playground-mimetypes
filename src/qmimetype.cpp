@@ -371,6 +371,11 @@ bool QMimeType::matchesType(const QString &type) const
     return m_d->type == type || m_d->aliases.contains(type);
 }
 
+unsigned QMimeType::matchesData(const QByteArray &data) const
+{
+    return m_d->matchesData(data);
+}
+
 unsigned QMimeType::matchesFile(const QFileInfo &file) const
 {
     FileMatchContext context(file);

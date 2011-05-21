@@ -98,6 +98,8 @@ public:
     // Check for type or one of the aliases
     bool matchesType(const QString &type) const;
 
+    unsigned matchesData(const QByteArray &data) const;
+
     // Check glob patterns weights and magic priorities so the highest
     // value is returned. A 0 (zero) indicates no match.
     unsigned matchesFile(const QFileInfo &file) const;

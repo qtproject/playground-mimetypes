@@ -282,8 +282,8 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     if (!f.isReadable())
         return candidateByName;
 
-//    if (candidateByName.matchesData(context.data()) > 50)
-//        return candidateByName;
+    if (candidateByName.matchesData(context.data()) > MIN_MATCH_WEIGHT)
+        return candidateByName;
 
     unsigned priorityByName = *priorityPtr;
     QMimeType candidateByData(findByData(context.data(), priorityPtr));
