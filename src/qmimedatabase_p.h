@@ -86,7 +86,6 @@ public:
 //    QMimeType findByFileUnlocked(const QFileInfo &f) const;
 
 private:
-    typedef QHash<QString, MimeMapEntry> TypeMimeTypeMap;
     typedef QHash<QString, QString> AliasMap;
     typedef QMultiHash<QString, QString> ParentChildrenMap;
 
@@ -106,7 +105,7 @@ private:
     void determineLevels();
     void raiseLevelRecursion(MimeMapEntry &e, int level);
 
-    TypeMimeTypeMap m_typeMimeTypeMap;
+    QHash<QString, MimeMapEntry*> m_typeMimeTypeMap;
     AliasMap m_aliasMap;
     ParentChildrenMap m_parentChildrenMap;
     int m_maxLevel;
