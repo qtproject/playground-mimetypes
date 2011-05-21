@@ -217,7 +217,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f) const
     return rc;
 }
 
-QMimeType QMimeDatabasePrivate::findByName(const QString &name) const
+QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priorityPtr) const
 {
     // Is the hierarchy set up in case we find several matches?
     if (m_maxLevel < 0) {
@@ -227,75 +227,71 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name) const
 
     QMimeType candidate;
 
-    unsigned priority = 0;
-
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (int level = m_maxLevel; level >= 0 && !candidate.isValid(); level--) {
-        for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
-            if (it.value().level == level) {
-                const unsigned suffixPriority = it.value().type.m_d->matchesFileBySuffix(name);
-                if (suffixPriority && suffixPriority > priority) {
-                    priority = suffixPriority;
-                    candidate = it.value().type;
+    for (int level = m_maxLevel; level >= 0 && !candidate.isValid(); level--)
+        foreach (const MimeMapEntry &entry, m_typeMimeTypeMap)
+            if (entry.level == level) {
+                const unsigned suffixPriority = entry.type.m_d->matchesFileBySuffix(name);
+                if (suffixPriority && suffixPriority > *priorityPtr) {
+                    *priorityPtr = suffixPriority;
+                    candidate = entry.type;
                     if (suffixPriority >= QMimeGlobPattern::MaxWeight)
                         return candidate;
                 }
             }
-        }
+
+    return candidate;
+}
+
+QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
+{
+    // Is the hierarchy set up in case we find several matches?
+    if (m_maxLevel < 0) {
+        QMimeDatabasePrivate *db = const_cast<QMimeDatabasePrivate *>(this);
+        db->determineLevels();
     }
+
+    QMimeType candidate;
+
+    for (int level = m_maxLevel; level >= 0; level--)
+        foreach (const MimeMapEntry &entry, m_typeMimeTypeMap)
+            if (entry.level == level) {
+                const unsigned contentPriority = entry.type.m_d->matchesData(data);
+                if (contentPriority && contentPriority > *priorityPtr) {
+                    *priorityPtr = contentPriority;
+                    candidate = entry.type;
+                }
+            }
 
     return candidate;
 }
 
 QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
 {
-    // Is the hierarchy set up in case we find several matches?
-    if (m_maxLevel < 0) {
-        QMimeDatabasePrivate *db = const_cast<QMimeDatabasePrivate *>(this);
-        db->determineLevels();
-    }
-
     // First, glob patterns are evaluated. If there is a match with max weight,
     // this one is selected and we are done. Otherwise, the file contents are
     // evaluated and the match with the highest value (either a magic priority or
     // a glob pattern weight) is selected. Matching starts from max level (most
     // specific) in both cases, even when there is already a suffix matching candidate.
     *priorityPtr = 0;
-    QMimeType candidate;
     FileMatchContext context(f);
 
     // Pass 1) Try to match on suffix#type
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (int level = m_maxLevel; level >= 0 && !candidate.isValid(); level--) {
-        for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
-            if (it.value().level == level) {
-                const unsigned suffixPriority = it.value().type.m_d->matchesFileBySuffix(context.fileName());
-                if (suffixPriority && suffixPriority > *priorityPtr) {
-                    *priorityPtr = suffixPriority;
-                    candidate = it.value().type;
-                    if (suffixPriority >= QMimeGlobPattern::MaxWeight)
-                        return candidate;
-                }
-            }
-        }
-    }
+    QMimeType candidateByName = findByName(f.canonicalFilePath(), priorityPtr);
 
     // Pass 2) Match on content
     if (!f.isReadable())
-        return candidate;
-    for (int level = m_maxLevel; level >= 0; level--) {
-        for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
-            if (it.value().level == level) {
-                const unsigned contentPriority = it.value().type.m_d->matchesData(context.data());
-                if (contentPriority && contentPriority > *priorityPtr) {
-                    *priorityPtr = contentPriority;
-                    candidate = it.value().type;
-                }
-            }
-        }
-    }
+        return candidateByName;
 
-    return candidate;
+//    if (candidateByName.matchesData(context.data()) > 50)
+//        return candidateByName;
+
+    unsigned priorityByName = *priorityPtr;
+    QMimeType candidateByData(findByData(context.data(), priorityPtr));
+
+    if (priorityByName < *priorityPtr)
+        return candidateByData;
+    else
+        return candidateByName;
 }
 
 // Debugging wrapper around findByData()
@@ -313,31 +309,6 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data) const
         }
     }
     return rc;
-}
-
-QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
-{
-    // Is the hierarchy set up in case we find several matches?
-    if (m_maxLevel < 0) {
-        QMimeDatabasePrivate *db = const_cast<QMimeDatabasePrivate *>(this);
-        db->determineLevels();
-    }
-
-    *priorityPtr = 0;
-    QMimeType candidate;
-
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (int level = m_maxLevel; level >= 0; level--)
-        for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it)
-            if (it.value().level == level) {
-                const unsigned contentPriority = it.value().type.m_d->matchesData(data);
-                if (contentPriority && contentPriority > *priorityPtr) {
-                    *priorityPtr = contentPriority;
-                    candidate = it.value().type;
-                }
-            }
-
-    return candidate;
 }
 
 // Return all known suffixes
@@ -671,7 +642,8 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 QMimeType QMimeDatabase::findByName(const QString &name) const
 {
     m_d->m_mutex.lock();
-    const QMimeType rc = m_d->findByName(name);
+    unsigned priority = 0;
+    const QMimeType rc = m_d->findByName(name, &priority);
     m_d->m_mutex.unlock();
     return rc;
 }

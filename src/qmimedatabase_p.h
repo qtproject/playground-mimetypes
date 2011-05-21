@@ -58,7 +58,6 @@ public:
 
     QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &f) const;
-    QMimeType findByName(const QString &name) const;
     QMimeType findByData(const QByteArray &data) const;
 
     QStringList filterStrings() const;
@@ -100,8 +99,11 @@ private:
 
     bool addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage);
     inline QString resolveAlias(const QString &name) const;
-    QMimeType findByFile(const QFileInfo &f, unsigned *priority) const;
-    QMimeType findByData(const QByteArray &data, unsigned *priority) const;
+
+    QMimeType findByFile(const QFileInfo &f, unsigned *priorityPtr) const;
+    QMimeType findByData(const QByteArray &data, unsigned *priorityPtr) const;
+    QMimeType findByName(const QString &name, unsigned *priorityPtr) const;
+
     void determineLevels();
     void raiseLevelRecursion(MimeMapEntry &e, int level);
 
