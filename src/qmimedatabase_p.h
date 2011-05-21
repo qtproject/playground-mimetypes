@@ -58,10 +58,6 @@ public:
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
     bool addMimeType(QMimeType mt);
 
-    QMimeType findByType(const QString &type) const;
-    QMimeType findByFile(const QFileInfo &f) const;
-    QMimeType findByData(const QByteArray &data) const;
-
     QStringList filterStrings() const;
 
     QStringList suffixes() const;
@@ -102,6 +98,7 @@ private:
     bool addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage);
     inline QString resolveAlias(const QString &name) const;
 
+    QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &f, unsigned *priorityPtr) const;
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr) const;
     QMimeType findByName(const QString &name, unsigned *priorityPtr) const;

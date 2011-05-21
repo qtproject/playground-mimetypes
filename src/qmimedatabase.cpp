@@ -196,27 +196,6 @@ QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
     return m_typeMimeTypeMap.value(resolveAlias(typeOrAlias)).type;
 }
 
-// Debugging wrapper around findByFile()
-QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f) const
-{
-    unsigned priority = 0;
-    if (debugMimeDB)
-        qDebug() << '>' << Q_FUNC_INFO << f.absoluteFilePath();
-
-    if (f.isDir())
-        return findByType("inode/directory");
-
-    const QMimeType rc = findByFile(f, &priority);
-    if (debugMimeDB) {
-        if (rc.isValid()) {
-            qDebug() << "<MimeDatabase::findByFile: match prio=" << priority << rc.type();
-        } else {
-            qDebug() << "<MimeDatabase::findByFile: no match";
-        }
-    }
-    return rc;
-}
-
 QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priorityPtr) const
 {
     // Is the hierarchy set up in case we find several matches?
@@ -292,23 +271,6 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
         return candidateByData;
     else
         return candidateByName;
-}
-
-// Debugging wrapper around findByData()
-QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data) const
-{
-    unsigned priority = 0;
-    if (debugMimeDB)
-        qDebug() << '>' << Q_FUNC_INFO << data.left(20).toHex();
-    const QMimeType rc = findByData(data, &priority);
-    if (debugMimeDB) {
-        if (rc.isValid()) {
-            qDebug() << "<MimeDatabase::findByData: match prio=" << priority << rc.type();
-        } else {
-            qDebug() << "<MimeDatabase::findByData: no match";
-        }
-    }
-    return rc;
 }
 
 // Return all known suffixes
@@ -627,7 +589,8 @@ QMimeType QMimeDatabase::findByType(const QString &typeOrAlias) const
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
     m_d->m_mutex.lock();
-    const QMimeType rc = m_d->findByFile(fileInfo);
+    unsigned priority = 0;
+    const QMimeType rc = m_d->findByFile(fileInfo, &priority);
     m_d->m_mutex.unlock();
     return rc;
 }
@@ -657,7 +620,8 @@ QMimeType QMimeDatabase::findByName(const QString &name) const
 QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 {
     m_d->m_mutex.lock();
-    const QMimeType rc = m_d->findByData(data);
+    unsigned priority = 0;
+    const QMimeType rc = m_d->findByData(data, &priority);
     m_d->m_mutex.unlock();
     return rc;
 }
