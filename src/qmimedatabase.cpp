@@ -215,8 +215,8 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priori
                 if (suffixPriority && suffixPriority > *priorityPtr) {
                     *priorityPtr = suffixPriority;
                     candidate = entry->type;
-                    if (suffixPriority >= QMimeGlobPattern::MaxWeight)
-                        return candidate;
+//                    if (suffixPriority >= QMimeGlobPattern::MaxWeight)
+//                        return candidate;
                 }
             }
 
@@ -257,7 +257,8 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     FileMatchContext context(f);
 
     // Pass 1) Try to match on suffix#type
-    QMimeType candidateByName = findByName(f.canonicalFilePath(), priorityPtr);
+#warning TODO: add supprort for full path patterns
+    QMimeType candidateByName = findByName(f.fileName(), priorityPtr);
 
     // Pass 2) Match on content
     if (!f.isReadable())
@@ -602,7 +603,8 @@ QMimeType QMimeDatabase::findByName(const QString &name) const
 {
     m_d->m_mutex.lock();
     unsigned priority = 0;
-    const QMimeType rc = m_d->findByName(name, &priority);
+#warning Use path not filename
+    const QMimeType rc = m_d->findByName(QFileInfo(name).fileName(), &priority);
     m_d->m_mutex.unlock();
     return rc;
 }
