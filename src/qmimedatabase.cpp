@@ -128,6 +128,7 @@ void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
     const QStringList childTypes = m_parentChildrenMap.values(e.type.type());
     if (childTypes.empty())
         return;
+
     // look them up in the type->mime type map
     const int nextLevel = level + 1;
     const TypeMimeTypeMap::iterator tm_end = m_typeMimeTypeMap.end();
@@ -145,6 +146,7 @@ void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
 
 void QMimeDatabasePrivate::determineLevels()
 {
+    typedef TypeMimeTypeMap::iterator Iterator;
     // Loop over toplevels and recurse down their hierarchies.
     // Determine top levels by subtracting the children from the parent
     // set. Note that a toplevel at this point might have 'subclassesOf'
@@ -153,30 +155,31 @@ void QMimeDatabasePrivate::determineLevels()
     // First, take the parent->child entries  whose parent exists and build
     // sets of parents/children
     QSet<QString> parentSet, childrenSet;
-    const ParentChildrenMap::const_iterator pcend = m_parentChildrenMap.constEnd();
-    for (ParentChildrenMap::const_iterator it =  m_parentChildrenMap.constBegin(); it !=  pcend; ++it)
-        if (m_typeMimeTypeMap.contains(it.key())) {
-            parentSet.insert(it.key());
-            childrenSet.insert(it.value());
+    ParentChildrenMap::const_iterator pit;
+    for (pit = m_parentChildrenMap.constBegin(); pit != m_parentChildrenMap.constEnd(); ++pit)
+        if (m_typeMimeTypeMap.contains(pit.key())) {
+            parentSet.insert(pit.key());
+            childrenSet.insert(pit.value());
         }
+
     const QSet<QString> topLevels = parentSet.subtract(childrenSet);
     if (debugMimeDB)
         qDebug() << Q_FUNC_INFO << "top levels" << topLevels;
+
     const TypeMimeTypeMap::iterator tm_end = m_typeMimeTypeMap.end();
-    const QSet<QString>::const_iterator tl_cend = topLevels.constEnd();
-    for (QSet<QString>::const_iterator tl_it =  topLevels.constBegin(); tl_it !=  tl_cend; ++tl_it) {
-        const TypeMimeTypeMap::iterator tm_it = m_typeMimeTypeMap.find(resolveAlias(*tl_it));
+    foreach (const QString &topLevel, topLevels) {
+        const TypeMimeTypeMap::iterator tm_it = m_typeMimeTypeMap.find(resolveAlias(topLevel));
         if (tm_it == tm_end) {
             qWarning("%s: Inconsistent mime hierarchy detected, top level element %s cannot be found.",
-                     Q_FUNC_INFO, tl_it->toUtf8().constData());
+                     Q_FUNC_INFO, topLevel.toUtf8().constData());
         } else {
             raiseLevelRecursion(tm_it.value(), 0);
         }
     }
 
     // move all danglings to top level
-    TypeMimeTypeMap::iterator cend = m_typeMimeTypeMap.end();
-    for (TypeMimeTypeMap::iterator it = m_typeMimeTypeMap.begin(); it != cend; ++it) {
+    TypeMimeTypeMap::iterator it;
+    for (it = m_typeMimeTypeMap.begin(); it != m_typeMimeTypeMap.end(); ++it) {
         if (it.value().level == Dangling) {
             it.value().level = 0;
         }
@@ -278,9 +281,8 @@ QStringList QMimeDatabasePrivate::suffixes() const
 {
     QStringList rc;
 
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it)
-        rc += it.value().type.suffixes();
+    foreach (const MimeMapEntry &entry, m_typeMimeTypeMap)
+        rc += entry.type.suffixes();
 
     return rc;
 }
@@ -289,9 +291,8 @@ QStringList QMimeDatabasePrivate::filterStrings() const
 {
     QStringList rc;
 
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
-        const QString filterString = it.value().type.filterString();
+    foreach (const MimeMapEntry &entry, m_typeMimeTypeMap) {
+        const QString filterString = entry.type.filterString();
         if (!filterString.isEmpty())
             rc += filterString;
     }
@@ -303,9 +304,8 @@ QList<QMimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
 {
     QList<QMimeGlobPattern> globPatterns;
 
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it)
-        globPatterns.append(it.value().type.globPatterns());
+    foreach (const MimeMapEntry &entry, m_typeMimeTypeMap)
+        globPatterns.append(entry.type.globPatterns());
 
     return globPatterns;
 }
@@ -322,15 +322,14 @@ QList<QSharedPointer<IMagicMatcher> > QMimeDatabasePrivate::magicMatchers() cons
 {
     QList<QSharedPointer<IMagicMatcher> > magicMatchers;
 
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it)
-        magicMatchers.append(it.value().type.magicMatchers());
+    foreach (const MimeMapEntry &entry, m_typeMimeTypeMap)
+        magicMatchers.append(entry.type.magicMatchers());
 
     return magicMatchers;
 }
 
 void QMimeDatabasePrivate::setMagicMatchers(const QString &typeOrAlias,
-                                           const QList<QSharedPointer<IMagicMatcher> > &matchers)
+                                            const QList<QSharedPointer<IMagicMatcher> > &matchers)
 {
     TypeMimeTypeMap::iterator tit =  m_typeMimeTypeMap.find(resolveAlias(typeOrAlias));
     if (tit != m_typeMimeTypeMap.end())
@@ -341,9 +340,8 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 {
     QList<QMimeType> mimeTypes;
 
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it)
-        mimeTypes.append(it.value().type);
+    foreach (const MimeMapEntry &entry, m_typeMimeTypeMap)
+        mimeTypes.append(entry.type);
 
     return mimeTypes;
 }
@@ -503,10 +501,9 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
 void QMimeDatabasePrivate::debug(QTextStream &str) const
 {
     str << ">MimeDatabase\n";
-    const TypeMimeTypeMap::const_iterator cend = m_typeMimeTypeMap.constEnd();
-    for (TypeMimeTypeMap::const_iterator it = m_typeMimeTypeMap.constBegin(); it != cend; ++it) {
-        str << "Entry level " << it.value().level << '\n';
-        it.value().type.m_d->debug(str);
+    foreach (const MimeMapEntry &entry, m_typeMimeTypeMap) {
+        str << "Entry level " << entry.level << '\n';
+        entry.type.m_d->debug(str);
     }
     str << "<MimeDatabase\n";
 }
