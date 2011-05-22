@@ -5,3 +5,4 @@ To be done:
 -rewrite parser
 -add binary parser
 -explore user-modified types
+-add support fot AND magics
