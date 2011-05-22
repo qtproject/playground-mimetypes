@@ -198,6 +198,17 @@ QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
     return QMimeType();
 }
 
+static unsigned matchesBySuffix(const QMimeType &type, const QString &name, unsigned *length)
+{
+    foreach (const QMimeGlobPattern &gp, type.globPatterns()) {
+        if (gp.regExp().exactMatch(name)) {
+            *length = gp.regExp().pattern().length();
+            return gp.weight();
+        }
+    }
+    return 0;
+}
+
 QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priorityPtr) const
 {
     // Is the hierarchy set up in case we find several matches?
@@ -207,16 +218,18 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priori
     }
 
     QMimeType candidate;
+    unsigned length = 0;
 
-    for (int level = m_maxLevel; level >= 0 && !candidate.isValid(); level--)
+    for (int level = m_maxLevel; level >= 0 /*&& !candidate.isValid()*/; level--)
         foreach (const MimeMapEntry *entry, m_typeMimeTypeMap)
             if (entry->level == level) {
-                const unsigned suffixPriority = entry->type.m_d->matchesFileBySuffix(name);
-                if (suffixPriority && suffixPriority > *priorityPtr) {
+                unsigned currentLength;
+                const unsigned suffixPriority = matchesBySuffix(entry->type, name, &currentLength);
+                if (suffixPriority && (suffixPriority > *priorityPtr
+                                       || (suffixPriority == *priorityPtr && currentLength > length)) ) {
+                    length = currentLength;
                     *priorityPtr = suffixPriority;
                     candidate = entry->type;
-//                    if (suffixPriority >= QMimeGlobPattern::MaxWeight)
-//                        return candidate;
                 }
             }
 
