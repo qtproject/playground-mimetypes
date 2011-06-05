@@ -25,9 +25,7 @@
 
 #include "qmimetype.h"
 
-#include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QMutex>
 
 QT_BEGIN_NAMESPACE
 
@@ -77,9 +75,9 @@ public:
     // The mime types from the functions bellow are considered only in regard to
     // their glob patterns and rule-based magic matchers.
     void syncUserModifiedMimeTypes();
+    void clearUserModifiedMimeTypes();
     static QList<QMimeType> readUserModifiedMimeTypes();
     static void writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes);
-    void clearUserModifiedMimeTypes();
 
     static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
                                                  int weight = QMimeGlobPattern::MaxWeight);

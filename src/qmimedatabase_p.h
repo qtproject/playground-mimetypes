@@ -5,6 +5,7 @@
 
 #include <QtCore/QTextStream>
 #include <QtCore/QMultiHash>
+#include <QtCore/QMutex>
 
 // XML tags in mime files
 const char * const mimeInfoTagC = "mime-info";

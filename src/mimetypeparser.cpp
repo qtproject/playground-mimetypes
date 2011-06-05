@@ -25,9 +25,10 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
+#include <QtCore/QDir>
+#include <QtCore/QPair>
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
-#include <QtCore/QStack>
 
 /*!
     \class MimeTypeParser
@@ -249,7 +250,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 break;
             default:
                 break;
-            } // switch nextStage
+            }
             break;
         // continue switch QXmlStreamReader::Token...
         case QXmlStreamReader::EndElement: // Finished element
@@ -282,12 +283,127 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
 
         default:
             break;
-        } // switch reader.readNext()
+        }
     }
 
     if (reader.hasError()) {
         *errorMessage = QString::fromLatin1("An error has been encountered at line %1 of %2: %3:").arg(reader.lineNumber()).arg(fileName, reader.errorString());
         return false;
     }
+
     return true;
+}
+
+static inline QString toOffset_helper(const QPair<int, int> &startEnd)
+{
+    return QString::number(startEnd.first) + QLatin1Char(':') + QString::number(startEnd.second);
+}
+
+static inline QPair<int, int> fromOffset_helper(const QString &offset)
+{
+    const QStringList startEnd = offset.split(QLatin1Char(':'));
+    Q_ASSERT(startEnd.size() == 2);
+    return qMakePair(startEnd.at(0).toInt(), startEnd.at(1).toInt());
+}
+
+QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
+{
+    QList<QMimeType> mimeTypes;
+    QFile file(kModifiedMimeTypesPath + kModifiedMimeTypesFile);
+    if (file.open(QFile::ReadOnly)) {
+        QMimeType mimeType;
+        QHash<int, QList<QMimeMagicRule> > rules;
+        QXmlStreamReader reader(&file);
+        QXmlStreamAttributes atts;
+        while (!reader.atEnd()) {
+            switch (reader.readNext()) {
+            case QXmlStreamReader::StartElement:
+                atts = reader.attributes();
+                if (reader.name() == mimeTypeTagC) {
+                    mimeType.setType(atts.value(QLatin1String(mimeTypeAttributeC)).toString());
+                    const QString &patterns = atts.value(QLatin1String(patternAttributeC)).toString();
+                    mimeType.setGlobPatterns(toGlobPatterns(patterns.split(kSemiColon)));
+                } else if (reader.name() == matchTagC) {
+                    const QString &value = atts.value(QLatin1String(matchValueAttributeC)).toString();
+                    const QString &type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
+                    const QString &offset = atts.value(QLatin1String(matchOffsetAttributeC)).toString();
+                    QPair<int, int> range = fromOffset_helper(offset);
+                    const int priority = atts.value(QLatin1String(priorityAttributeC)).toString().toInt();
+
+                    QMimeMagicRule::Type magicType = QMimeMagicRule::type(type.toLatin1());
+                    if (magicType != QMimeMagicRule::Invalid)
+                        rules[priority].append(QMimeMagicRule(magicType, value.toUtf8(), range.first, range.second));
+                }
+                break;
+            case QXmlStreamReader::EndElement:
+                if (reader.name() == mimeTypeTagC) {
+                    mimeType.setMagicRuleMatchers(MagicRuleMatcher::createMatchers(rules));
+                    mimeTypes.append(mimeType);
+                    mimeType.clear();
+                    rules.clear();
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        if (reader.hasError())
+            qWarning() << kModifiedMimeTypesFile << reader.errorString() << reader.lineNumber()
+                       << reader.columnNumber();
+        file.close();
+    }
+    return mimeTypes;
+}
+
+void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes)
+{
+    // Keep mime types modified which are already on file, unless they are part of the current set.
+    QSet<QString> currentMimeTypes;
+    foreach (const QMimeType &mimeType, mimeTypes)
+        currentMimeTypes.insert(mimeType.type());
+    const QList<QMimeType> &inFileMimeTypes = QMimeDatabasePrivate::readUserModifiedMimeTypes();
+    QList<QMimeType> allModifiedMimeTypes = mimeTypes;
+    foreach (const QMimeType &mimeType, inFileMimeTypes)
+        if (!currentMimeTypes.contains(mimeType.type()))
+            allModifiedMimeTypes.append(mimeType);
+
+    if (QFile::exists(kModifiedMimeTypesPath) || QDir().mkpath(kModifiedMimeTypesPath)) {
+        QFile file(kModifiedMimeTypesPath + kModifiedMimeTypesFile);
+        if (file.open(QFile::WriteOnly | QFile::Truncate)) {
+            // Notice this file only represents user modifications. It is writen in a
+            // convienient way for synchronization, which is similar to but not exactly the
+            // same format we use for the embedded mime type files.
+            QXmlStreamWriter writer(&file);
+            writer.setAutoFormatting(true);
+            writer.writeStartDocument();
+            writer.writeStartElement(QLatin1String(mimeInfoTagC));
+            foreach (const QMimeType &mimeType, allModifiedMimeTypes) {
+                writer.writeStartElement(QLatin1String(mimeTypeTagC));
+                writer.writeAttribute(QLatin1String(mimeTypeAttributeC), mimeType.type());
+                writer.writeAttribute(QLatin1String(patternAttributeC),
+                                      fromGlobPatterns(mimeType.globPatterns()).join(kSemiColon));
+                foreach (const QSharedPointer<IMagicMatcher> &matcher, mimeType.magicMatchers()) {
+                    // Only care about rule-based matchers.
+                    if (MagicRuleMatcher *ruleMatcher =
+                        dynamic_cast<MagicRuleMatcher *>(matcher.data())) {
+                        const QList<QMimeMagicRule> &rules = ruleMatcher->magicRules();
+                        foreach (const QMimeMagicRule &rule, rules) {
+                            writer.writeStartElement(QLatin1String(matchTagC));
+                            writer.writeAttribute(QLatin1String(matchValueAttributeC), QString::fromUtf8(rule.matchValue().constData()));
+                            writer.writeAttribute(QLatin1String(matchTypeAttributeC), QString::fromLatin1(QMimeMagicRule::typeName(rule.type())));
+                            writer.writeAttribute(QLatin1String(matchOffsetAttributeC),
+                                                  toOffset_helper(qMakePair(rule.startPos(), rule.endPos())));
+                            writer.writeAttribute(QLatin1String(priorityAttributeC),
+                                                  QString::number(ruleMatcher->priority()));
+                            writer.writeEndElement();
+                        }
+                    }
+                }
+                writer.writeEndElement();
+            }
+            writer.writeEndElement();
+            writer.writeEndDocument();
+            file.close();
+        }
+    }
 }
