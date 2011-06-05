@@ -3,9 +3,12 @@
 
 #include "qmimedatabase.h"
 
-#include <QtCore/QTextStream>
 #include <QtCore/QMultiHash>
 #include <QtCore/QMutex>
+#ifndef QT_NO_DEBUG_STREAM
+#include <QtCore/QTextStream>
+#endif
+
 
 // XML tags in mime files
 const char * const mimeInfoTagC = "mime-info";
@@ -82,7 +85,9 @@ public:
                                                  int weight = QMimeGlobPattern::MaxWeight);
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
+#ifndef QT_NO_DEBUG_STREAM
     void debug(QTextStream &str) const;
+#endif
 
 //    QMimeType findByFileUnlocked(const QFileInfo &f) const;
 

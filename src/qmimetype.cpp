@@ -21,10 +21,11 @@
 #include "qmimetype.h"
 #include "qmimetype_p.h"
 
+#include <QtCore/QDebug>
+#include <QtCore/QTextStream>
+
 #include "qmimedatabase.h"
 #include "magicmatcher_p.h"
-
-#include <QtCore/QDebug>
 
 QT_BEGIN_NAMESPACE
 
@@ -84,6 +85,7 @@ void QMimeTypeData::assignSuffixes(const QStringList &patterns)
         assignSuffix(pattern);
 }
 
+#ifndef QT_NO_DEBUG_STREAM
 void QMimeTypeData::debug(QTextStream &str, int indent) const
 {
     const QString indentS = QString(indent, QLatin1Char(' '));
@@ -107,6 +109,7 @@ void QMimeTypeData::debug(QTextStream &str, int indent) const
     }
     str << '\n';
 }
+#endif
 
 unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 {

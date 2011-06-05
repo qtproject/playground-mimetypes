@@ -341,8 +341,8 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 void QMimeDatabasePrivate::syncUserModifiedMimeTypes()
 {
     QHash<QString, QMimeType> userModified;
-    const QList<QMimeType> &userMimeTypes = QMimeDatabasePrivate::readUserModifiedMimeTypes();
-    foreach (const QMimeType &userMimeType, userMimeTypes)
+
+    foreach (const QMimeType &userMimeType, QMimeDatabasePrivate::readUserModifiedMimeTypes())
         userModified.insert(userMimeType.type(), userMimeType);
 
     foreach (MimeMapEntry *entry, m_typeMimeTypeMap) {
@@ -383,6 +383,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
     return patterns;
 }
 
+#ifndef QT_NO_DEBUG_STREAM
 void QMimeDatabasePrivate::debug(QTextStream &str) const
 {
     str << ">MimeDatabase\n";
@@ -392,6 +393,7 @@ void QMimeDatabasePrivate::debug(QTextStream &str) const
     }
     str << "<MimeDatabase\n";
 }
+#endif
 
 QT_BEGIN_NAMESPACE
 
