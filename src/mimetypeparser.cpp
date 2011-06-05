@@ -135,7 +135,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
                               QString *errorMessage, QMimeMagicRule *&rule)
 {
     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
-    QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type.toLatin1());
+    QMimeMagicRule::Type magicType = QMimeMagicRule::type(type.toLatin1());
     if (magicType == QMimeMagicRule::Invalid) {
         qWarning("%s: match type %s is not supported.", Q_FUNC_INFO, type.toUtf8().constData());
         return true;
@@ -157,7 +157,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
         qDebug() << Q_FUNC_INFO << value << startPos << endPos;
 
 //    ruleMatcher->add(QMimeMagicRule(magicType, value, startPos, endPos));
-    rule = new QMimeMagicRule(magicType, value, startPos, endPos);
+    rule = new QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos);
     return true;
 }
 

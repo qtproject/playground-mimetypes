@@ -24,13 +24,16 @@
 #include "qmime_global.h"
 
 #include <QtCore/QByteArray>
-#include <QtCore/QPair>
+#include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 
 #include "qmimemagicrule.h"
 
 QT_BEGIN_NAMESPACE
+
+typedef QList<QMimeMagicRule> QMimeMagicRuleList;
 
 class QMIME_EXPORT IMagicMatcher
 {

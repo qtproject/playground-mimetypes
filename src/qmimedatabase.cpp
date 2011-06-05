@@ -27,6 +27,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QPair>
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 
@@ -359,6 +360,18 @@ void QMimeDatabasePrivate::syncUserModifiedMimeTypes()
     }
 }
 
+static inline QString toOffset_helper(const QPair<int, int> &startEnd)
+{
+    return QString::number(startEnd.first) + QLatin1Char(':') + QString::number(startEnd.second);
+}
+
+static inline QPair<int, int> fromOffset_helper(const QString &offset)
+{
+    const QStringList startEnd = offset.split(QLatin1Char(':'));
+    Q_ASSERT(startEnd.size() == 2);
+    return qMakePair(startEnd.at(0).toInt(), startEnd.at(1).toInt());
+}
+
 QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
 {
     QList<QMimeType> mimeTypes;
@@ -380,12 +393,12 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
                     const QString &value = atts.value(matchValueAttributeC).toString();
                     const QString &type = atts.value(matchTypeAttributeC).toString();
                     const QString &offset = atts.value(matchOffsetAttributeC).toString();
-                    QPair<int, int> range = QMimeMagicRule::fromOffset(offset);
+                    QPair<int, int> range = fromOffset_helper(offset);
                     const int priority = atts.value(priorityAttributeC).toString().toInt();
 
-                    QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type.toLatin1());
+                    QMimeMagicRule::Type magicType = QMimeMagicRule::type(type.toLatin1());
                     if (magicType != QMimeMagicRule::Invalid)
-                        rules[priority].append(QMimeMagicRule(magicType, value, range.first, range.second));
+                        rules[priority].append(QMimeMagicRule(magicType, value.toUtf8(), range.first, range.second));
                 }
                 break;
             case QXmlStreamReader::EndElement:
@@ -443,11 +456,10 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
                         const QList<QMimeMagicRule> &rules = ruleMatcher->magicRules();
                         foreach (const QMimeMagicRule &rule, rules) {
                             writer.writeStartElement(matchTagC);
-                            writer.writeAttribute(matchValueAttributeC, rule.matchValue());
-                            writer.writeAttribute(matchTypeAttributeC, rule.matchType());
+                            writer.writeAttribute(matchValueAttributeC, QString::fromUtf8(rule.matchValue().constData()));
+                            writer.writeAttribute(matchTypeAttributeC, QString::fromLatin1(QMimeMagicRule::typeName(rule.type())));
                             writer.writeAttribute(matchOffsetAttributeC,
-                                                  QMimeMagicRule::toOffset(
-                                                      qMakePair(rule.startPos(), rule.endPos())));
+                                                  toOffset_helper(qMakePair(rule.startPos(), rule.endPos())));
                             writer.writeAttribute(priorityAttributeC,
                                                   QString::number(ruleMatcher->priority()));
                             writer.writeEndElement();
