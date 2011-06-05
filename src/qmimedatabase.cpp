@@ -386,15 +386,15 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
             case QXmlStreamReader::StartElement:
                 atts = reader.attributes();
                 if (reader.name() == mimeTypeTagC) {
-                    mimeType.setType(atts.value(mimeTypeAttributeC).toString());
-                    const QString &patterns = atts.value(patternAttributeC).toString();
+                    mimeType.setType(atts.value(QLatin1String(mimeTypeAttributeC)).toString());
+                    const QString &patterns = atts.value(QLatin1String(patternAttributeC)).toString();
                     mimeType.setGlobPatterns(toGlobPatterns(patterns.split(kSemiColon)));
                 } else if (reader.name() == matchTagC) {
-                    const QString &value = atts.value(matchValueAttributeC).toString();
-                    const QString &type = atts.value(matchTypeAttributeC).toString();
-                    const QString &offset = atts.value(matchOffsetAttributeC).toString();
+                    const QString &value = atts.value(QLatin1String(matchValueAttributeC)).toString();
+                    const QString &type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
+                    const QString &offset = atts.value(QLatin1String(matchOffsetAttributeC)).toString();
                     QPair<int, int> range = fromOffset_helper(offset);
-                    const int priority = atts.value(priorityAttributeC).toString().toInt();
+                    const int priority = atts.value(QLatin1String(priorityAttributeC)).toString().toInt();
 
                     QMimeMagicRule::Type magicType = QMimeMagicRule::type(type.toLatin1());
                     if (magicType != QMimeMagicRule::Invalid)
@@ -444,23 +444,22 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
             writer.writeStartDocument();
             writer.writeStartElement(QLatin1String(mimeInfoTagC));
             foreach (const QMimeType &mimeType, allModifiedMimeTypes) {
-                writer.writeStartElement(mimeTypeTagC);
-                writer.writeAttribute(mimeTypeAttributeC, mimeType.type());
-                writer.writeAttribute(patternAttributeC,
+                writer.writeStartElement(QLatin1String(mimeTypeTagC));
+                writer.writeAttribute(QLatin1String(mimeTypeAttributeC), mimeType.type());
+                writer.writeAttribute(QLatin1String(patternAttributeC),
                                       fromGlobPatterns(mimeType.globPatterns()).join(kSemiColon));
-                const QList<QSharedPointer<IMagicMatcher> > &matchers = mimeType.magicMatchers();
-                foreach (const QSharedPointer<IMagicMatcher> &matcher, matchers) {
+                foreach (const QSharedPointer<IMagicMatcher> &matcher, mimeType.magicMatchers()) {
                     // Only care about rule-based matchers.
                     if (MagicRuleMatcher *ruleMatcher =
                         dynamic_cast<MagicRuleMatcher *>(matcher.data())) {
                         const QList<QMimeMagicRule> &rules = ruleMatcher->magicRules();
                         foreach (const QMimeMagicRule &rule, rules) {
-                            writer.writeStartElement(matchTagC);
-                            writer.writeAttribute(matchValueAttributeC, QString::fromUtf8(rule.matchValue().constData()));
-                            writer.writeAttribute(matchTypeAttributeC, QString::fromLatin1(QMimeMagicRule::typeName(rule.type())));
-                            writer.writeAttribute(matchOffsetAttributeC,
+                            writer.writeStartElement(QLatin1String(matchTagC));
+                            writer.writeAttribute(QLatin1String(matchValueAttributeC), QString::fromUtf8(rule.matchValue().constData()));
+                            writer.writeAttribute(QLatin1String(matchTypeAttributeC), QString::fromLatin1(QMimeMagicRule::typeName(rule.type())));
+                            writer.writeAttribute(QLatin1String(matchOffsetAttributeC),
                                                   toOffset_helper(qMakePair(rule.startPos(), rule.endPos())));
-                            writer.writeAttribute(priorityAttributeC,
+                            writer.writeAttribute(QLatin1String(priorityAttributeC),
                                                   QString::number(ruleMatcher->priority()));
                             writer.writeEndElement();
                         }
