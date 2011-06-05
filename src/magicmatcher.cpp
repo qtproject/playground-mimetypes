@@ -26,6 +26,8 @@
 #include <QtCore/QDebug>
 #include <qendian.h>
 
+QT_BEGIN_NAMESPACE
+
 // UTF16 byte order marks
 static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
 static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
@@ -194,3 +196,5 @@ IMagicMatcher::IMagicMatcherList MagicRuleMatcher::createMatchers(
     }
     return matchers;
 }
+
+QT_END_NAMESPACE

@@ -9,6 +9,7 @@
 #include <QtCore/QTextStream>
 #endif
 
+QT_BEGIN_NAMESPACE
 
 // XML tags in mime files
 const char * const mimeInfoTagC = "mime-info";
@@ -156,5 +157,7 @@ private:
 
     QMimeDatabasePrivate &m_db;
 };
+
+QT_END_NAMESPACE
 
 #endif // QMIMEDATABASE_P_H

@@ -25,6 +25,8 @@
 
 #include <QtCore/QHash>
 
+QT_BEGIN_NAMESPACE
+
 class QTextStream;
 
 class FileMatchContext;
@@ -64,5 +66,7 @@ public:
 };
 
 enum { debugMimeDB = 0 };
+
+QT_END_NAMESPACE
 
 #endif // QMIMETYPE_P_H

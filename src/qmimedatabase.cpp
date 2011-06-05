@@ -30,6 +30,8 @@
 #include <algorithm>
 #include <functional>
 
+QT_BEGIN_NAMESPACE
+
 const QChar QMimeDatabasePrivate::kSemiColon(QLatin1Char(';'));
 const QString QMimeDatabasePrivate::kModifiedMimeTypesFile(QLatin1String("modifiedmimetypes.xml"));
 QString QMimeDatabasePrivate::kModifiedMimeTypesPath;
@@ -395,7 +397,6 @@ void QMimeDatabasePrivate::debug(QTextStream &str) const
 }
 #endif
 
-QT_BEGIN_NAMESPACE
 
 /*!
     \class MimeDatabase

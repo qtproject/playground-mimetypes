@@ -6,6 +6,8 @@
 
 #include <QtCore/QFileInfo>
 
+QT_BEGIN_NAMESPACE
+
 // Fallback priorities, must be low.
 enum {
     BinaryMatchPriority = QMimeGlobPattern::MinWeight + 1,
@@ -57,5 +59,7 @@ public:
 
     static bool isTextFile(const QByteArray &data);
 };
+
+QT_END_NAMESPACE
 
 #endif // MAGICMATCHER_P_H

@@ -30,6 +30,8 @@
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 
+QT_BEGIN_NAMESPACE
+
 /*!
     \class MimeTypeParser
     \brief Mime type parser
@@ -407,3 +409,5 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
         }
     }
 }
+
+QT_END_NAMESPACE
