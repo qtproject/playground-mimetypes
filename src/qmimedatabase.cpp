@@ -49,6 +49,9 @@ QMimeDatabasePrivate::QMimeDatabasePrivate() :
 
 bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage)
 {
+    if (errorMessage)
+        errorMessage->clear();
+
     MimeTypeParser parser(*this);
     return parser.parse(device, fileName, errorMessage);
 }
@@ -57,14 +60,22 @@ bool QMimeDatabasePrivate::addMimeTypes(const QString &fileName, QString *errorM
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        *errorMessage = QString::fromLatin1("Cannot open %1: %2").arg(fileName, file.errorString());
+        if (errorMessage)
+            *errorMessage = QString::fromLatin1("Cannot open %1: %2").arg(fileName, file.errorString());
         return false;
     }
+
+    if (errorMessage)
+        errorMessage->clear();
+
     return addMimeTypes(&file, fileName, errorMessage);
 }
 
 bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, QString *errorMessage)
 {
+    if (errorMessage)
+        errorMessage->clear();
+
     return addMimeTypes(device, QLatin1String("<stream>"), errorMessage);
 }
 

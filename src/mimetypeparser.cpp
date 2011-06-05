@@ -308,7 +308,8 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
     }
 
     if (reader.hasError()) {
-        *errorMessage = QString::fromLatin1("An error has been encountered at line %1 of %2: %3:").arg(reader.lineNumber()).arg(fileName, reader.errorString());
+        if (errorMessage)
+            *errorMessage = QString::fromLatin1("An error has been encountered at line %1 of %2: %3:").arg(reader.lineNumber()).arg(fileName, reader.errorString());
         return false;
     }
 
