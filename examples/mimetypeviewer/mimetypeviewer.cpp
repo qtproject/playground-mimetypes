@@ -31,7 +31,9 @@ void MimeTypeViewer::addDatabase(const QString &file)
 
 void MimeTypeViewer::onAddTypesButtonClicked()
 {
-    QString file = QFileDialog::getOpenFileName(this, tr("Select database"));
+    QString file = QFileDialog::getOpenFileName(this, tr("Select database"),
+                                                QLatin1String("../../../qmime"),
+                                                tr("shared-mime-db (*.org.xml)"));
     if (file.isEmpty())
         return;
 
