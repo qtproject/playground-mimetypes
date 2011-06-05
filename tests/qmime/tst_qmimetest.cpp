@@ -83,6 +83,8 @@ void QmimeTest::testFindByFile()
         QString mimetype = list.at(1);
         file.prepend(SRCDIR"testfiles/");
 
+        qDebug() << file << database.findByFile(QFileInfo(file)).type() << database.findByType(mimetype).type();
+
         if (failByFileData) {
             QEXPECT_FAIL("", "Should fail", Continue);
             QCOMPARE(database.findByFile(QFileInfo(file)).type(), database.findByType(mimetype).type());

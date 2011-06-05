@@ -27,6 +27,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
+#include <QtCore/QStack>
 
 /*!
     \class BaseMimeTypeParser
@@ -121,7 +122,7 @@ static bool parseNumber(const QString &n, int *target, QString *errorMessage)
 //  <match value="0x9501" type="big16" offset="0:64"/>
 static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
                               const MagicRuleMatcherPtr  &ruleMatcher,
-                              QString *errorMessage)
+                              QString *errorMessage, QMimeMagicRule *&rule)
 {
     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
     QMimeMagicRule::Type magicType = QMimeMagicRule::stringToType(type.toLatin1());
@@ -145,7 +146,8 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
     if (debugMimeDB)
         qDebug() << Q_FUNC_INFO << value << startPos << endPos;
 
-    ruleMatcher->add(QMimeMagicRule(magicType, value, startPos, endPos));
+//    ruleMatcher->add(QMimeMagicRule(magicType, value, startPos, endPos));
+    rule = new QMimeMagicRule(magicType, value, startPos, endPos);
     return true;
 }
 
@@ -153,6 +155,8 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
 {
     QMimeTypeData data;
     MagicRuleMatcherPtr ruleMatcher;
+    int priority = 0;
+    QList<QMimeMagicRule> rules;
     QXmlStreamReader reader(dev);
     ParseStage ps = ParseBeginning;
     QXmlStreamAttributes atts;
@@ -200,25 +204,35 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             }
                 break;
             case ParseMagic: {
-                int priority = 0;
+//                int priority = 0;
+                priority = 0;
                 const QString priorityS = atts.value(QLatin1String(priorityAttributeC)).toString();
                 if (!priorityS.isEmpty()) {
                     if (!parseNumber(priorityS, &priority, errorMessage))
                         return false;
 
                 }
-                ruleMatcher = MagicRuleMatcherPtr(new MagicRuleMatcher);
-                ruleMatcher->setPriority(priority);
+//                ruleMatcher = MagicRuleMatcherPtr(new MagicRuleMatcher);
+//                ruleMatcher->setPriority(priority);
             }
                 break;
-            case ParseMagicMatchRule:
-                if (ruleMatcher.isNull()) {
-                    qWarning() << "BaseMimeTypeParser::parse : ruleMatcher unexpectedly null";
-                    return false;
+            case ParseMagicMatchRule: {
+//                if (ruleMatcher.isNull()) {
+//                    qWarning() << "BaseMimeTypeParser::parse : ruleMatcher unexpectedly null";
+//                    return false;
+//                }
+                if (!ruleMatcher) {
+                    ruleMatcher = MagicRuleMatcherPtr(new MagicRuleMatcher);
+                    ruleMatcher->setPriority(priority);
                 }
-                if (!addMagicMatchRule(atts, ruleMatcher, errorMessage))
+
+                QMimeMagicRule *rule = 0;
+                if (!addMagicMatchRule(atts, ruleMatcher, errorMessage, rule))
                     return false;
+                rules.append(*rule);
+                delete rule;
                 break;
+            }
             case ParseError:
                 reader.raiseError(QString::fromLatin1("Unexpected element <%1>").
                                   arg(reader.name().toString()));
@@ -235,13 +249,23 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 data.clear();
             } else {
                 // Finished a match sequence
-                if (reader.name() == QLatin1String(magicTagC)) {
-                    if (ruleMatcher.isNull()) {
-                        qWarning() << "BaseMimeTypeParser::parse : ruleMatcher unexpectedly null";
-                        return false;
+//                if (reader.name() == QLatin1String(magicTagC)) {
+//                    if (ruleMatcher.isNull()) {
+//                        qWarning() << "BaseMimeTypeParser::parse : ruleMatcher unexpectedly null";
+//                        return false;
+//                    }
+//                    data.magicMatchers.push_back(ruleMatcher);
+//                    ruleMatcher = MagicRuleMatcherPtr();
+//                }
+
+                // Finished a match sequence
+                if (reader.name() == QLatin1String(matchTagC)) {
+                    if (!ruleMatcher.isNull()) {
+                        ruleMatcher->add(rules);
+                        data.magicMatchers.push_back(ruleMatcher);
+                        ruleMatcher = MagicRuleMatcherPtr();
                     }
-                    data.magicMatchers.push_back(ruleMatcher);
-                    ruleMatcher = MagicRuleMatcherPtr();
+                    rules.takeLast();
                 }
             }
             break;

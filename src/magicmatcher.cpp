@@ -162,10 +162,13 @@ IMagicMatcher::Type MagicRuleMatcher::type() const
 
 bool MagicRuleMatcher::matches(const QByteArray &data) const
 {
+    if (m_list.isEmpty())
+        return false;
+//    qDebug() << this->magicRules();
     for (int i = 0; i < m_list.size(); i++)
-        if ( m_list.at(i).matches(data))
-            return true;
-    return false;
+        if ( !m_list.at(i).matches(data))
+            return false;
+    return true;
 }
 
 int MagicRuleMatcher::priority() const
