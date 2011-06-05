@@ -11,35 +11,11 @@
 
 QT_BEGIN_NAMESPACE
 
-// XML tags in mime files
-const char * const mimeInfoTagC = "mime-info";
-const char * const mimeTypeTagC = "mime-type";
-const char * const mimeTypeAttributeC = "type";
-const char * const subClassTagC = "sub-class-of";
-const char * const commentTagC = "comment";
-const char * const globTagC = "glob";
-const char * const aliasTagC = "alias";
-const char * const patternAttributeC = "pattern";
-const char * const weightAttributeC = "weight";
-const char * const localeAttributeC = "xml:lang";
-
-const char * const magicTagC = "magic";
-const char * const priorityAttributeC = "priority";
-const char * const matchTagC = "match";
-const char * const matchValueAttributeC = "value";
-const char * const matchTypeAttributeC = "type";
-const char * const matchOffsetAttributeC = "offset";
-
-// Types
-const char * const textTypeC = "text/plain";
-const char * const binaryTypeC = "application/octet-stream";
-
-// MimeMapEntry: Entry of a type map, consisting of type and level.
-
 #define MIN_MATCH_WEIGHT 50
 
 enum { Dangling = 32767 };
 
+// MimeMapEntry: Entry of a type map, consisting of type and level.
 struct MimeMapEntry
 {
     explicit MimeMapEntry(const QMimeType &t = QMimeType(), int aLevel = Dangling) :
@@ -90,13 +66,10 @@ public:
     void debug(QTextStream &str) const;
 #endif
 
-//    QMimeType findByFileUnlocked(const QFileInfo &f) const;
-
 private:
     typedef QHash<QString, QString> AliasMap;
     typedef QMultiHash<QString, QString> ParentChildrenMap;
 
-    static const QChar kSemiColon;
     static const QString kModifiedMimeTypesFile;
     static QString kModifiedMimeTypesPath;
 

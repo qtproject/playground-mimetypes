@@ -32,7 +32,10 @@
 
 QT_BEGIN_NAMESPACE
 
-const QChar QMimeDatabasePrivate::kSemiColon(QLatin1Char(';'));
+// Types
+const char *const textTypeC = "text/plain";
+const char *const binaryTypeC = "application/octet-stream";
+
 const QString QMimeDatabasePrivate::kModifiedMimeTypesFile(QLatin1String("modifiedmimetypes.xml"));
 QString QMimeDatabasePrivate::kModifiedMimeTypesPath;
 

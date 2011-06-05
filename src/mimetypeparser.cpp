@@ -32,6 +32,25 @@
 
 QT_BEGIN_NAMESPACE
 
+// XML tags in mime files
+const char *const mimeInfoTagC = "mime-info";
+const char *const mimeTypeTagC = "mime-type";
+const char *const mimeTypeAttributeC = "type";
+const char *const subClassTagC = "sub-class-of";
+const char *const commentTagC = "comment";
+const char *const globTagC = "glob";
+const char *const aliasTagC = "alias";
+const char *const patternAttributeC = "pattern";
+const char *const weightAttributeC = "weight";
+const char *const localeAttributeC = "xml:lang";
+
+const char *const magicTagC = "magic";
+const char *const priorityAttributeC = "priority";
+const char *const matchTagC = "match";
+const char *const matchValueAttributeC = "value";
+const char *const matchTypeAttributeC = "type";
+const char *const matchOffsetAttributeC = "offset";
+
 /*!
     \class MimeTypeParser
     \brief Mime type parser
@@ -324,7 +343,7 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
                 if (reader.name() == mimeTypeTagC) {
                     mimeType.setType(atts.value(QLatin1String(mimeTypeAttributeC)).toString());
                     const QString &patterns = atts.value(QLatin1String(patternAttributeC)).toString();
-                    mimeType.setGlobPatterns(toGlobPatterns(patterns.split(kSemiColon)));
+                    mimeType.setGlobPatterns(toGlobPatterns(patterns.split(QLatin1Char(';'))));
                 } else if (reader.name() == matchTagC) {
                     const QString &value = atts.value(QLatin1String(matchValueAttributeC)).toString();
                     const QString &type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
@@ -383,7 +402,7 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
                 writer.writeStartElement(QLatin1String(mimeTypeTagC));
                 writer.writeAttribute(QLatin1String(mimeTypeAttributeC), mimeType.type());
                 writer.writeAttribute(QLatin1String(patternAttributeC),
-                                      fromGlobPatterns(mimeType.globPatterns()).join(kSemiColon));
+                                      fromGlobPatterns(mimeType.globPatterns()).join(QLatin1String(";")));
                 foreach (const QSharedPointer<IMagicMatcher> &matcher, mimeType.magicMatchers()) {
                     // Only care about rule-based matchers.
                     if (MagicRuleMatcher *ruleMatcher =
