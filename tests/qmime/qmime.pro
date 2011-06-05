@@ -8,7 +8,7 @@ QT       += testlib
 
 QT       -= gui
 
-TARGET = tst_qmimetest
+TARGET = tst_qmimetype
 CONFIG   += console
 CONFIG   -= app_bundle
 
@@ -22,5 +22,5 @@ INCLUDEPATH *= $$PWD/../../include
 
 #DEFINES += SRC_DIR $$PWD
 
-SOURCES += tst_qmimetest.cpp
+SOURCES += tst_qmimetype.cpp
 DEFINES += SRCDIR='"\\"$$PWD/\\""'
