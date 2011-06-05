@@ -171,12 +171,12 @@ bool MagicRuleMatcher::matches(const QByteArray &data) const
     return true;
 }
 
-int MagicRuleMatcher::priority() const
+unsigned MagicRuleMatcher::priority() const
 {
     return m_priority;
 }
 
-void MagicRuleMatcher::setPriority(int p)
+void MagicRuleMatcher::setPriority(unsigned p)
 {
     m_priority = p;
 }

@@ -22,14 +22,16 @@
 #define QMIMETYPE_P_H
 
 #include "qmimetype.h"
+
 #include <QtCore/QHash>
 #include <QtCore/QTextStream>
 
 class FileMatchContext;
 
-class QMimeTypeData : public QSharedData {
+class QMimeTypeData : public QSharedData
+{
 public:
-    typedef QHash<QString,QString> LocaleHash;
+    typedef QHash<QString, QString> LocaleHash;
 
     QMimeTypeData();
 
@@ -48,7 +50,6 @@ public:
 
     QString type;
     QString comment;
-
     LocaleHash localeComments;
     QStringList aliases;
     QList<QMimeGlobPattern> globPatterns;

@@ -45,7 +45,7 @@ class BinaryMatcher : public IMagicMatcher {
 public:
     BinaryMatcher() {}
     virtual bool matches(const QByteArray & /*data*/) const { return true; }
-    virtual int priority() const  { return BinaryMatchPriority; }
+    virtual unsigned priority() const  { return BinaryMatchPriority; }
 };
 
 class HeuristicTextMagicMatcher : public IMagicMatcher {
@@ -53,7 +53,7 @@ class HeuristicTextMagicMatcher : public IMagicMatcher {
 public:
     HeuristicTextMagicMatcher() {}
     virtual bool matches(const QByteArray &data) const;
-    virtual int priority() const  { return TextMatchPriority; }
+    virtual unsigned priority() const  { return TextMatchPriority; }
 
     static bool isTextFile(const QByteArray &data);
 };

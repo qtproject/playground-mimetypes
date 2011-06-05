@@ -45,17 +45,6 @@ QMimeDatabasePrivate::QMimeDatabasePrivate() :
 #warning TODO: FIX!!!
 }
 
-/*!
-    \class MimeTypeParser
-    \brief Mime type parser
-
-    Populates MimeDataBase
-
-    \sa MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
-    \sa MimeTypeParser
-*/
-
 bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage)
 {
     MimeTypeParser parser(*this);
@@ -65,7 +54,7 @@ bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, const QString &fileNa
 bool QMimeDatabasePrivate::addMimeTypes(const QString &fileName, QString *errorMessage)
 {
     QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         *errorMessage = QString::fromLatin1("Cannot open %1: %2").arg(fileName, file.errorString());
         return false;
     }
@@ -98,14 +87,12 @@ bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
     // Register the children, resolved via alias map. Note that it is still
     // possible that aliases end up in the map if the parent classes are not inserted
     // at this point (thus their aliases not known).
-    const QStringList subClassesOf = mt.subClassOf();
-    for (int i = 0; i < subClassesOf.size(); i++)
-        m_parentChildrenMap.insert(resolveAlias(subClassesOf.at(i)), type);
+    foreach (const QString &subClassOf, mt.subClassOf())
+        m_parentChildrenMap.insert(resolveAlias(subClassOf), type);
 
     // register aliasses
-    const QStringList aliases = mt.aliases();
-    for (int i = 0; i < aliases.size(); i++)
-        m_aliasMap.insert(aliases.at(i), type);
+    foreach (const QString &alias, mt.aliases())
+        m_aliasMap.insert(alias, type);
 
     m_maxLevel = -1; // Mark as dirty
     return true;
@@ -123,22 +110,16 @@ void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
 
     if (m_maxLevel < level)
         m_maxLevel = level;
-    // At all events recurse over children since nodes might have been
-    // added.
-    const QStringList childTypes = m_parentChildrenMap.values(e.type.type());
-    if (childTypes.empty())
-        return;
 
+    // At all events recurse over children since nodes might have been added;
     // look them up in the type->mime type map
-    const int nextLevel = level + 1;
-    for (int i = 0; i < childTypes.size(); i++) {
-        const QString &alias = childTypes.at(i);
+    foreach (const QString &alias, m_parentChildrenMap.values(e.type.type())) {
         MimeMapEntry *entry = m_typeMimeTypeMap.value(resolveAlias(alias));
         if (!entry) {
             qWarning("%s: Inconsistent mime hierarchy detected, child %s of %s cannot be found.",
-                     Q_FUNC_INFO, alias.toUtf8().constData(), e.type.type().toUtf8().constData());
+                     Q_FUNC_INFO, alias.toLocal8Bit().constData(), e.type.type().toLocal8Bit().constData());
         } else {
-            raiseLevelRecursion(*entry, nextLevel);
+            raiseLevelRecursion(*entry, level + 1);
         }
     }
 }
@@ -154,11 +135,12 @@ void QMimeDatabasePrivate::determineLevels()
     // sets of parents/children
     QSet<QString> parentSet, childrenSet;
     ParentChildrenMap::const_iterator pit;
-    for (pit = m_parentChildrenMap.constBegin(); pit != m_parentChildrenMap.constEnd(); ++pit)
+    for (pit = m_parentChildrenMap.constBegin(); pit != m_parentChildrenMap.constEnd(); ++pit) {
         if (m_typeMimeTypeMap.contains(pit.key())) {
             parentSet.insert(pit.key());
             childrenSet.insert(pit.value());
         }
+    }
 
     const QSet<QString> topLevels = parentSet.subtract(childrenSet);
     if (debugMimeDB)
@@ -168,7 +150,7 @@ void QMimeDatabasePrivate::determineLevels()
         MimeMapEntry *entry = m_typeMimeTypeMap.value(resolveAlias(topLevel));
         if (!entry) {
             qWarning("%s: Inconsistent mime hierarchy detected, top level element %s cannot be found.",
-                     Q_FUNC_INFO, topLevel.toUtf8().constData());
+                     Q_FUNC_INFO, topLevel.toLocal8Bit().constData());
         } else {
             raiseLevelRecursion(*entry, 0);
         }
@@ -176,9 +158,8 @@ void QMimeDatabasePrivate::determineLevels()
 
     // move all danglings to top level
     foreach (MimeMapEntry *entry, m_typeMimeTypeMap) {
-        if (entry->level == Dangling) {
+        if (entry->level == Dangling)
             entry->level = 0;
-        }
     }
 }
 
@@ -220,18 +201,20 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priori
     QMimeType candidate;
     unsigned length = 0;
 
-    for (int level = m_maxLevel; level >= 0 /*&& !candidate.isValid()*/; level--)
-        foreach (const MimeMapEntry *entry, m_typeMimeTypeMap)
+    for (int level = m_maxLevel; level >= 0 /*&& !candidate.isValid()*/; level--) {
+        foreach (const MimeMapEntry *entry, m_typeMimeTypeMap) {
             if (entry->level == level) {
                 unsigned currentLength;
                 const unsigned suffixPriority = matchesBySuffix(entry->type, name, &currentLength);
                 if (suffixPriority && (suffixPriority > *priorityPtr
-                                       || (suffixPriority == *priorityPtr && currentLength > length)) ) {
+                                       || (suffixPriority == *priorityPtr && currentLength > length))) {
                     length = currentLength;
                     *priorityPtr = suffixPriority;
                     candidate = entry->type;
                 }
             }
+        }
+    }
 
     return candidate;
 }
@@ -246,8 +229,8 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
 
     QMimeType candidate;
 
-    for (int level = m_maxLevel; level >= 0; level--)
-        foreach (const MimeMapEntry *entry, m_typeMimeTypeMap)
+    for (int level = m_maxLevel; level >= 0; level--) {
+        foreach (const MimeMapEntry *entry, m_typeMimeTypeMap) {
             if (entry->level == level) {
                 const unsigned contentPriority = entry->type.m_d->matchesData(data);
                 if (contentPriority && contentPriority > *priorityPtr) {
@@ -255,6 +238,8 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
                     candidate = entry->type;
                 }
             }
+        }
+    }
 
     return candidate;
 }
@@ -283,10 +268,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     unsigned priorityByName = *priorityPtr;
     QMimeType candidateByData(findByData(context.data(), priorityPtr));
 
-    if (priorityByName < *priorityPtr)
-        return candidateByData;
-    else
-        return candidateByName;
+    return priorityByName < *priorityPtr ? candidateByData : candidateByName;
 }
 
 // Return all known suffixes
@@ -493,8 +475,8 @@ QList<QMimeGlobPattern> QMimeDatabasePrivate::toGlobPatterns(const QStringList &
     QList<QMimeGlobPattern> globPatterns;
 
     foreach (const QString &pattern, patterns) {
-        QRegExp regExp(pattern, Qt::CaseSensitive, QRegExp::Wildcard);
-        globPatterns.append(QMimeGlobPattern(regExp, weight));
+        const QRegExp wildcard(pattern, Qt::CaseSensitive, QRegExp::WildcardUnix);
+        globPatterns.append(QMimeGlobPattern(wildcard, weight));
     }
 
     return globPatterns;
@@ -585,10 +567,9 @@ QMimeDatabase::~QMimeDatabase()
 */
 QMimeType QMimeDatabase::findByType(const QString &typeOrAlias) const
 {
-    m_d->m_mutex.lock();
-    const QMimeType rc = m_d->findByType(typeOrAlias);
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->findByType(typeOrAlias);
 }
 
 /*!
@@ -598,11 +579,10 @@ QMimeType QMimeDatabase::findByType(const QString &typeOrAlias) const
 */
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
-    m_d->m_mutex.lock();
+    QMutexLocker locker(&m_d->m_mutex);
+
     unsigned priority = 0;
-    const QMimeType rc = m_d->findByFile(fileInfo, &priority);
-    m_d->m_mutex.unlock();
-    return rc;
+    return m_d->findByFile(fileInfo, &priority);
 }
 
 /*!
@@ -614,12 +594,11 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 */
 QMimeType QMimeDatabase::findByName(const QString &name) const
 {
-    m_d->m_mutex.lock();
+    QMutexLocker locker(&m_d->m_mutex);
+
     unsigned priority = 0;
 #warning Use path not filename
-    const QMimeType rc = m_d->findByName(QFileInfo(name).fileName(), &priority);
-    m_d->m_mutex.unlock();
-    return rc;
+    return m_d->findByName(QFileInfo(name).fileName(), &priority);
 }
 
 /*!
@@ -630,51 +609,45 @@ QMimeType QMimeDatabase::findByName(const QString &name) const
 */
 QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 {
-    m_d->m_mutex.lock();
+    QMutexLocker locker(&m_d->m_mutex);
+
     unsigned priority = 0;
-    const QMimeType rc = m_d->findByData(data, &priority);
-    m_d->m_mutex.unlock();
-    return rc;
+    return m_d->findByData(data, &priority);
 }
 
 bool QMimeDatabase::addMimeType(const QMimeType &mt)
 {
-    m_d->m_mutex.lock();
-    const bool rc = m_d->addMimeType(mt);
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->addMimeType(mt);
 }
 
 bool QMimeDatabase::addMimeTypes(const QString &fileName, QString *errorMessage)
 {
-    m_d->m_mutex.lock();
-    const bool rc = m_d->addMimeTypes(fileName, errorMessage);
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->addMimeTypes(fileName, errorMessage);
 }
 
 bool QMimeDatabase::addMimeTypes(QIODevice *device, QString *errorMessage)
 {
-    m_d->m_mutex.lock();
-    const bool rc = m_d->addMimeTypes(device, errorMessage);
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->addMimeTypes(device, errorMessage);
 }
 
 QStringList QMimeDatabase::suffixes() const
 {
-    m_d->m_mutex.lock();
-    const QStringList rc = m_d->suffixes();
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->suffixes();
 }
 
 QStringList QMimeDatabase::filterStrings() const
 {
-    m_d->m_mutex.lock();
-    const QStringList rc = m_d->filterStrings();
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->filterStrings();
 }
 
 QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
@@ -702,56 +675,53 @@ QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
 
 QList<QMimeGlobPattern> QMimeDatabase::globPatterns() const
 {
-    m_d->m_mutex.lock();
-    const QList<QMimeGlobPattern> rc = m_d->globPatterns();
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->globPatterns();
 }
 
 void QMimeDatabase::setGlobPatterns(const QString &typeOrAlias,
                                    const QList<QMimeGlobPattern> &globPatterns)
 {
-    m_d->m_mutex.lock();
+    QMutexLocker locker(&m_d->m_mutex);
+
     m_d->setGlobPatterns(typeOrAlias, globPatterns);
-    m_d->m_mutex.unlock();
 }
 
 QMimeDatabase::IMagicMatcherList QMimeDatabase::magicMatchers() const
 {
-    m_d->m_mutex.lock();
-    const IMagicMatcherList rc = m_d->magicMatchers();
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->magicMatchers();
 }
 
 void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias,
                                     const IMagicMatcherList &matchers)
 {
-    m_d->m_mutex.lock();
+    QMutexLocker locker(&m_d->m_mutex);
+
     m_d->setMagicMatchers(typeOrAlias, matchers);
-    m_d->m_mutex.unlock();
 }
 
 QList<QMimeType> QMimeDatabase::mimeTypes() const
 {
-    m_d->m_mutex.lock();
-    const QList<QMimeType> &mimeTypes = m_d->mimeTypes();
-    m_d->m_mutex.unlock();
-    return mimeTypes;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->mimeTypes();
 }
 
 void QMimeDatabase::syncUserModifiedMimeTypes()
 {
-    m_d->m_mutex.lock();
+    QMutexLocker locker(&m_d->m_mutex);
+
     m_d->syncUserModifiedMimeTypes();
-    m_d->m_mutex.unlock();
 }
 
 void QMimeDatabase::clearUserModifiedMimeTypes()
 {
-    m_d->m_mutex.lock();
+    QMutexLocker locker(&m_d->m_mutex);
+
     m_d->clearUserModifiedMimeTypes();
-    m_d->m_mutex.unlock();
 }
 
 QList<QMimeType> QMimeDatabase::readUserModifiedMimeTypes()
@@ -782,10 +752,9 @@ QString QMimeDatabase::preferredSuffixByFile(const QFileInfo &f) const
 
 bool QMimeDatabase::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
 {
-    m_d->m_mutex.lock();
-    const bool rc = m_d->setPreferredSuffix(typeOrAlias, suffix);
-    m_d->m_mutex.unlock();
-    return rc;
+    QMutexLocker locker(&m_d->m_mutex);
+
+    return m_d->setPreferredSuffix(typeOrAlias, suffix);
 }
 
 QList<QMimeGlobPattern> QMimeDatabase::toGlobPatterns(const QStringList &patterns, int weight)
@@ -798,6 +767,7 @@ QStringList QMimeDatabase::fromGlobPatterns(const QList<QMimeGlobPattern> &globP
     return QMimeDatabasePrivate::fromGlobPatterns(globPatterns);
 }
 
+#ifndef QT_NO_DEBUG_STREAM
 QDebug operator<<(QDebug d, const QMimeDatabase &mt)
 {
     QString s;
@@ -808,5 +778,6 @@ QDebug operator<<(QDebug d, const QMimeDatabase &mt)
     d << s;
     return d;
 }
+#endif
 
 QT_END_NAMESPACE

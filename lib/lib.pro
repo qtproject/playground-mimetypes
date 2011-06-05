@@ -7,6 +7,8 @@
 TARGET = qmimetype
 TEMPLATE = lib
 
+DESTDIR = ./
+
 DEFINES += QMIME_LIBRARY
 
 include($$PWD/../src/src.pri)

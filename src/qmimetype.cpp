@@ -46,15 +46,6 @@ QMimeGlobPattern::~QMimeGlobPattern()
 {
 }
 
-const QRegExp &QMimeGlobPattern::regExp() const
-{
-    return m_regExp;
-}
-
-unsigned QMimeGlobPattern::weight() const
-{
-    return m_weight;
-}
 
 QMimeTypeData::QMimeTypeData()
     // RE to match a suffix glob pattern: "*.ext" (and not sth like "Makefile" or
@@ -132,9 +123,8 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     unsigned priority = 0;
     if (!data.isEmpty()) {
         foreach (const IMagicMatcher::IMagicMatcherSharedPointer &matcher, magicMatchers) {
-            const unsigned magicPriority = matcher->priority();
-            if (magicPriority > priority && matcher->matches(data))
-                priority = magicPriority;
+            if (matcher->priority() > priority && matcher->matches(data))
+                priority = matcher->priority();
         }
     }
     return priority;
@@ -143,9 +133,7 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 QString QMimeTypeData::formatFilterString(const QString &description, const QList<QMimeGlobPattern> &globs)
 {
     QString rc;
-    if (globs.empty())  // Binary files
-        return rc;
-    {
+    if (!globs.empty()) { // !Binary files
         QTextStream str(&rc);
         str << description;
         if (!globs.empty()) {
@@ -230,13 +218,6 @@ QMimeType::QMimeType(const QMimeType &rhs) :
 {
 }
 
-QMimeType &QMimeType::operator=(const QMimeType &rhs)
-{
-    if (this != &rhs)
-        m_d = rhs.m_d;
-    return *this;
-}
-
 QMimeType::QMimeType(const QMimeTypeData &d) :
     m_d(new QMimeTypeData(d))
 {
@@ -244,6 +225,13 @@ QMimeType::QMimeType(const QMimeTypeData &d) :
 
 QMimeType::~QMimeType()
 {
+}
+
+QMimeType &QMimeType::operator=(const QMimeType &other)
+{
+    if (this != &other)
+        m_d = other.m_d;
+    return *this;
 }
 
 void QMimeType::clear()
@@ -310,9 +298,9 @@ QStringList QMimeType::aliases() const
     return m_d->aliases;
 }
 
-void QMimeType::setAliases(const QStringList &a)
+void QMimeType::setAliases(const QStringList &aliases)
 {
-     m_d->aliases = a;
+     m_d->aliases = aliases;
 }
 
 QList<QMimeGlobPattern> QMimeType::globPatterns() const
@@ -351,21 +339,27 @@ bool QMimeType::setPreferredSuffix(const QString &s)
 {
     if (!m_d->suffixes.contains(s)) {
         qWarning("%s: Attempt to set preferred suffix to '%s', which is not in the list of suffixes: %s.",
-                 m_d->type.toUtf8().constData(),
-                 s.toUtf8().constData(),
-                 m_d->suffixes.join(QLatin1String(",")).toUtf8().constData());
+                 m_d->type.toLocal8Bit().constData(),
+                 s.toLocal8Bit().constData(),
+                 m_d->suffixes.join(QLatin1String(", ")).toLocal8Bit().constData());
         return false;
     }
     m_d->preferredSuffix = s;
     return true;
 }
 
+/*!
+    Returns a filter string usable for a file dialog.
+*/
 QString QMimeType::filterString() const
 {
     // @todo: Use localeComment() once creator is shipped with translations
     return QMimeTypeData::formatFilterString(comment(), m_d->globPatterns);
 }
 
+/*!
+    Checks for \a type or one of the aliases.
+*/
 bool QMimeType::matchesType(const QString &type) const
 {
     return m_d->type == type || m_d->aliases.contains(type);
@@ -376,6 +370,10 @@ unsigned QMimeType::matchesData(const QByteArray &data) const
     return m_d->matchesData(data);
 }
 
+/*!
+    Checks the glob pattern weights and magic priorities so the highest
+    value is returned. A 0 (zero) indicates no match.
+*/
 unsigned QMimeType::matchesFile(const QFileInfo &file) const
 {
     FileMatchContext context(file);
@@ -430,6 +428,7 @@ void QMimeType::setMagicRuleMatchers(const IMagicMatcherList &matchers)
     m_d->magicMatchers = tmp;
 }
 
+#ifndef QT_NO_DEBUG_STREAM
 QDebug operator<<(QDebug d, const QMimeType &mt)
 {
     QString s;
@@ -440,5 +439,6 @@ QDebug operator<<(QDebug d, const QMimeType &mt)
     d << s;
     return d;
 }
+#endif
 
 QT_END_NAMESPACE

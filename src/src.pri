@@ -5,7 +5,7 @@ SOURCES += qmimedatabase.cpp \
     qmimetype.cpp \
     magicmatcher.cpp \
     mimetypeparser.cpp \
-    ../src/qmimemagicrule.cpp
+    qmimemagicrule.cpp
 
 HEADERS += qmime_global.h \
     qmimedatabase.h \
@@ -14,4 +14,4 @@ HEADERS += qmime_global.h \
     qmimetype_p.h \
     magicmatcher_p.h \
     qmimedatabase_p.h \
-    ../src/qmimemagicrule.h
+    qmimemagicrule.h

@@ -30,6 +30,18 @@
 #include <QtCore/QStack>
 
 /*!
+    \class MimeTypeParser
+    \brief Mime type parser
+
+    Populates MimeDataBase
+
+    \sa MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
+    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
+    \sa MimeTypeParser
+*/
+
+
+/*!
     \class BaseMimeTypeParser
     \brief Generic parser for a sequence of <mime-type>.
 
@@ -46,17 +58,15 @@ void BaseMimeTypeParser::addGlobPattern(const QString &pattern, const QString &w
         return;
     // Collect patterns as a QRegExp list and filter out the plain
     // suffix ones for our suffix list. Use first one as preferred
-    const QRegExp wildCard(pattern, Qt::CaseSensitive, QRegExp::Wildcard);
+    const QRegExp wildCard(pattern, Qt::CaseSensitive, QRegExp::WildcardUnix);
     if (!wildCard.isValid()) {
         qWarning("%s: Invalid wildcard '%s'.",
                  Q_FUNC_INFO, pattern.toUtf8().constData());
         return;
     }
 
-    if (weight.isEmpty())
-        d->globPatterns.push_back(QMimeGlobPattern(wildCard));
-    else
-        d->globPatterns.push_back(QMimeGlobPattern(wildCard, weight.toInt()));
+    const unsigned iweight = !weight.isEmpty() ? unsigned(weight.toInt()) : QMimeGlobPattern::MaxWeight;
+    d->globPatterns.push_back(QMimeGlobPattern(wildCard, iweight));
 
     d->assignSuffix(pattern);
 }

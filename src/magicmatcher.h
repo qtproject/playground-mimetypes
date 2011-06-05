@@ -41,14 +41,15 @@ public:
     typedef QSharedPointer<IMagicMatcher> IMagicMatcherSharedPointer;
     typedef QList<IMagicMatcherSharedPointer> IMagicMatcherList;
 
+    virtual ~IMagicMatcher() {}
+
     enum Type { RuleMatcher, CustomMatcher };
     virtual Type type() const { return CustomMatcher; }
 
     // Check for a match on contents of a file
     virtual bool matches(const QByteArray &data) const = 0;
     // Return a priority value from 1..100
-    virtual int priority() const = 0;
-    virtual ~IMagicMatcher() {}
+    virtual unsigned priority() const = 0;
 };
 
 class QMIME_EXPORT MagicRuleMatcher : public IMagicMatcher
@@ -65,15 +66,15 @@ public:
 
     virtual bool matches(const QByteArray &data) const;
 
-    virtual int priority() const;
-    void setPriority(int p);
+    virtual unsigned priority() const;
+    void setPriority(unsigned p);
 
     // Create a list of MagicRuleMatchers from a hash of rules indexed by priorities.
     static IMagicMatcher::IMagicMatcherList createMatchers(const QHash<int, QList<QMimeMagicRule> > &);
 
 private:
     QMimeMagicRuleList m_list;
-    int m_priority;
+    unsigned m_priority;
 };
 
 QT_END_NAMESPACE

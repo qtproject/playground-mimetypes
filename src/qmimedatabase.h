@@ -85,11 +85,17 @@ public:
                                                  int weight = QMimeGlobPattern::MaxWeight);
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
+#ifndef QT_NO_DEBUG_STREAM
     friend QDebug operator<<(QDebug d, const QMimeDatabase &mt);
+#endif
 
 private:
     QMimeDatabasePrivate *m_d;
 };
+
+#ifndef QT_NO_DEBUG_STREAM
+QMIME_EXPORT QDebug operator<<(QDebug debug, const QMimeType &mt);
+#endif
 
 QT_END_NAMESPACE
 

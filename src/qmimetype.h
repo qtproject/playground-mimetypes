@@ -26,7 +26,6 @@
 #include "magicmatcher.h"
 
 #include <QtCore/QRegExp>
-#include <QtCore/QString>
 #include <QtCore/QStringList>
 
 QT_BEGIN_NAMESPACE
@@ -42,13 +41,16 @@ public:
     explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = MaxWeight);
     ~QMimeGlobPattern();
 
-    const QRegExp &regExp() const;
-    unsigned weight() const;
+    inline const QRegExp &regExp() const
+    { return m_regExp; }
+    inline unsigned weight() const
+    { return m_weight; }
 
 private:
-    QRegExp m_regExp;
-    int m_weight;
+    const QRegExp m_regExp;
+    const int m_weight;
 };
+
 
 class QMimeTypeData;
 class QMIME_EXPORT QMimeType
@@ -64,8 +66,9 @@ public:
               const QList<QMimeGlobPattern> &globPatterns = QList<QMimeGlobPattern>(),
               const QStringList &subClassOf = QStringList());
     QMimeType(const QMimeType&);
-    QMimeType &operator=(const QMimeType&);
     ~QMimeType();
+
+    QMimeType &operator=(const QMimeType &other);
 
     void clear();
 
@@ -76,7 +79,7 @@ public:
     void setType(const QString &type);
 
     QStringList aliases() const;
-    void setAliases(const QStringList &);
+    void setAliases(const QStringList &aliases);
 
     QString comment() const;
     void setComment(const QString &comment);
@@ -95,16 +98,12 @@ public:
     QString preferredSuffix() const;
     bool setPreferredSuffix(const QString&);
 
-    // Check for type or one of the aliases
     bool matchesType(const QString &type) const;
 
     unsigned matchesData(const QByteArray &data) const;
 
-    // Check glob patterns weights and magic priorities so the highest
-    // value is returned. A 0 (zero) indicates no match.
     unsigned matchesFile(const QFileInfo &file) const;
 
-    // Return a filter string usable for a file dialog
     QString filterString() const;
 
     void addMagicMatcher(const IMagicMatcherSharedPointer &matcher);
@@ -116,7 +115,9 @@ public:
     IMagicMatcherList magicRuleMatchers() const;
     void setMagicRuleMatchers(const IMagicMatcherList &matchers);
 
+#ifndef QT_NO_DEBUG_STREAM
     friend QDebug operator<<(QDebug d, const QMimeType &mt);
+#endif
 
 private:
     explicit QMimeType(const QMimeTypeData &d);
@@ -126,6 +127,10 @@ private:
 
     QSharedDataPointer<QMimeTypeData> m_d;
 };
+
+#ifndef QT_NO_DEBUG_STREAM
+QMIME_EXPORT QDebug operator<<(QDebug debug, const QMimeType &mt);
+#endif
 
 QT_END_NAMESPACE
 
