@@ -113,9 +113,7 @@ static inline QByteArray makePattern(const QByteArray &value)
     const char *p = value.constData();
     const char *e = p + value.size();
     for ( ; p < e; ++p) {
-        if (*p == '\\') {
-            ++p;
-            Q_ASSERT(p < e);
+        if (*p == '\\' && ++p < e) {
             if (*p == 'x') { // hex (\\xff)
                 char c = 0;
                 for (int i = 0; i < 2 && p + 1 < e; ++i) {
