@@ -50,6 +50,7 @@ const char *const matchTagC = "match";
 const char *const matchValueAttributeC = "value";
 const char *const matchTypeAttributeC = "type";
 const char *const matchOffsetAttributeC = "offset";
+const char *const matchMaskAttributeC = "mask";
 
 /*!
     \class MimeTypeParser
@@ -175,11 +176,14 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
     const QString endPosS   = colonIndex == -1 ? offsetS : offsetS.mid(colonIndex + 1);
     if (!parseNumber(startPosS, &startPos, errorMessage) || !parseNumber(endPosS, &endPos, errorMessage))
         return false;
-    if (debugMimeDB)
-        qDebug() << Q_FUNC_INFO << value << startPos << endPos;
+    const QString mask = atts.value(QLatin1String(matchMaskAttributeC)).toString();
 
-//    ruleMatcher->add(QMimeMagicRule(magicType, value, startPos, endPos));
-    rule = new QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos);
+    if (debugMimeDB)
+        qDebug() << Q_FUNC_INFO << value << startPos << endPos << mask;
+
+//    ruleMatcher->add(QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1()));
+    rule = new QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1());
+
     return true;
 }
 
@@ -346,15 +350,16 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
                     const QString &patterns = atts.value(QLatin1String(patternAttributeC)).toString();
                     mimeType.setGlobPatterns(toGlobPatterns(patterns.split(QLatin1Char(';'))));
                 } else if (reader.name() == matchTagC) {
-                    const QString &value = atts.value(QLatin1String(matchValueAttributeC)).toString();
-                    const QString &type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
-                    const QString &offset = atts.value(QLatin1String(matchOffsetAttributeC)).toString();
+                    const QString value = atts.value(QLatin1String(matchValueAttributeC)).toString();
+                    const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
+                    const QString offset = atts.value(QLatin1String(matchOffsetAttributeC)).toString();
+                    const QString mask = atts.value(QLatin1String(matchMaskAttributeC)).toString();
                     QPair<int, int> range = fromOffset_helper(offset);
                     const int priority = atts.value(QLatin1String(priorityAttributeC)).toString().toInt();
 
                     QMimeMagicRule::Type magicType = QMimeMagicRule::type(type.toLatin1());
                     if (magicType != QMimeMagicRule::Invalid)
-                        rules[priority].append(QMimeMagicRule(magicType, value.toUtf8(), range.first, range.second));
+                        rules[priority].append(QMimeMagicRule(magicType, value.toUtf8(), range.first, range.second, mask.toLatin1()));
                 }
                 break;
             case QXmlStreamReader::EndElement:
@@ -419,10 +424,11 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
                         const QList<QMimeMagicRule> &rules = ruleMatcher->magicRules();
                         foreach (const QMimeMagicRule &rule, rules) {
                             writer.writeStartElement(QLatin1String(matchTagC));
-                            writer.writeAttribute(QLatin1String(matchValueAttributeC), QString::fromUtf8(rule.matchValue().constData()));
+                            writer.writeAttribute(QLatin1String(matchValueAttributeC), QString::fromUtf8(rule.value().constData()));
                             writer.writeAttribute(QLatin1String(matchTypeAttributeC), QString::fromLatin1(QMimeMagicRule::typeName(rule.type()).constData()));
                             writer.writeAttribute(QLatin1String(matchOffsetAttributeC),
                                                   toOffset_helper(qMakePair(rule.startPos(), rule.endPos())));
+                            writer.writeAttribute(QLatin1String(matchMaskAttributeC), QString::fromLatin1(rule.mask().constData()));
                             writer.writeAttribute(QLatin1String(priorityAttributeC),
                                                   QString::number(ruleMatcher->priority()));
                             writer.writeEndElement();

@@ -20,31 +20,31 @@
 
 #include "qmimemagicrule.h"
 
-#include <QtCore/QStringList>
+#include <QtCore/QList>
 #include <qendian.h>
 
 QT_BEGIN_NAMESPACE
 
 // in the same order as Type!
 static const char magicRuleTypes_string[] =
-    "unknown\0"
+    "invalid\0"
     "string\0"
-    "byte\0"
+    "host16\0"
+    "host32\0"
     "big16\0"
     "big32\0"
     "little16\0"
     "little32\0"
-    "host16\0"
-    "host32\0"
+    "byte\0"
     "\0";
 
 static const int magicRuleTypes_indices[] = {
-    0, 8, 15, 20, 26, 32, 41, 50, 57, 64, 0
+    0, 8, 15, 22, 29, 35, 41, 50, 59, 65, 0
 };
 
 QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray &type)
 {
-    for (int i = String; i <= Host32; ++i) {
+    for (int i = String; i <= Byte; ++i) {
         if (type == magicRuleTypes_string + magicRuleTypes_indices[i])
             return static_cast<Type>(i);
     }
@@ -60,126 +60,158 @@ QByteArray QMimeMagicRule::typeName(QMimeMagicRule::Type type)
 struct QMimeMagicRulePrivate
 {
     QMimeMagicRule::Type type;
-    QByteArray matchValue;
+    QByteArray value;
     int startPos;
     int endPos;
+    QByteArray mask;
 
     QByteArray pattern;
     quint32 number;
+    quint32 numberMask;
 
     typedef bool (*MatchFunction)(QMimeMagicRulePrivate *d, const QByteArray &data);
     MatchFunction matchFunction;
 };
 
 
-static bool matchBytes(QMimeMagicRulePrivate *d, const QByteArray &data)
+static bool matchString(QMimeMagicRulePrivate *d, const QByteArray &data)
 {
-    if (d->startPos >= data.size() || d->startPos + d->pattern.size() >= data.size())
-        return false;
+    const char *p = data.constData() + d->startPos;
+    const char *e = p + qMin(data.size() - d->pattern.size(), d->endPos);
+    for ( ; p <= e; ++p) {
+        int i = 0;
+        while (i < d->pattern.size() && (p[i] & d->mask.at(i)) == (d->pattern.at(i) & d->mask.at(i)))
+            ++i;
+        if (i == d->pattern.size())
+            return true;
+    }
 
-    // most common case: some string at position 0
-    if (d->startPos == 0 && d->startPos == d->endPos)
-        return data.startsWith(d->pattern);
-
-    int end = d->endPos - d->startPos + d->pattern.size();
-    if (end > data.size())
-        end = data.size();
-
-    return QByteArray::fromRawData(data.constData() + d->startPos, end).contains(d->pattern);
+    return false;
 }
 
 template <typename T>
 static bool matchNumber(QMimeMagicRulePrivate *d, const QByteArray &data)
 {
     const T value(d->number);
+    const T mask(d->numberMask);
 
     const char *p = data.constData() + d->startPos;
-    const char *e = p + qMin(data.size() - int(sizeof(T)), d->endPos + 1);
-    while (p < e) {
-        if (*reinterpret_cast<const T*>(p) == value)
+    const char *e = p + qMin(data.size() - int(sizeof(T)), d->endPos);
+    for ( ; p <= e; ++p) {
+        if ((*reinterpret_cast<const T*>(p) & mask) == value)
             return true;
-        ++p;
     }
 
     return false;
 }
 
-static inline QByteArray bytesFromSequence(const QByteArray &sequence)
+static inline QByteArray makePattern(const QByteArray &value)
 {
-    QByteArray result;
+    QByteArray pattern(value.size(), Qt::Uninitialized);
+    char *data = pattern.data();
 
-    bool ok;
-
-    if (!sequence.startsWith('\\')) {
-        char c = char(sequence.toInt(&ok, 0)); // autodetect
-        if (ok)
-            result += c;
-        return result;
-    }
-
-    // Expect hex format value like \0x7f\0x45\0x4c\0x46
-    foreach (const QByteArray &byte, sequence.split('\\')) {
-        char c = char(byte.toInt(&ok, 16)); // hex
-        if (!ok)
-            return QByteArray();
-        result += c;
-    }
-
-    return result;
-}
-
-QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type type, const QByteArray &matchValue, int startPos, int endPos)
-    : d(new QMimeMagicRulePrivate)
-{
-    uint value = 0;
-    if (type >= Big16 && type <= Host32) {
-        bool ok;
-        value = matchValue.toUInt(&ok, 0); // autodetect
-        if (!ok) {
-            qWarning("QMimeMagicRule(): Can't convert \"%s\" to int", matchValue.constData());
-            type = Invalid;
+    const char *p = value.constData();
+    const char *e = p + value.size();
+    for ( ; p < e; ++p) {
+        if (*p == '\\') {
+            ++p;
+            Q_ASSERT(p < e);
+            if (*p == 'x') { // hex (\\xff)
+                char c = 0;
+                for (int i = 0; i < 2 && p + 1 < e; ++i) {
+                    ++p;
+                    if (*p >= '0' && *p <= '9')
+                        c = (c << 4) + *p - '0';
+                    else if (*p >= 'a' && *p <= 'f')
+                        c = (c << 4) + *p - 'a' + 10;
+                    else if (*p >= 'A' && *p <= 'F')
+                        c = (c << 4) + *p - 'A' + 10;
+                    else
+                        continue;
+                }
+                *data++ = c;
+            } else if (*p >= '0' && *p <= '7') { // oct (\\7, or \\77, or \\377)
+                char c = *p - '0';
+                if (p + 1 < e && p[1] >= '0' && p[1] <= '7') {
+                    c = (c << 3) + *(++p) - '0';
+                    if (p + 1 < e && p[1] >= '0' && p[1] <= '7' && p[-1] <= '3')
+                        c = (c << 3) + *(++p) - '0';
+                }
+                *data++ = c;
+            } else { // escaped
+                *data++ = *p;
+            }
+        } else {
+            *data++ = *p;
         }
     }
+    pattern.truncate(data - pattern.data());
+
+    return pattern;
+}
+
+QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type type, const QByteArray &value, int startPos, int endPos, const QByteArray &mask)
+    : d(new QMimeMagicRulePrivate)
+{
+    Q_ASSERT(!value.isEmpty());
 
     d->type = type;
-    d->matchValue = matchValue;
+    d->value = value;
     d->startPos = startPos;
     d->endPos = endPos;
+    d->mask = mask;
+    d->matchFunction = 0;
+
+    if (d->type >= Host16 && d->type <= Byte) {
+        bool ok;
+        d->number = d->value.toUInt(&ok, 0); // autodetect
+        Q_ASSERT(ok);
+        d->numberMask = !d->mask.isEmpty() ? d->mask.toUInt(&ok, 0) : 0; // autodetect
+    }
 
     switch (d->type) {
     case String:
-        d->pattern = matchValue;
-        d->matchFunction = matchBytes;
+        d->pattern = makePattern(d->value);
+        d->pattern.squeeze();
+        if (!d->mask.isEmpty()) {
+            Q_ASSERT(d->mask.size() >= 4 && d->mask.startsWith("0x"));
+            d->mask = QByteArray::fromHex(QByteArray::fromRawData(d->mask.constData() + 2, d->mask.size() - 2));
+            Q_ASSERT(d->mask.size() == d->pattern.size());
+        } else {
+            d->mask.fill(0xff, d->pattern.size());
+        }
+        d->mask.squeeze();
+        d->matchFunction = matchString;
         break;
     case Byte:
-        d->pattern = bytesFromSequence(matchValue);
-        if (!d->pattern.isEmpty()) {
-            d->matchFunction = matchBytes;
-        } else {
-            qWarning("QMimeMagicRule(): Incorrect byte sequence \"%s\"", matchValue.constData());
-            d->matchFunction = 0;
+        if (d->number <= quint8(-1)) {
+            if (d->numberMask == 0)
+                d->numberMask = quint8(-1);
+            d->matchFunction = matchNumber<quint8>;
         }
         break;
     case Big16:
-    case Host16: // reverse on little-endians
-        d->number = qFromBigEndian<quint16>(value);
-        d->matchFunction = matchNumber<quint16>;
-        break;
+    case Host16:
     case Little16:
-        d->number = qFromLittleEndian<quint16>(value);
-        d->matchFunction = matchNumber<quint16>;
+        if (d->number <= quint16(-1)) {
+            d->number = d->type == Little16 ? qFromLittleEndian<quint16>(d->number) : qFromBigEndian<quint16>(d->number);
+            if (d->numberMask == 0)
+                d->numberMask = quint16(-1);
+            d->matchFunction = matchNumber<quint16>;
+        }
         break;
     case Big32:
-    case Host32: // reverse on little-endians
-        d->number = qFromBigEndian<quint32>(value);
-        d->matchFunction = matchNumber<quint32>;
-        break;
+    case Host32:
     case Little32:
-        d->number = qFromLittleEndian<quint32>(value);
-        d->matchFunction = matchNumber<quint32>;
+        if (d->number <= quint32(-1)) {
+            d->number = d->type == Little32 ? qFromLittleEndian<quint32>(d->number) : qFromBigEndian<quint32>(d->number);
+            if (d->numberMask == 0)
+                d->numberMask = quint32(-1);
+            d->matchFunction = matchNumber<quint32>;
+        }
         break;
     default:
-        d->matchFunction = 0;
+        break;
     }
 }
 
@@ -203,9 +235,9 @@ QMimeMagicRule::Type QMimeMagicRule::type() const
     return d->type;
 }
 
-QByteArray QMimeMagicRule::matchValue() const
+QByteArray QMimeMagicRule::value() const
 {
-    return d->matchValue;
+    return d->value;
 }
 
 int QMimeMagicRule::startPos() const
@@ -216,6 +248,16 @@ int QMimeMagicRule::startPos() const
 int QMimeMagicRule::endPos() const
 {
     return d->endPos;
+}
+
+QByteArray QMimeMagicRule::mask() const
+{
+    return d->mask;
+}
+
+bool QMimeMagicRule::isValid() const
+{
+    return d->matchFunction;
 }
 
 bool QMimeMagicRule::matches(const QByteArray &data) const

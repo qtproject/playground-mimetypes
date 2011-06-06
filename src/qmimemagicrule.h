@@ -23,6 +23,7 @@
 
 #include "qmime_global.h"
 
+#include <QtCore/QByteArray>
 #include <QtCore/QScopedPointer>
 
 QT_BEGIN_NAMESPACE
@@ -31,18 +32,21 @@ class QMimeMagicRulePrivate;
 class QMIME_EXPORT QMimeMagicRule
 {
 public:
-    enum Type { Invalid = 0, String, Byte, Big16, Big32, Little16, Little32, Host16, Host32 };
+    enum Type { Invalid = 0, String, Host16, Host32, Big16, Big32, Little16, Little32, Byte };
 
-    QMimeMagicRule(Type type, const QByteArray &matchValue, int startPos, int endPos);
+    QMimeMagicRule(Type type, const QByteArray &value, int startPos, int endPos, const QByteArray &mask = QByteArray());
     QMimeMagicRule(const QMimeMagicRule &other);
     ~QMimeMagicRule();
 
     QMimeMagicRule &operator=(const QMimeMagicRule &other);
 
     Type type() const;
-    QByteArray matchValue() const;
+    QByteArray value() const;
     int startPos() const;
     int endPos() const;
+    QByteArray mask() const;
+
+    bool isValid() const;
 
     bool matches(const QByteArray &data) const;
 
