@@ -70,13 +70,14 @@ QByteArray FileMatchContext::data()
 {
     // Do we need to read?
     if (m_state == DataNotRead) {
-        const QString fullName = m_fileInfo.absoluteFilePath();
-        QFile file(fullName);
+        QFile file(m_fileInfo.absoluteFilePath());
         if (file.open(QIODevice::ReadOnly)) {
             m_data = file.read(MaxData);
             m_state = DataRead;
         } else {
-            qWarning("%s failed to open %s: %s\n", Q_FUNC_INFO, fullName.toUtf8().constData(), file.errorString().toUtf8().constData());
+            qWarning("%s failed to open %s: %s", Q_FUNC_INFO,
+                     m_fileInfo.absoluteFilePath().toLocal8Bit().constData(),
+                     file.errorString().toLocal8Bit().constData());
             m_state = NoDataAvailable;
         }
     }
@@ -137,19 +138,19 @@ bool HeuristicTextMagicMatcher::matches(const QByteArray &data) const
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-MagicRuleMatcher::MagicRuleMatcher() :
-     m_priority(65535)
+MagicRuleMatcher::MagicRuleMatcher()
+    : m_priority(65535)
 {
 }
 
-void MagicRuleMatcher::add(const QMimeMagicRule &rule)
+void MagicRuleMatcher::addRule(const QMimeMagicRule &rule)
 {
     m_list.append(rule);
 }
 
-void MagicRuleMatcher::add(const QMimeMagicRuleList &ruleList)
+void MagicRuleMatcher::addRules(const QMimeMagicRuleList &rules)
 {
-    m_list.append(ruleList);
+    m_list.append(rules);
 }
 
 QMimeMagicRuleList MagicRuleMatcher::magicRules() const
@@ -178,23 +179,9 @@ unsigned MagicRuleMatcher::priority() const
     return m_priority;
 }
 
-void MagicRuleMatcher::setPriority(unsigned p)
+void MagicRuleMatcher::setPriority(unsigned priority)
 {
-    m_priority = p;
-}
-
-IMagicMatcher::IMagicMatcherList MagicRuleMatcher::createMatchers(
-    const QHash<int, QMimeMagicRuleList > &rulesByPriority)
-{
-    IMagicMatcher::IMagicMatcherList matchers;
-    QHash<int, QMimeMagicRuleList>::const_iterator ruleIt = rulesByPriority.begin();
-    for (; ruleIt != rulesByPriority.end(); ++ruleIt) {
-        MagicRuleMatcher *magicRuleMatcher = new MagicRuleMatcher();
-        magicRuleMatcher->setPriority(ruleIt.key());
-        magicRuleMatcher->add(ruleIt.value());
-        matchers.append(IMagicMatcher::IMagicMatcherSharedPointer(magicRuleMatcher));
-    }
-    return matchers;
+    m_priority = priority;
 }
 
 QT_END_NAMESPACE

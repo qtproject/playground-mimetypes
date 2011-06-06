@@ -61,8 +61,8 @@ class QMIME_EXPORT MagicRuleMatcher : public IMagicMatcher
 public:
     MagicRuleMatcher();
 
-    void add(const QMimeMagicRule &rule);
-    void add(const QMimeMagicRuleList &ruleList);
+    void addRule(const QMimeMagicRule &rule);
+    void addRules(const QMimeMagicRuleList &rules);
     QMimeMagicRuleList magicRules() const;
 
     virtual Type type() const;
@@ -70,10 +70,7 @@ public:
     virtual bool matches(const QByteArray &data) const;
 
     virtual unsigned priority() const;
-    void setPriority(unsigned p);
-
-    // Create a list of MagicRuleMatchers from a hash of rules indexed by priorities.
-    static IMagicMatcher::IMagicMatcherList createMatchers(const QHash<int, QList<QMimeMagicRule> > &);
+    void setPriority(unsigned priority);
 
 private:
     QMimeMagicRuleList m_list;

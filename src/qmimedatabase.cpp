@@ -214,7 +214,7 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priori
     QMimeType candidate;
     unsigned length = 0;
 
-    for (int level = m_maxLevel; level >= 0 /*&& !candidate.isValid()*/; level--) {
+    for (int level = m_maxLevel; level >= 0 /*&& !candidate.isValid()*/; --level) {
         foreach (const MimeMapEntry *entry, m_typeMimeTypeMap) {
             if (entry->level == level) {
                 unsigned currentLength;
@@ -242,7 +242,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
 
     QMimeType candidate;
 
-    for (int level = m_maxLevel; level >= 0; level--) {
+    for (int level = m_maxLevel; level >= 0; --level) {
         foreach (const MimeMapEntry *entry, m_typeMimeTypeMap) {
             if (entry->level == level) {
                 const unsigned contentPriority = entry->type.m_d->matchesData(data);
@@ -362,8 +362,8 @@ void QMimeDatabasePrivate::syncUserModifiedMimeTypes()
         userModified.insert(userMimeType.type(), userMimeType);
 
     foreach (MimeMapEntry *entry, m_typeMimeTypeMap) {
-        QHash<QString, QMimeType>::const_iterator userMimeIt = userModified.find(entry->type.type());
-        if (userMimeIt != userModified.end()) {
+        QHash<QString, QMimeType>::const_iterator userMimeIt = userModified.constFind(entry->type.type());
+        if (userMimeIt != userModified.constEnd()) {
             entry->type.setGlobPatterns(userMimeIt.value().globPatterns());
             entry->type.setMagicRuleMatchers(userMimeIt.value().magicRuleMatchers());
         }

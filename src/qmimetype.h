@@ -99,9 +99,7 @@ public:
     bool setPreferredSuffix(const QString&);
 
     bool matchesType(const QString &type) const;
-
     unsigned matchesData(const QByteArray &data) const;
-
     unsigned matchesFile(const QFileInfo &file) const;
 
     QString filterString() const;
@@ -111,7 +109,7 @@ public:
     const IMagicMatcherList &magicMatchers() const;
     void setMagicMatchers(const IMagicMatcherList &matchers);
 
-    // Convenience for rule-base matchers.
+    // Convenience for rule-base matchers
     IMagicMatcherList magicRuleMatchers() const;
     void setMagicRuleMatchers(const IMagicMatcherList &matchers);
 

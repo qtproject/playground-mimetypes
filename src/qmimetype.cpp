@@ -203,17 +203,11 @@ QMimeType::QMimeType(const QString &type,
                      const QStringList &subClassOf) :
     m_d(new QMimeTypeData)
 {
-    if (!type.isEmpty())
-        setType(type);
-
-    if (!matchers.isEmpty())
-        setMagicMatchers(matchers);
-
+    m_d->type = type;
+    m_d->magicMatchers = matchers;
     if (!globPatterns.isEmpty())
         setGlobPatterns(globPatterns);
-
-    if (!subClassOf.isEmpty())
-        setSubClassOf(subClassOf);
+    m_d->subClassOf = subClassOf;
 }
 
 QMimeType::QMimeType(const QMimeType &rhs) :
