@@ -39,9 +39,6 @@ class QMIME_EXPORT QMimeDatabase
 {
     Q_DISABLE_COPY(QMimeDatabase)
 public:
-    typedef IMagicMatcher::IMagicMatcherList IMagicMatcherList;
-    typedef IMagicMatcher::IMagicMatcherSharedPointer IMagicMatcherSharedPointer;
-
     QMimeDatabase();
     ~QMimeDatabase();
 

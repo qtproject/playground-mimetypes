@@ -588,15 +588,14 @@ void QMimeDatabase::setGlobPatterns(const QString &typeOrAlias,
     m_d->setGlobPatterns(typeOrAlias, globPatterns);
 }
 
-QMimeDatabase::IMagicMatcherList QMimeDatabase::magicMatchers() const
+IMagicMatcherList QMimeDatabase::magicMatchers() const
 {
     QMutexLocker locker(&m_d->m_mutex);
 
     return m_d->magicMatchers();
 }
 
-void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias,
-                                    const IMagicMatcherList &matchers)
+void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias, const IMagicMatcherList &matchers)
 {
     QMutexLocker locker(&m_d->m_mutex);
 

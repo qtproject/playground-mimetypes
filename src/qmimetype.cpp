@@ -125,7 +125,7 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 {
     unsigned priority = 0;
     if (!data.isEmpty()) {
-        foreach (const IMagicMatcher::IMagicMatcherSharedPointer &matcher, magicMatchers) {
+        foreach (const IMagicMatcherSharedPointer &matcher, magicMatchers) {
             if (matcher->priority() > priority && matcher->matches(data))
                 priority = matcher->priority();
         }
@@ -390,7 +390,7 @@ void QMimeType::addMagicMatcher(const IMagicMatcherSharedPointer &matcher)
     m_d->magicMatchers.push_back(matcher);
 }
 
-const QMimeType::IMagicMatcherList &QMimeType::magicMatchers() const
+const IMagicMatcherList &QMimeType::magicMatchers() const
 {
     return m_d->magicMatchers;
 }
@@ -400,7 +400,7 @@ void QMimeType::setMagicMatchers(const IMagicMatcherList &matchers)
     m_d->magicMatchers = matchers;
 }
 
-QMimeType::IMagicMatcherList QMimeType::magicRuleMatchers() const
+IMagicMatcherList QMimeType::magicRuleMatchers() const
 {
     IMagicMatcherList result;
 

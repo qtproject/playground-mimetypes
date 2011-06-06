@@ -46,6 +46,7 @@ const char *const localeAttributeC = "xml:lang";
 
 const char *const magicTagC = "magic";
 const char *const priorityAttributeC = "priority";
+
 const char *const matchTagC = "match";
 const char *const matchValueAttributeC = "value";
 const char *const matchTypeAttributeC = "type";
@@ -364,13 +365,13 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
                 break;
             case QXmlStreamReader::EndElement:
                 if (reader.name() == mimeTypeTagC) {
-                    IMagicMatcher::IMagicMatcherList matchers;
-                    QHash<int, QMimeMagicRuleList>::const_iterator it = rules.constBegin();
+                    IMagicMatcherList matchers;
+                    QHash<int, QList<QMimeMagicRule> >::const_iterator it = rules.constBegin();
                     for ( ; it != rules.constEnd(); ++it) {
                         MagicRuleMatcher *magicRuleMatcher = new MagicRuleMatcher();
                         magicRuleMatcher->setPriority(it.key());
                         magicRuleMatcher->addRules(it.value());
-                        matchers.append(IMagicMatcher::IMagicMatcherSharedPointer(magicRuleMatcher));
+                        matchers.append(IMagicMatcherSharedPointer(magicRuleMatcher));
                     }
                     mimeType.setMagicRuleMatchers(matchers);
                     mimeTypes.append(mimeType);

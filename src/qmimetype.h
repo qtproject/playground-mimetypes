@@ -56,9 +56,6 @@ class QMimeTypeData;
 class QMIME_EXPORT QMimeType
 {
 public:
-    typedef IMagicMatcher::IMagicMatcherList IMagicMatcherList;
-    typedef IMagicMatcher::IMagicMatcherSharedPointer IMagicMatcherSharedPointer;
-
     QMimeType();
     explicit QMimeType(const QString &type);
     QMimeType(const QString &type,

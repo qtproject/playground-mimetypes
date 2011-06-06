@@ -148,12 +148,12 @@ void MagicRuleMatcher::addRule(const QMimeMagicRule &rule)
     m_list.append(rule);
 }
 
-void MagicRuleMatcher::addRules(const QMimeMagicRuleList &rules)
+void MagicRuleMatcher::addRules(const QList<QMimeMagicRule> &rules)
 {
     m_list.append(rules);
 }
 
-QMimeMagicRuleList MagicRuleMatcher::magicRules() const
+QList<QMimeMagicRule> MagicRuleMatcher::magicRules() const
 {
     return m_list;
 }
@@ -167,10 +167,12 @@ bool MagicRuleMatcher::matches(const QByteArray &data) const
 {
     if (m_list.isEmpty())
         return false;
-//    qDebug() << this->magicRules();
-    for (int i = 0; i < m_list.size(); i++)
-        if ( !m_list.at(i).matches(data))
+
+    foreach (const QMimeMagicRule &magicRule, m_list) {
+        if (!magicRule.matches(data))
             return false;
+    }
+
     return true;
 }
 

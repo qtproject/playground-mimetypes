@@ -33,17 +33,12 @@
 
 QT_BEGIN_NAMESPACE
 
-typedef QList<QMimeMagicRule> QMimeMagicRuleList;
-
 class QMIME_EXPORT IMagicMatcher
 {
     Q_DISABLE_COPY(IMagicMatcher)
 protected:
     IMagicMatcher() {}
 public:
-    typedef QSharedPointer<IMagicMatcher> IMagicMatcherSharedPointer;
-    typedef QList<IMagicMatcherSharedPointer> IMagicMatcherList;
-
     virtual ~IMagicMatcher() {}
 
     enum Type { RuleMatcher, CustomMatcher };
@@ -55,6 +50,10 @@ public:
     virtual unsigned priority() const = 0;
 };
 
+typedef QSharedPointer<IMagicMatcher> IMagicMatcherSharedPointer;
+typedef QList<IMagicMatcherSharedPointer> IMagicMatcherList;
+
+
 class QMIME_EXPORT MagicRuleMatcher : public IMagicMatcher
 {
     Q_DISABLE_COPY(MagicRuleMatcher)
@@ -62,8 +61,8 @@ public:
     MagicRuleMatcher();
 
     void addRule(const QMimeMagicRule &rule);
-    void addRules(const QMimeMagicRuleList &rules);
-    QMimeMagicRuleList magicRules() const;
+    void addRules(const QList<QMimeMagicRule> &rules);
+    QList<QMimeMagicRule> magicRules() const;
 
     virtual Type type() const;
 
@@ -73,7 +72,7 @@ public:
     void setPriority(unsigned priority);
 
 private:
-    QMimeMagicRuleList m_list;
+    QList<QMimeMagicRule> m_list;
     unsigned m_priority;
 };
 
