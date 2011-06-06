@@ -376,7 +376,7 @@ unsigned QMimeType::matchesFile(const QFileInfo &file) const
     FileMatchContext context(file);
     const unsigned suffixPriority = m_d->matchesFileBySuffix(context.fileName());
     if (suffixPriority >= QMimeGlobPattern::MaxWeight)
-        return suffixPriority;
+        return QMimeGlobPattern::MaxWeight;
     return qMax(suffixPriority, m_d->matchesData(context.data()));
 }
 

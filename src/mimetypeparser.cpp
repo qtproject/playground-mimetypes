@@ -84,12 +84,11 @@ void BaseMimeTypeParser::addGlobPattern(const QString &pattern, const QString &w
     // suffix ones for our suffix list. Use first one as preferred
     const QRegExp wildCard(pattern, Qt::CaseSensitive, QRegExp::WildcardUnix);
     if (!wildCard.isValid()) {
-        qWarning("%s: Invalid wildcard '%s'.",
-                 Q_FUNC_INFO, pattern.toUtf8().constData());
+        qWarning("%s: Invalid wildcard '%s'.", Q_FUNC_INFO, pattern.toLocal8Bit().constData());
         return;
     }
 
-    const unsigned iweight = !weight.isEmpty() ? unsigned(weight.toInt()) : QMimeGlobPattern::MaxWeight;
+    const unsigned iweight = !weight.isEmpty() ? unsigned(weight.toInt()) : QMimeGlobPattern::DefaultWeight;
     d->globPatterns.push_back(QMimeGlobPattern(wildCard, iweight));
 
     d->assignSuffix(pattern);
@@ -182,7 +181,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
     if (debugMimeDB)
         qDebug() << Q_FUNC_INFO << value << startPos << endPos << mask;
 
-//    ruleMatcher->add(QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1()));
+//    ruleMatcher->addRule(QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1()));
     rule = new QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1());
 
     return true;

@@ -77,7 +77,7 @@ public:
     static void writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes);
 
     static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
-                                                 int weight = QMimeGlobPattern::MaxWeight);
+                                                  int weight = QMimeGlobPattern::DefaultWeight);
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
 #ifndef QT_NO_DEBUG_STREAM

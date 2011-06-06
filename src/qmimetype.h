@@ -36,9 +36,10 @@ class QMIME_EXPORT QMimeGlobPattern
 {
 public:
     static const unsigned MaxWeight = 100;
+    static const unsigned DefaultWeight = 50;
     static const unsigned MinWeight = 1;
 
-    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = MaxWeight);
+    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = DefaultWeight);
     ~QMimeGlobPattern();
 
     inline const QRegExp &regExp() const
