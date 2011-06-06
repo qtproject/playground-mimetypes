@@ -48,8 +48,8 @@ public:
     { return m_weight; }
 
 private:
-    const QRegExp m_regExp;
-    const int m_weight;
+    QRegExp m_regExp;
+    int m_weight;
 };
 
 

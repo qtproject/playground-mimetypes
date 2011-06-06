@@ -7,7 +7,7 @@
 TARGET = qmimetype
 TEMPLATE = lib
 
-DESTDIR = ./
+win32: DESTDIR = ./
 
 DEFINES += QMIME_LIBRARY
 
