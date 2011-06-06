@@ -252,7 +252,12 @@ int QMimeMagicRule::endPos() const
 
 QByteArray QMimeMagicRule::mask() const
 {
-    return d->mask;
+    QByteArray mask = d->mask;
+    if (d->type == String) {
+        // restore '0x'
+        mask = "0x" + mask.toHex();
+    }
+    return mask;
 }
 
 bool QMimeMagicRule::isValid() const
