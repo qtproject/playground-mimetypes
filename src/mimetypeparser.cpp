@@ -18,7 +18,7 @@
 **
 **************************************************************************/
 
-#include "qmimedatabase_p.h"
+#include "mimetypeparser_p.h"
 
 #include "qmimetype_p.h"
 #include "magicmatcher_p.h"
@@ -94,10 +94,9 @@ static inline void addGlobPattern(const QRegExp &wildCard, unsigned weight, QMim
     d->assignSuffix(wildCard.pattern());
 }
 
-BaseMimeTypeParser::ParseStage BaseMimeTypeParser::nextStage(ParseStage currentStage,
-                                                             const QStringRef &startElement)
+BaseMimeTypeParser::ParseState BaseMimeTypeParser::nextState(ParseState currentState, const QStringRef &startElement)
 {
-    switch (currentStage) {
+    switch (currentState) {
     case ParseBeginning:
         if (startElement == QLatin1String(mimeInfoTagC))
             return ParseMimeInfo;
@@ -193,12 +192,12 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
     int priority = 50;
     QList<QMimeMagicRule> rules;
     QXmlStreamReader reader(dev);
-    ParseStage ps = ParseBeginning;
+    ParseState ps = ParseBeginning;
     QXmlStreamAttributes atts;
     while (!reader.atEnd()) {
         switch (reader.readNext()) {
         case QXmlStreamReader::StartElement:
-            ps = nextStage(ps, reader.name());
+            ps = nextState(ps, reader.name());
             atts = reader.attributes();
             switch (ps) {
             case ParseMimeType: { // start parsing a type
@@ -228,13 +227,11 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             case ParseComment: {
                 // comments have locale attributes. We want the default, English one
                 QString locale = atts.value(QLatin1String(localeAttributeC)).toString();
-                const QString comment = QCoreApplication::translate("MimeType",
-                                                                    reader.readElementText().toAscii());
-                if (locale.isEmpty()) {
+                const QString comment = QCoreApplication::translate("MimeType", reader.readElementText().toAscii());
+                if (locale.isEmpty())
                     data.comment = comment;
-                } else {
+                else
                     data.localeComments.insert(locale, comment);
-                }
             }
                 break;
             case ParseAlias: {

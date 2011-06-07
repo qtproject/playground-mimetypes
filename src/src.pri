@@ -15,5 +15,6 @@ HEADERS += qmime_global.h \
     magicmatcher.h \
     qmimetype_p.h \
     magicmatcher_p.h \
+    mimetypeparser_p.h \
     qmimedatabase_p.h \
     qmimemagicrule.h

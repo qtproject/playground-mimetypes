@@ -1,13 +1,33 @@
+/**************************************************************************
+**
+** This file is part of QMime
+**
+** Based on Qt Creator source code
+**
+** Qt Creator Copyright (c) 2011 Nokia Corporation and/or its subsidiary(-ies).
+**
+**
+** GNU Lesser General Public License Usage
+**
+** This file may be used under the terms of the GNU Lesser General Public
+** License version 2.1 as published by the Free Software Foundation and
+** appearing in the file LICENSE.LGPL included in the packaging of this file.
+** Please review the following information to ensure the GNU Lesser General
+** Public License version 2.1 requirements will be met:
+** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**************************************************************************/
+
 #ifndef QMIMEDATABASE_P_H
 #define QMIMEDATABASE_P_H
-
-#include "qmimedatabase.h"
 
 #include <QtCore/QMultiHash>
 #include <QtCore/QMutex>
 #ifndef QT_NO_DEBUG_STREAM
 #include <QtCore/QTextStream>
 #endif
+
+#include "qmimetype.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -91,43 +111,6 @@ private:
     ParentChildrenMap m_parentChildrenMap;
     int m_maxLevel;
     QMutex m_mutex;
-};
-
-class BaseMimeTypeParser {
-    Q_DISABLE_COPY(BaseMimeTypeParser)
-public:
-    BaseMimeTypeParser() {}
-    virtual ~BaseMimeTypeParser() {}
-
-    bool parse(QIODevice *dev, const QString &fileName, QString *errorMessage);
-
-private:
-    // Overwrite to process the sequence of parsed data
-    virtual bool process(const QMimeType &t, QString *errorMessage) = 0;
-
-    enum ParseStage { ParseBeginning,
-                      ParseMimeInfo,
-                      ParseMimeType,
-                      ParseComment,
-                      ParseGlobPattern,
-                      ParseSubClass,
-                      ParseAlias,
-                      ParseMagic,
-                      ParseMagicMatchRule,
-                      ParseOtherMimeTypeSubTag,
-                      ParseError };
-
-    static ParseStage nextStage(ParseStage currentStage, const QStringRef &startElement);
-};
-
-// Parser that builds MimeDB hierarchy by adding to MimeDatabasePrivate
-class MimeTypeParser : public BaseMimeTypeParser {
-public:
-    explicit MimeTypeParser(QMimeDatabasePrivate &db) : m_db(db) {}
-private:
-    virtual bool process(const QMimeType &t, QString *) { m_db.addMimeType(t); return true; }
-
-    QMimeDatabasePrivate &m_db;
 };
 
 QT_END_NAMESPACE

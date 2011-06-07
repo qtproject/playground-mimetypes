@@ -19,8 +19,6 @@
 **************************************************************************/
 
 #include "qmimedatabase.h"
-#include "qmimetype_p.h"
-#include "magicmatcher_p.h"
 #include "qmimedatabase_p.h"
 
 #include <QtCore/QDebug>
@@ -29,6 +27,10 @@
 
 #include <algorithm>
 #include <functional>
+
+#include "magicmatcher_p.h"
+#include "mimetypeparser_p.h"
+#include "qmimetype_p.h"
 
 QT_BEGIN_NAMESPACE
 
