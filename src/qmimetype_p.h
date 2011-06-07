@@ -57,6 +57,7 @@ public:
     QString comment;
     LocaleHash localeComments;
     QStringList aliases;
+    QString genericIconName;
     QList<QMimeGlobPattern> globPatterns;
     QStringList subClassOf;
     QString preferredSuffix;

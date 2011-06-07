@@ -84,6 +84,9 @@ public:
     QString localeComment(const QString &locale = QString() /* en, de...*/) const;
     void setLocaleComment(const QString &locale, const QString &comment);
 
+    QString genericIconName() const;
+    void setGenericIconName(const QString &genericIconName);
+
     QList<QMimeGlobPattern> globPatterns() const;
     void setGlobPatterns(const QList<QMimeGlobPattern> &);
 

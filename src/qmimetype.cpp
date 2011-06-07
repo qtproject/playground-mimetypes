@@ -300,6 +300,16 @@ void QMimeType::setAliases(const QStringList &aliases)
      m_d->aliases = aliases;
 }
 
+QString QMimeType::genericIconName() const
+{
+    return m_d->genericIconName;
+}
+
+void QMimeType::setGenericIconName(const QString &genericIconName)
+{
+    m_d->genericIconName = genericIconName;
+}
+
 QList<QMimeGlobPattern> QMimeType::globPatterns() const
 {
     return m_d->globPatterns;

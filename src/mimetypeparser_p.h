@@ -47,6 +47,7 @@ private:
         ParseMimeInfo,
         ParseMimeType,
         ParseComment,
+        ParseGenericIcon,
         ParseGlobPattern,
         ParseSubClass,
         ParseAlias,
