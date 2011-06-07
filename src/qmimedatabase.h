@@ -32,7 +32,6 @@ QT_BEGIN_NAMESPACE
 class QByteArray;
 class QFileInfo;
 class QIODevice;
-class QDebug;
 
 class QMimeDatabasePrivate;
 class QMIME_EXPORT QMimeDatabase
@@ -80,17 +79,9 @@ public:
                                                   int weight = QMimeGlobPattern::DefaultWeight);
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
-#ifndef QT_NO_DEBUG_STREAM
-    friend QDebug operator<<(QDebug d, const QMimeDatabase &mt);
-#endif
-
 private:
     QMimeDatabasePrivate *const d;
 };
-
-#ifndef QT_NO_DEBUG_STREAM
-QMIME_EXPORT QDebug operator<<(QDebug debug, const QMimeType &mt);
-#endif
 
 QT_END_NAMESPACE
 

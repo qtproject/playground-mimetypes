@@ -23,10 +23,10 @@
 
 #include "qmime_global.h"
 
-#include "magicmatcher.h"
-
 #include <QtCore/QRegExp>
 #include <QtCore/QStringList>
+
+#include "magicmatcher.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -109,10 +109,6 @@ public:
     void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
     void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
 
-#ifndef QT_NO_DEBUG_STREAM
-    friend QDebug operator<<(QDebug d, const QMimeType &mt);
-#endif
-
 private:
     explicit QMimeType(const QMimeTypeData &dd);
 
@@ -121,10 +117,6 @@ private:
 
     QSharedDataPointer<QMimeTypeData> d;
 };
-
-#ifndef QT_NO_DEBUG_STREAM
-QMIME_EXPORT QDebug operator<<(QDebug debug, const QMimeType &mt);
-#endif
 
 QT_END_NAMESPACE
 

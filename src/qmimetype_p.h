@@ -41,9 +41,6 @@ public:
     void clear();
     void assignSuffix(const QString &pattern);
     void assignSuffixes(const QStringList &patterns);
-#ifndef QT_NO_DEBUG_STREAM
-    void debug(QTextStream &str, int indent = 0) const;
-#endif
 
     unsigned matchesFileBySuffix(const QString &name) const;
     unsigned matchesData(const QByteArray &data) const;
@@ -62,7 +59,6 @@ public:
     QList<QMimeMagicRuleMatcher> magicMatchers;
 };
 
-enum { debugMimeDB = 0 };
 
 QT_END_NAMESPACE
 

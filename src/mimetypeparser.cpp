@@ -181,9 +181,6 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
         return false;
     const QString mask = atts.value(QLatin1String(matchMaskAttributeC)).toString();
 
-    if (debugMimeDB)
-        qDebug() << Q_FUNC_INFO << value << startPos << endPos << mask;
-
 //    ruleMatcher->addRule(QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1()));
     rule = new QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1());
 

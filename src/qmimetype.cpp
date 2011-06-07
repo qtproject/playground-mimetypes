@@ -21,7 +21,7 @@
 #include "qmimetype.h"
 #include "qmimetype_p.h"
 
-#include <QtCore/QDebug>
+#include <QtCore/QLocale>
 
 #include "qmimedatabase.h"
 #include "magicmatcher_p.h"
@@ -53,7 +53,7 @@ QMimeTypeData::QMimeTypeData()
     : suffixPattern(QLatin1String("^\\*\\.[\\w+]+$"))
 {
     if (!suffixPattern.isValid())
-        qWarning() << "MimeTypeData::MimeTypeData : invalid suffixPattern";
+        qWarning("MimeTypeData(): invalid suffixPattern");
 }
 
 void QMimeTypeData::clear()
@@ -83,34 +83,6 @@ void QMimeTypeData::assignSuffixes(const QStringList &patterns)
     foreach (const QString &pattern, patterns)
         assignSuffix(pattern);
 }
-
-#ifndef QT_NO_DEBUG_STREAM
-#include <QtCore/QTextStream>
-
-void QMimeTypeData::debug(QTextStream &str, int indent) const
-{
-    const QString indentS = QString(indent, QLatin1Char(' '));
-    const QString comma = QString(1, QLatin1Char(','));
-    str << indentS << "Type: " << type;
-    if (!aliases.empty())
-        str << " Aliases: " << aliases.join(comma);
-    str << ", magic: " << magicMatchers.size() << '\n';
-    str << indentS << "Comment: " << comment << '\n';
-    if (!subClassOf.empty())
-        str << indentS << "SubClassesOf: " << subClassOf.join(comma) << '\n';
-    if (!globPatterns.empty()) {
-        str << indentS << "Glob: ";
-        foreach (const QMimeGlobPattern &gp, globPatterns)
-            str << gp.regExp().pattern() << '(' << gp.weight() << ')';
-        str << '\n';
-        if (!suffixes.empty()) {
-            str <<  indentS << "Suffixes: " << suffixes.join(comma)
-                << " preferred: " << preferredSuffix << '\n';
-        }
-    }
-    str << '\n';
-}
-#endif
 
 unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 {
@@ -399,18 +371,5 @@ void QMimeType::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
 {
     d->magicMatchers = matchers;
 }
-
-#ifndef QT_NO_DEBUG_STREAM
-QDebug operator<<(QDebug d, const QMimeType &mt)
-{
-    QString s;
-    {
-        QTextStream str(&s);
-        mt.d->debug(str);
-    }
-    d << s;
-    return d;
-}
-#endif
 
 QT_END_NAMESPACE

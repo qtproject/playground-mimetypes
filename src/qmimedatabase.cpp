@@ -21,9 +21,9 @@
 #include "qmimedatabase.h"
 #include "qmimedatabase_p.h"
 
-#include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+#include <QtCore/QSet>
 
 #include <algorithm>
 #include <functional>
@@ -149,11 +149,7 @@ void QMimeDatabasePrivate::determineLevels()
         }
     }
 
-    const QSet<QString> topLevels = parentSet.subtract(childrenSet);
-    if (debugMimeDB)
-        qDebug() << Q_FUNC_INFO << "top levels" << topLevels;
-
-    foreach (const QString &topLevel, topLevels) {
+    foreach (const QString &topLevel, parentSet.subtract(childrenSet)) {
         MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(topLevel));
         if (!entry) {
             qWarning("%s: Inconsistent mime hierarchy detected, top level element %s cannot be found.",
@@ -417,18 +413,6 @@ bool QMimeDatabasePrivate::isTextFile(const QByteArray &data)
     return true;
 }
 
-#ifndef QT_NO_DEBUG_STREAM
-void QMimeDatabasePrivate::debug(QTextStream &str) const
-{
-    str << ">MimeDatabase\n";
-    foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
-        str << "Entry level " << entry->level << '\n';
-        entry->type.d->debug(str);
-    }
-    str << "<MimeDatabase\n";
-}
-#endif
-
 
 /*!
     \class MimeDatabase
@@ -683,18 +667,5 @@ QStringList QMimeDatabase::fromGlobPatterns(const QList<QMimeGlobPattern> &globP
 {
     return QMimeDatabasePrivate::fromGlobPatterns(globPatterns);
 }
-
-#ifndef QT_NO_DEBUG_STREAM
-QDebug operator<<(QDebug d, const QMimeDatabase &mt)
-{
-    QString s;
-    {
-        QTextStream str(&s);
-        mt.d->debug(str);
-    }
-    d << s;
-    return d;
-}
-#endif
 
 QT_END_NAMESPACE

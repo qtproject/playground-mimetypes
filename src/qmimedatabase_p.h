@@ -23,9 +23,6 @@
 
 #include <QtCore/QMultiHash>
 #include <QtCore/QMutex>
-#ifndef QT_NO_DEBUG_STREAM
-#include <QtCore/QTextStream>
-#endif
 
 #include "qmimetype.h"
 
@@ -83,10 +80,6 @@ public:
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
     static bool isTextFile(const QByteArray &data);
-
-#ifndef QT_NO_DEBUG_STREAM
-    void debug(QTextStream &str) const;
-#endif
 
 private:
     typedef QHash<QString, QString> AliasMap;

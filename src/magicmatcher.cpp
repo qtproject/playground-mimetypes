@@ -23,7 +23,6 @@
 
 #include "qmimetype_p.h"
 
-#include <QtCore/QDebug>
 #include <qendian.h>
 
 QT_BEGIN_NAMESPACE
