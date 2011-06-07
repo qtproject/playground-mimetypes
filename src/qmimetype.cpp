@@ -72,7 +72,7 @@ void QMimeTypeData::assignSuffix(const QString &pattern)
 {
     if (suffixPattern.exactMatch(pattern)) {
         const QString suffix = pattern.right(pattern.size() - 2);
-        suffixes.push_back(suffix);
+        suffixes.append(suffix);
         if (preferredSuffix.isEmpty())
             preferredSuffix = suffix;
     }
@@ -359,7 +359,7 @@ QStringList QMimeType::suffixes() const
 
 void QMimeType::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
 {
-    d->magicMatchers.push_back(matcher);
+    d->magicMatchers.append(matcher);
 }
 
 QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const

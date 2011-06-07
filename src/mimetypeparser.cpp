@@ -226,7 +226,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             case ParseSubClass: {
                 const QString inheritsFrom = atts.value(QLatin1String(mimeTypeAttributeC)).toString();
                 if (!inheritsFrom.isEmpty())
-                    data.subClassOf.push_back(inheritsFrom);
+                    data.subClassOf.append(inheritsFrom);
             }
                 break;
             case ParseComment: {
@@ -242,7 +242,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             case ParseAlias: {
                 const QString alias = atts.value(QLatin1String(mimeTypeAttributeC)).toString();
                 if (!alias.isEmpty())
-                    data.aliases.push_back(alias);
+                    data.aliases.append(alias);
             }
                 break;
             case ParseMagic: {
@@ -295,7 +295,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
 //                        qWarning() << "BaseMimeTypeParser::parse : ruleMatcher unexpectedly null";
 //                        return false;
 //                    }
-//                    data.magicMatchers.push_back(ruleMatcher);
+//                    data.magicMatchers.append(ruleMatcher);
 //                    ruleMatcher = MagicRuleMatcherPtr();
 //                }
 
@@ -303,7 +303,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 if (reader.name() == QLatin1String(matchTagC)) {
                     if (ruleMatcher) {
                         ruleMatcher->addRules(rules);
-                        data.magicMatchers.push_back(*ruleMatcher);
+                        data.magicMatchers.append(*ruleMatcher);
                         ruleMatcher = 0;
                     }
                     rules.takeLast();
