@@ -62,6 +62,8 @@ public:
                                                   int weight = QMimeGlobPattern::DefaultWeight);
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
+    static bool isTextFile(const QByteArray &data);
+
 #ifndef QT_NO_DEBUG_STREAM
     void debug(QTextStream &str) const;
 #endif

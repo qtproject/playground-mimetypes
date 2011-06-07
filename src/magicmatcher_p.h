@@ -8,12 +8,6 @@
 
 QT_BEGIN_NAMESPACE
 
-// Fallback priorities, must be low.
-enum {
-    BinaryMatchPriority = QMimeGlobPattern::MinWeight + 1,
-    TextMatchPriority
-};
-
 typedef QSharedPointer<MagicRuleMatcher> MagicRuleMatcherPtr;
 
 class FileMatchContext {
@@ -40,24 +34,6 @@ private:
     const QString m_fileName;
     State m_state;
     QByteArray m_data;
-};
-
-class BinaryMatcher : public IMagicMatcher {
-    Q_DISABLE_COPY(BinaryMatcher)
-public:
-    BinaryMatcher() {}
-    virtual bool matches(const QByteArray & /*data*/) const { return true; }
-    virtual unsigned priority() const  { return BinaryMatchPriority; }
-};
-
-class HeuristicTextMagicMatcher : public IMagicMatcher {
-    Q_DISABLE_COPY(HeuristicTextMagicMatcher)
-public:
-    HeuristicTextMagicMatcher() {}
-    virtual bool matches(const QByteArray &data) const;
-    virtual unsigned priority() const  { return TextMatchPriority; }
-
-    static bool isTextFile(const QByteArray &data);
 };
 
 QT_END_NAMESPACE

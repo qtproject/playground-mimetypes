@@ -36,6 +36,10 @@ QT_BEGIN_NAMESPACE
 const char *const textTypeC = "text/plain";
 const char *const binaryTypeC = "application/octet-stream";
 
+// UTF16 byte order marks
+static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
+static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
+
 const QString QMimeDatabasePrivate::kModifiedMimeTypesFile(QLatin1String("modifiedmimetypes.xml"));
 QString QMimeDatabasePrivate::kModifiedMimeTypesPath;
 
@@ -84,15 +88,7 @@ bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
     if (!mt.isValid())
         return false;
 
-    const QString type = mt.type();
-    // Hack: Add a magic text matcher to "text/plain" and the fallback matcher to
-    // binary types "application/octet-stream"
-    if (type == QLatin1String(textTypeC)) {
-        mt.addMagicMatcher(QSharedPointer<IMagicMatcher>(new HeuristicTextMagicMatcher));
-    } else {
-        if (type == QLatin1String(binaryTypeC))
-            mt.addMagicMatcher(QSharedPointer<IMagicMatcher>(new BinaryMatcher));
-    }
+    const QString &type = mt.type();
 
     // insert the type.
     m_typeMimeTypeMap.insert(type, new MimeMapEntry(mt));
@@ -254,7 +250,18 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
         }
     }
 
-    return candidate;
+    if (candidate.isValid())
+        return candidate;
+
+    // Hack
+    // TODO: use low fallback priorities ( 2 and 1)?
+    if (isTextFile(data))
+        candidate = findByName(QLatin1String(textTypeC), priorityPtr); // try to guess if it is text
+
+    if (candidate.isValid())
+        return candidate;
+
+    return findByName(QLatin1String(binaryTypeC), priorityPtr); // fallback to application/octet-stream
 }
 
 QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
@@ -268,7 +275,6 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     FileMatchContext context(f);
 
     // Pass 1) Try to match on suffix#type
-#warning TODO: add supprort for full path patterns
     QMimeType candidateByName = findByName(f.fileName(), priorityPtr);
 
     // Pass 2) Match on content
@@ -399,6 +405,20 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
     return patterns;
 }
 
+bool QMimeDatabasePrivate::isTextFile(const QByteArray &data)
+{
+    const int size = data.size();
+    for (int i = 0; i < size; i++) {
+        const char c = data.at(i);
+        if (c >= 0x01 && c < 0x09) // Sure-fire binary
+            return false;
+        if (c == 0)             // Check for UTF16
+            return data.startsWith(bigEndianByteOrderMarkC) ||
+                    data.startsWith(littleEndianByteOrderMarkC);
+    }
+    return true;
+}
+
 #ifndef QT_NO_DEBUG_STREAM
 void QMimeDatabasePrivate::debug(QTextStream &str) const
 {
@@ -499,7 +519,6 @@ QMimeType QMimeDatabase::findByName(const QString &name) const
     QMutexLocker locker(&m_d->m_mutex);
 
     unsigned priority = 0;
-#warning Use path not filename
     return m_d->findByName(QFileInfo(name).fileName(), &priority);
 }
 

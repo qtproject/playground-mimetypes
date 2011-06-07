@@ -85,48 +85,6 @@ QByteArray FileMatchContext::data()
 }
 
 /*!
-    \class BinaryMatcher
-    \brief The binary fallback matcher for mime type "application/octet-stream".
-
-    \sa MimeType, MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, HeuristicTextMagicMatcher
-    \sa BaseMimeTypeParser, MimeTypeParser
-*/
-
-/*!
-    \class HeuristicTextMagicMatcher
-    \brief Heuristic text file matcher for mime types.
-
-    If the data do not contain any character below tab (9), detect as text.
-    Additionally, check on UTF16 byte order markers.
-
-    \sa MimeType, MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher
-    \sa BaseMimeTypeParser, MimeTypeParser
-*/
-
-bool HeuristicTextMagicMatcher::isTextFile(const QByteArray &data)
-{
-    const int size = data.size();
-    for (int i = 0; i < size; i++) {
-        const char c = data.at(i);
-        if (c >= 0x01 && c < 0x09) // Sure-fire binary
-            return false;
-        if (c == 0)             // Check for UTF16
-            return data.startsWith(bigEndianByteOrderMarkC) || data.startsWith(littleEndianByteOrderMarkC);
-    }
-    return true;
-}
-
-bool HeuristicTextMagicMatcher::matches(const QByteArray &data) const
-{
-    const bool rc = isTextFile(data);
-    if (debugMimeDB)
-        qDebug() << Q_FUNC_INFO << " on " << data.size() << " returns " << rc;
-    return rc;
-}
-
-/*!
     \class MagicRuleMatcher
 
     \brief A Magic matcher that checks a number of rules based on operator "or".
