@@ -61,7 +61,7 @@ public:
     QStringList subClassOf;
     QString preferredSuffix;
     QStringList suffixes;
-    IMagicMatcherList magicMatchers;
+    QList<QMimeMagicRuleMatcher> magicMatchers;
 };
 
 enum { debugMimeDB = 0 };

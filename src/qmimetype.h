@@ -60,7 +60,7 @@ public:
     QMimeType();
     explicit QMimeType(const QString &type);
     QMimeType(const QString &type,
-              const IMagicMatcherList &matchers,
+              const QList<QMimeMagicRuleMatcher> &matchers,
               const QList<QMimeGlobPattern> &globPatterns = QList<QMimeGlobPattern>(),
               const QStringList &subClassOf = QStringList());
     QMimeType(const QMimeType&);
@@ -102,14 +102,9 @@ public:
 
     QString filterString() const;
 
-    void addMagicMatcher(const IMagicMatcherSharedPointer &matcher);
-
-    const IMagicMatcherList &magicMatchers() const;
-    void setMagicMatchers(const IMagicMatcherList &matchers);
-
-    // Convenience for rule-base matchers
-    IMagicMatcherList magicRuleMatchers() const;
-    void setMagicRuleMatchers(const IMagicMatcherList &matchers);
+    QList<QMimeMagicRuleMatcher> magicMatchers() const;
+    void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
+    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
 
 #ifndef QT_NO_DEBUG_STREAM
     friend QDebug operator<<(QDebug d, const QMimeType &mt);

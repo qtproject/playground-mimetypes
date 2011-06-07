@@ -47,9 +47,9 @@ public:
     QList<QMimeGlobPattern> globPatterns() const;
     void setGlobPatterns(const QString &typeOrAlias, const QList<QMimeGlobPattern> &globPatterns);
 
-    QList<QSharedPointer<IMagicMatcher> > magicMatchers() const;
+    QList<QMimeMagicRuleMatcher> magicMatchers() const;
     void setMagicMatchers(const QString &typeOrAlias,
-                          const QList<QSharedPointer<IMagicMatcher> > &matchers);
+                          const QList<QMimeMagicRuleMatcher> &matchers);
 
     QList<QMimeType> mimeTypes() const;
 

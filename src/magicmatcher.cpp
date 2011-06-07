@@ -44,7 +44,7 @@ static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
 
 //namespace Core {
 
-typedef QSharedPointer<MagicRuleMatcher> MagicRuleMatcherPtr;
+typedef QSharedPointer<QMimeMagicRuleMatcher> MagicRuleMatcherPtr;
 
 /*!
     \class FileMatchContext
@@ -96,32 +96,27 @@ QByteArray FileMatchContext::data()
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-MagicRuleMatcher::MagicRuleMatcher()
-    : m_priority(65535)
+QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(unsigned priority)
+    : m_priority(priority)
 {
 }
 
-void MagicRuleMatcher::addRule(const QMimeMagicRule &rule)
+void QMimeMagicRuleMatcher::addRule(const QMimeMagicRule &rule)
 {
     m_list.append(rule);
 }
 
-void MagicRuleMatcher::addRules(const QList<QMimeMagicRule> &rules)
+void QMimeMagicRuleMatcher::addRules(const QList<QMimeMagicRule> &rules)
 {
     m_list.append(rules);
 }
 
-QList<QMimeMagicRule> MagicRuleMatcher::magicRules() const
+QList<QMimeMagicRule> QMimeMagicRuleMatcher::magicRules() const
 {
     return m_list;
 }
 
-IMagicMatcher::Type MagicRuleMatcher::type() const
-{
-    return RuleMatcher;
-}
-
-bool MagicRuleMatcher::matches(const QByteArray &data) const
+bool QMimeMagicRuleMatcher::matches(const QByteArray &data) const
 {
     if (m_list.isEmpty())
         return false;
@@ -134,12 +129,12 @@ bool MagicRuleMatcher::matches(const QByteArray &data) const
     return true;
 }
 
-unsigned MagicRuleMatcher::priority() const
+unsigned QMimeMagicRuleMatcher::priority() const
 {
     return m_priority;
 }
 
-void MagicRuleMatcher::setPriority(unsigned priority)
+void QMimeMagicRuleMatcher::setPriority(unsigned priority)
 {
     m_priority = priority;
 }

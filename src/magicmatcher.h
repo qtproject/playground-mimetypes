@@ -33,42 +33,18 @@
 
 QT_BEGIN_NAMESPACE
 
-class QMIME_EXPORT IMagicMatcher
+class QMIME_EXPORT QMimeMagicRuleMatcher
 {
-    Q_DISABLE_COPY(IMagicMatcher)
-protected:
-    IMagicMatcher() {}
 public:
-    virtual ~IMagicMatcher() {}
-
-    enum Type { RuleMatcher, CustomMatcher };
-    virtual Type type() const { return CustomMatcher; }
-
-    // Check for a match on contents of a file
-    virtual bool matches(const QByteArray &data) const = 0;
-    // Return a priority value from 1..100
-    virtual unsigned priority() const = 0;
-};
-
-typedef QSharedPointer<IMagicMatcher> IMagicMatcherSharedPointer;
-typedef QList<IMagicMatcherSharedPointer> IMagicMatcherList;
-
-
-class QMIME_EXPORT MagicRuleMatcher : public IMagicMatcher
-{
-    Q_DISABLE_COPY(MagicRuleMatcher)
-public:
-    MagicRuleMatcher();
+    explicit QMimeMagicRuleMatcher(unsigned priority = 65535);
 
     void addRule(const QMimeMagicRule &rule);
     void addRules(const QList<QMimeMagicRule> &rules);
     QList<QMimeMagicRule> magicRules() const;
 
-    virtual Type type() const;
+    bool matches(const QByteArray &data) const;
 
-    virtual bool matches(const QByteArray &data) const;
-
-    virtual unsigned priority() const;
+    unsigned priority() const;
     void setPriority(unsigned priority);
 
 private:

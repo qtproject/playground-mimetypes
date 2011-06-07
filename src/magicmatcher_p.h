@@ -8,8 +8,6 @@
 
 QT_BEGIN_NAMESPACE
 
-typedef QSharedPointer<MagicRuleMatcher> MagicRuleMatcherPtr;
-
 class FileMatchContext {
     Q_DISABLE_COPY(FileMatchContext)
 public:

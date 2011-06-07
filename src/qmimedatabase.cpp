@@ -332,9 +332,9 @@ void QMimeDatabasePrivate::setGlobPatterns(const QString &typeOrAlias,
         entry->type.setGlobPatterns(globPatterns);
 }
 
-QList<QSharedPointer<IMagicMatcher> > QMimeDatabasePrivate::magicMatchers() const
+QList<QMimeMagicRuleMatcher > QMimeDatabasePrivate::magicMatchers() const
 {
-    QList<QSharedPointer<IMagicMatcher> > magicMatchers;
+    QList<QMimeMagicRuleMatcher> magicMatchers;
 
     foreach (const MimeMapEntry *entry, m_typeMimeTypeMap)
         magicMatchers.append(entry->type.magicMatchers());
@@ -343,7 +343,7 @@ QList<QSharedPointer<IMagicMatcher> > QMimeDatabasePrivate::magicMatchers() cons
 }
 
 void QMimeDatabasePrivate::setMagicMatchers(const QString &typeOrAlias,
-                                            const QList<QSharedPointer<IMagicMatcher> > &matchers)
+                                            const QList<QMimeMagicRuleMatcher> &matchers)
 {
     MimeMapEntry *entry = m_typeMimeTypeMap.value(resolveAlias(typeOrAlias));
     if (entry)
@@ -371,7 +371,7 @@ void QMimeDatabasePrivate::syncUserModifiedMimeTypes()
         QHash<QString, QMimeType>::const_iterator userMimeIt = userModified.constFind(entry->type.type());
         if (userMimeIt != userModified.constEnd()) {
             entry->type.setGlobPatterns(userMimeIt.value().globPatterns());
-            entry->type.setMagicRuleMatchers(userMimeIt.value().magicRuleMatchers());
+            entry->type.setMagicMatchers(userMimeIt.value().magicMatchers());
         }
     }
 }
@@ -607,14 +607,15 @@ void QMimeDatabase::setGlobPatterns(const QString &typeOrAlias,
     m_d->setGlobPatterns(typeOrAlias, globPatterns);
 }
 
-IMagicMatcherList QMimeDatabase::magicMatchers() const
+QList<QMimeMagicRuleMatcher> QMimeDatabase::magicMatchers() const
 {
     QMutexLocker locker(&m_d->m_mutex);
 
     return m_d->magicMatchers();
 }
 
-void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias, const IMagicMatcherList &matchers)
+void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias,
+                                     const QList<QMimeMagicRuleMatcher> &matchers)
 {
     QMutexLocker locker(&m_d->m_mutex);
 

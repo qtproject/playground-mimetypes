@@ -154,7 +154,6 @@ static bool parseNumber(const QString &n, int *target, QString *errorMessage)
 //  <match value="must be converted with BinHex" type="string" offset="11"/>
 //  <match value="0x9501" type="big16" offset="0:64"/>
 static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
-                              const MagicRuleMatcherPtr  &ruleMatcher,
                               QString *errorMessage, QMimeMagicRule *&rule)
 {
     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
@@ -190,7 +189,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
 bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString *errorMessage)
 {
     QMimeTypeData data;
-    MagicRuleMatcherPtr ruleMatcher;
+    QMimeMagicRuleMatcher *ruleMatcher = 0;
     int priority = 0;
     QList<QMimeMagicRule> rules;
     QXmlStreamReader reader(dev);
@@ -258,12 +257,12 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
 //                    return false;
 //                }
                 if (!ruleMatcher) {
-                    ruleMatcher = MagicRuleMatcherPtr(new MagicRuleMatcher);
+                    ruleMatcher = new QMimeMagicRuleMatcher;
                     ruleMatcher->setPriority(priority);
                 }
 
                 QMimeMagicRule *rule = 0;
-                if (!addMagicMatchRule(atts, ruleMatcher, errorMessage, rule))
+                if (!addMagicMatchRule(atts, /*ruleMatcher, */errorMessage, rule))
                     return false;
                 rules.append(*rule);
                 delete rule;
@@ -298,8 +297,8 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 if (reader.name() == QLatin1String(matchTagC)) {
                     if (ruleMatcher) {
                         ruleMatcher->addRules(rules);
-                        data.magicMatchers.push_back(ruleMatcher);
-                        ruleMatcher = MagicRuleMatcherPtr();
+                        data.magicMatchers.push_back(*ruleMatcher);
+                        ruleMatcher = 0;
                     }
                     rules.takeLast();
                 }
@@ -364,15 +363,15 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
                 break;
             case QXmlStreamReader::EndElement:
                 if (reader.name() == mimeTypeTagC) {
-                    IMagicMatcherList matchers;
+                    QList<QMimeMagicRuleMatcher> matchers;
                     QHash<int, QList<QMimeMagicRule> >::const_iterator it = rules.constBegin();
                     for ( ; it != rules.constEnd(); ++it) {
-                        MagicRuleMatcher *magicRuleMatcher = new MagicRuleMatcher();
-                        magicRuleMatcher->setPriority(it.key());
-                        magicRuleMatcher->addRules(it.value());
-                        matchers.append(IMagicMatcherSharedPointer(magicRuleMatcher));
+                        QMimeMagicRuleMatcher magicRuleMatcher;
+                        magicRuleMatcher.setPriority(it.key());
+                        magicRuleMatcher.addRules(it.value());
+                        matchers.append(magicRuleMatcher);
                     }
-                    mimeType.setMagicRuleMatchers(matchers);
+                    mimeType.setMagicMatchers(matchers);
                     mimeTypes.append(mimeType);
                     mimeType.clear();
                     rules.clear();
@@ -417,10 +416,11 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
                 writer.writeAttribute(QLatin1String(mimeTypeAttributeC), mimeType.type());
                 writer.writeAttribute(QLatin1String(patternAttributeC),
                                       fromGlobPatterns(mimeType.globPatterns()).join(QLatin1String(";")));
-                foreach (const QSharedPointer<IMagicMatcher> &matcher, mimeType.magicMatchers()) {
+                foreach (const QMimeMagicRuleMatcher &matcher, mimeType.magicMatchers()) {
                     // Only care about rule-based matchers.
-                    if (MagicRuleMatcher *ruleMatcher =
-                        dynamic_cast<MagicRuleMatcher *>(matcher.data())) {
+                    const QMimeMagicRuleMatcher *ruleMatcher = &matcher;
+//                    if (QMimeMagicRuleMatcher *ruleMatcher =
+//                        dynamic_cast<QMimeMagicRuleMatcher *>(matcher.data())) {
                         const QList<QMimeMagicRule> &rules = ruleMatcher->magicRules();
                         foreach (const QMimeMagicRule &rule, rules) {
                             writer.writeStartElement(QLatin1String(matchTagC));
@@ -433,7 +433,7 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
                                                   QString::number(ruleMatcher->priority()));
                             writer.writeEndElement();
                         }
-                    }
+//                    }
                 }
                 writer.writeEndElement();
             }

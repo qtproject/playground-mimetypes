@@ -125,9 +125,9 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 {
     unsigned priority = 0;
     if (!data.isEmpty()) {
-        foreach (const IMagicMatcherSharedPointer &matcher, magicMatchers) {
-            if (matcher->priority() > priority && matcher->matches(data))
-                priority = matcher->priority();
+        foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
+            if (matcher.priority() > priority && matcher.matches(data))
+                priority = matcher.priority();
         }
     }
     return priority;
@@ -198,7 +198,7 @@ QMimeType::QMimeType(const QString &type) :
 }
 
 QMimeType::QMimeType(const QString &type,
-                     const IMagicMatcherList &matchers,
+                     const QList<QMimeMagicRuleMatcher> &matchers,
                      const QList<QMimeGlobPattern> &globPatterns,
                      const QStringList &subClassOf) :
     m_d(new QMimeTypeData)
@@ -385,44 +385,19 @@ QStringList QMimeType::suffixes() const
     return m_d->suffixes;
 }
 
-void QMimeType::addMagicMatcher(const IMagicMatcherSharedPointer &matcher)
+void QMimeType::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
 {
     m_d->magicMatchers.push_back(matcher);
 }
 
-const IMagicMatcherList &QMimeType::magicMatchers() const
+QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
 {
     return m_d->magicMatchers;
 }
 
-void QMimeType::setMagicMatchers(const IMagicMatcherList &matchers)
+void QMimeType::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
 {
     m_d->magicMatchers = matchers;
-}
-
-IMagicMatcherList QMimeType::magicRuleMatchers() const
-{
-    IMagicMatcherList result;
-
-    foreach (const IMagicMatcherSharedPointer &matcher, m_d->magicMatchers) {
-        if (matcher->type() == IMagicMatcher::RuleMatcher)
-            result.append(matcher);
-    }
-
-    return result;
-}
-
-void QMimeType::setMagicRuleMatchers(const IMagicMatcherList &matchers)
-{
-    IMagicMatcherList tmp;
-
-    tmp.append(matchers);
-    foreach (const IMagicMatcherSharedPointer &matcher, m_d->magicMatchers) {
-        if (matcher->type() != IMagicMatcher::RuleMatcher)
-            tmp.append(matcher);
-    }
-
-    m_d->magicMatchers = tmp;
 }
 
 #ifndef QT_NO_DEBUG_STREAM
