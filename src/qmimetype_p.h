@@ -48,9 +48,6 @@ public:
     unsigned matchesFileBySuffix(const QString &name) const;
     unsigned matchesData(const QByteArray &data) const;
 
-    static QString formatFilterString(const QString &description,
-                                      const QList<QMimeGlobPattern> &globs);
-
     const QRegExp suffixPattern;
 
     QString type;

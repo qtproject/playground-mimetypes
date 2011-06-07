@@ -22,7 +22,6 @@
 #include "qmimetype_p.h"
 
 #include <QtCore/QDebug>
-#include <QtCore/QTextStream>
 
 #include "qmimedatabase.h"
 #include "magicmatcher_p.h"
@@ -86,6 +85,8 @@ void QMimeTypeData::assignSuffixes(const QStringList &patterns)
 }
 
 #ifndef QT_NO_DEBUG_STREAM
+#include <QtCore/QTextStream>
+
 void QMimeTypeData::debug(QTextStream &str, int indent) const
 {
     const QString indentS = QString(indent, QLatin1Char(' '));
@@ -114,10 +115,11 @@ void QMimeTypeData::debug(QTextStream &str, int indent) const
 unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 {
     // check globs
-    foreach (const QMimeGlobPattern &gp, globPatterns) {
-        if (gp.regExp().exactMatch(name))
-            return gp.weight();
+    foreach (const QMimeGlobPattern &glob, globPatterns) {
+        if (glob.regExp().exactMatch(name))
+            return glob.weight();
     }
+
     return 0;
 }
 
@@ -133,25 +135,6 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     return priority;
 }
 
-QString QMimeTypeData::formatFilterString(const QString &description, const QList<QMimeGlobPattern> &globs)
-{
-    QString rc;
-    if (!globs.empty()) { // !Binary files
-        QTextStream str(&rc);
-        str << description;
-        if (!globs.empty()) {
-            str << " (";
-            const int size = globs.size();
-            for (int i = 0; i < size; i++) {
-                if (i)
-                    str << ' ';
-                str << globs.at(i).regExp().pattern();
-            }
-            str << ')';
-        }
-    }
-    return rc;
-}
 
 /*!
     \class MimeType
@@ -355,8 +338,20 @@ bool QMimeType::setPreferredSuffix(const QString &preferredSuffix)
 */
 QString QMimeType::filterString() const
 {
-    // @todo: Use localeComment() once creator is shipped with translations
-    return QMimeTypeData::formatFilterString(comment(), d->globPatterns);
+    QString filter;
+
+    if (!d->globPatterns.empty()) { // !Binary files
+        // ### todo: Use localeComment() once creator is shipped with translations
+        filter += d->comment + QLatin1String(" (");
+        for (int i = 0; i < d->globPatterns.size(); ++i) {
+            if (i != 0)
+                filter += QLatin1Char(' ');
+            filter += d->globPatterns.at(i).regExp().pattern();
+        }
+        filter +=  QLatin1Char(')');
+    }
+
+    return filter;
 }
 
 /*!
