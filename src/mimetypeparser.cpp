@@ -42,6 +42,7 @@ const char *const globTagC = "glob";
 const char *const aliasTagC = "alias";
 const char *const patternAttributeC = "pattern";
 const char *const weightAttributeC = "weight";
+const char *const caseSensitiveAttributeC = "case-sensitive";
 const char *const localeAttributeC = "xml:lang";
 
 const char *const magicTagC = "magic";
@@ -76,22 +77,21 @@ const char *const matchMaskAttributeC = "mask";
     \sa MimeTypeParser
 */
 
-void BaseMimeTypeParser::addGlobPattern(const QString &pattern, const QString &weight, QMimeTypeData *d) const
+static inline void addGlobPattern(const QRegExp &wildCard, unsigned weight, QMimeTypeData *d)
 {
-    if (pattern.isEmpty())
-        return;
     // Collect patterns as a QRegExp list and filter out the plain
     // suffix ones for our suffix list. Use first one as preferred
-    const QRegExp wildCard(pattern, Qt::CaseInsensitive, QRegExp::WildcardUnix);
     if (!wildCard.isValid()) {
-        qWarning("%s: Invalid wildcard '%s'.", Q_FUNC_INFO, pattern.toLocal8Bit().constData());
+        qWarning("%s: Invalid wildcard '%s'.", Q_FUNC_INFO, wildCard.pattern().toLocal8Bit().constData());
         return;
     }
 
-    const unsigned iweight = !weight.isEmpty() ? unsigned(weight.toInt()) : QMimeGlobPattern::DefaultWeight;
-    d->globPatterns.push_back(QMimeGlobPattern(wildCard, iweight));
+    if (weight == 0)
+        weight = QMimeGlobPattern::DefaultWeight;
 
-    d->assignSuffix(pattern);
+    d->globPatterns.append(QMimeGlobPattern(wildCard, weight));
+
+    d->assignSuffix(wildCard.pattern());
 }
 
 BaseMimeTypeParser::ParseStage BaseMimeTypeParser::nextStage(ParseStage currentStage,
@@ -210,9 +210,14 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 }
             }
                 break;
-            case ParseGlobPattern:
-                addGlobPattern(atts.value(QLatin1String(patternAttributeC)).toString(),
-                               atts.value(QLatin1String(weightAttributeC)).toString(), &data);
+            case ParseGlobPattern: {
+                const QString pattern = atts.value(QLatin1String(patternAttributeC)).toString();
+                const unsigned weight = atts.value(QLatin1String(weightAttributeC)).toString().toInt();
+                const bool caseSensitive = atts.value(QLatin1String(caseSensitiveAttributeC)).toString() == QLatin1String("true");
+
+                const QRegExp wildCard(pattern, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive, QRegExp::WildcardUnix);
+                addGlobPattern(wildCard, weight, &data);
+            }
                 break;
             case ParseSubClass: {
                 const QString inheritsFrom = atts.value(QLatin1String(mimeTypeAttributeC)).toString();

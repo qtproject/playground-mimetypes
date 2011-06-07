@@ -106,8 +106,6 @@ private:
     // Overwrite to process the sequence of parsed data
     virtual bool process(const QMimeType &t, QString *errorMessage) = 0;
 
-    void addGlobPattern(const QString &pattern, const QString &weight, QMimeTypeData *d) const;
-
     enum ParseStage { ParseBeginning,
                       ParseMimeInfo,
                       ParseMimeType,
