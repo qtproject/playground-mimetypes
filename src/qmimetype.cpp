@@ -33,7 +33,7 @@ QT_BEGIN_NAMESPACE
     \class QMimeGlobPattern
     \brief Glob pattern for file names for mime type matching.
 
-    \sa QMimeType, QMimeDatabase, IMagicMatcher, MagicRuleMatcher, QMimeMagicRule
+    \sa QMimeType, QMimeDatabase, MagicRuleMatcher, QMimeMagicRule
     \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
@@ -160,10 +160,6 @@ QString QMimeTypeData::formatFilterString(const QString &description, const QLis
 
     Contains most information from standard mime type XML database files.
 
-    Currently, all magic types are supported. In addition,
-    C++ classes, derived from IMagicMatcher can be added to check
-    on contents.
-
     In addition, the class provides a list of suffixes and a concept of the
     'preferred suffix' (derived from glob patterns). This is used for example
     to be able to configure the suffix used for C++-files in Qt Creator.
@@ -180,43 +176,42 @@ QString QMimeTypeData::formatFilterString(const QString &description, const QLis
     </mime-info>
     \endcode
 
-    \sa QMimeDatabase, IMagicMatcher, MagicRuleMatcher, QMimeMagicRule, QMimeGlobPattern
+    \sa QMimeDatabase, MagicRuleMatcher, QMimeMagicRule, QMimeGlobPattern
     \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-QMimeType::QMimeType() :
-    m_d(new QMimeTypeData)
+QMimeType::QMimeType()
+    : d(new QMimeTypeData)
 {
 }
 
-QMimeType::QMimeType(const QString &type) :
-    m_d(new QMimeTypeData)
+QMimeType::QMimeType(const QString &type)
+    : d(new QMimeTypeData)
 {
-    if (!type.isEmpty())
-        setType(type);
+    d->type = type;
 }
 
 QMimeType::QMimeType(const QString &type,
                      const QList<QMimeMagicRuleMatcher> &matchers,
                      const QList<QMimeGlobPattern> &globPatterns,
-                     const QStringList &subClassOf) :
-    m_d(new QMimeTypeData)
+                     const QStringList &subClassOf)
+    : d(new QMimeTypeData)
 {
-    m_d->type = type;
-    m_d->magicMatchers = matchers;
+    d->type = type;
+    d->magicMatchers = matchers;
     if (!globPatterns.isEmpty())
         setGlobPatterns(globPatterns);
-    m_d->subClassOf = subClassOf;
+    d->subClassOf = subClassOf;
 }
 
-QMimeType::QMimeType(const QMimeType &rhs) :
-    m_d(rhs.m_d)
+QMimeType::QMimeType(const QMimeType &other)
+    : d(other.d)
 {
 }
 
-QMimeType::QMimeType(const QMimeTypeData &d) :
-    m_d(new QMimeTypeData(d))
+QMimeType::QMimeType(const QMimeTypeData &dd)
+    : d(new QMimeTypeData(dd))
 {
 }
 
@@ -227,43 +222,43 @@ QMimeType::~QMimeType()
 QMimeType &QMimeType::operator=(const QMimeType &other)
 {
     if (this != &other)
-        m_d = other.m_d;
+        d = other.d;
     return *this;
 }
 
 void QMimeType::clear()
 {
-    m_d->clear();
+    d->clear();
 }
 
 bool QMimeType::isValid() const
 {
-    return !m_d->type.isEmpty();
+    return !d->type.isEmpty();
 }
 
 bool QMimeType::isTopLevel() const
 {
-    return m_d->subClassOf.empty();
+    return d->subClassOf.empty();
 }
 
 QString QMimeType::type() const
 {
-    return m_d->type;
+    return d->type;
 }
 
 void QMimeType::setType(const QString &type)
 {
-    m_d->type = type;
+    d->type = type;
 }
 
 QString QMimeType::comment() const
 {
-    return m_d->comment;
+    return d->comment;
 }
 
 void QMimeType::setComment(const QString &comment)
 {
-    m_d->comment = comment;
+    d->comment = comment;
 }
 
 // Return "en", "de", etc. derived from "en_US", de_DE".
@@ -279,7 +274,7 @@ static inline QString systemLanguage()
 QString QMimeType::localeComment(const QString &localeArg) const
 {
     const QString locale = localeArg.isEmpty() ? systemLanguage() : localeArg;
-    return m_d->localeComments.value(locale, m_d->comment);
+    return d->localeComments.value(locale, d->comment);
 }
 
 void QMimeType::setLocaleComment(const QString &locale, const QString &comment)
@@ -287,71 +282,71 @@ void QMimeType::setLocaleComment(const QString &locale, const QString &comment)
     if (locale.isEmpty())
         return;
 
-     m_d->localeComments[locale] = comment;
+     d->localeComments[locale] = comment;
 }
 
 QStringList QMimeType::aliases() const
 {
-    return m_d->aliases;
+    return d->aliases;
 }
 
 void QMimeType::setAliases(const QStringList &aliases)
 {
-     m_d->aliases = aliases;
+     d->aliases = aliases;
 }
 
 QString QMimeType::genericIconName() const
 {
-    return m_d->genericIconName;
+    return d->genericIconName;
 }
 
 void QMimeType::setGenericIconName(const QString &genericIconName)
 {
-    m_d->genericIconName = genericIconName;
+    d->genericIconName = genericIconName;
 }
 
 QList<QMimeGlobPattern> QMimeType::globPatterns() const
 {
-    return m_d->globPatterns;
+    return d->globPatterns;
 }
 
-void QMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &g)
+void QMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
 {
-    m_d->globPatterns = g;
+    d->globPatterns = globPatterns;
 
-    QString oldPrefferedSuffix = m_d->preferredSuffix;
-    m_d->suffixes.clear();
-    m_d->preferredSuffix.clear();
-    m_d->assignSuffixes(QMimeDatabase::fromGlobPatterns(g));
-    if (m_d->preferredSuffix != oldPrefferedSuffix && m_d->suffixes.contains(oldPrefferedSuffix))
-        m_d->preferredSuffix = oldPrefferedSuffix;
+    QString oldPrefferedSuffix = d->preferredSuffix;
+    d->suffixes.clear();
+    d->preferredSuffix.clear();
+    d->assignSuffixes(QMimeDatabase::fromGlobPatterns(globPatterns));
+    if (d->preferredSuffix != oldPrefferedSuffix && d->suffixes.contains(oldPrefferedSuffix))
+        d->preferredSuffix = oldPrefferedSuffix;
 }
 
 QStringList QMimeType::subClassOf() const
 {
-    return m_d->subClassOf;
+    return d->subClassOf;
 }
 
-void QMimeType::setSubClassOf(const QStringList &s)
+void QMimeType::setSubClassOf(const QStringList &subClassOf)
 {
-    m_d->subClassOf = s;
+    d->subClassOf = subClassOf;
 }
 
 QString QMimeType::preferredSuffix() const
 {
-    return m_d->preferredSuffix;
+    return d->preferredSuffix;
 }
 
-bool QMimeType::setPreferredSuffix(const QString &s)
+bool QMimeType::setPreferredSuffix(const QString &preferredSuffix)
 {
-    if (!m_d->suffixes.contains(s)) {
+    if (!d->suffixes.contains(preferredSuffix)) {
         qWarning("%s: Attempt to set preferred suffix to '%s', which is not in the list of suffixes: %s.",
-                 m_d->type.toLocal8Bit().constData(),
-                 s.toLocal8Bit().constData(),
-                 m_d->suffixes.join(QLatin1String(", ")).toLocal8Bit().constData());
+                 d->type.toLocal8Bit().constData(),
+                 preferredSuffix.toLocal8Bit().constData(),
+                 d->suffixes.join(QLatin1String(", ")).toLocal8Bit().constData());
         return false;
     }
-    m_d->preferredSuffix = s;
+    d->preferredSuffix = preferredSuffix;
     return true;
 }
 
@@ -361,7 +356,7 @@ bool QMimeType::setPreferredSuffix(const QString &s)
 QString QMimeType::filterString() const
 {
     // @todo: Use localeComment() once creator is shipped with translations
-    return QMimeTypeData::formatFilterString(comment(), m_d->globPatterns);
+    return QMimeTypeData::formatFilterString(comment(), d->globPatterns);
 }
 
 /*!
@@ -369,12 +364,12 @@ QString QMimeType::filterString() const
 */
 bool QMimeType::matchesType(const QString &type) const
 {
-    return m_d->type == type || m_d->aliases.contains(type);
+    return d->type == type || d->aliases.contains(type);
 }
 
 unsigned QMimeType::matchesData(const QByteArray &data) const
 {
-    return m_d->matchesData(data);
+    return d->matchesData(data);
 }
 
 /*!
@@ -384,30 +379,30 @@ unsigned QMimeType::matchesData(const QByteArray &data) const
 unsigned QMimeType::matchesFile(const QFileInfo &file) const
 {
     FileMatchContext context(file);
-    const unsigned suffixPriority = m_d->matchesFileBySuffix(context.fileName());
+    const unsigned suffixPriority = d->matchesFileBySuffix(context.fileName());
     if (suffixPriority >= QMimeGlobPattern::MaxWeight)
         return QMimeGlobPattern::MaxWeight;
-    return qMax(suffixPriority, m_d->matchesData(context.data()));
+    return qMax(suffixPriority, d->matchesData(context.data()));
 }
 
 QStringList QMimeType::suffixes() const
 {
-    return m_d->suffixes;
+    return d->suffixes;
 }
 
 void QMimeType::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
 {
-    m_d->magicMatchers.push_back(matcher);
+    d->magicMatchers.push_back(matcher);
 }
 
 QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
 {
-    return m_d->magicMatchers;
+    return d->magicMatchers;
 }
 
 void QMimeType::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
 {
-    m_d->magicMatchers = matchers;
+    d->magicMatchers = matchers;
 }
 
 #ifndef QT_NO_DEBUG_STREAM
@@ -416,7 +411,7 @@ QDebug operator<<(QDebug d, const QMimeType &mt)
     QString s;
     {
         QTextStream str(&s);
-        mt.m_d->debug(str);
+        mt.d->debug(str);
     }
     d << s;
     return d;

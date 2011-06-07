@@ -85,7 +85,7 @@ public:
 #endif
 
 private:
-    QMimeDatabasePrivate *m_d;
+    QMimeDatabasePrivate *const d;
 };
 
 #ifndef QT_NO_DEBUG_STREAM

@@ -40,7 +40,7 @@ static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
     It exists to enable reading the file contents "on demand"
     (as opposed to each mime type trying to open and read while checking).
 
-    \sa MimeType, MimeDatabase, IMagicMatcher, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
+    \sa MimeType, MimeDatabase, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
@@ -77,7 +77,7 @@ QByteArray FileMatchContext::data()
 
     It is used for rules parsed from XML files.
 
-    \sa MimeType, MimeDatabase, IMagicMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
+    \sa MimeType, MimeDatabase, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */

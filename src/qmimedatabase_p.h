@@ -46,10 +46,12 @@ struct MimeMapEntry
     int level; // hierachy level
 };
 
+
 class QMimeDatabasePrivate
 {
     Q_DISABLE_COPY(QMimeDatabasePrivate)
     friend class QMimeDatabase;
+
 public:
     QMimeDatabasePrivate();
 
@@ -96,7 +98,7 @@ private:
 
     bool addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage);
     inline QString resolveAlias(const QString &name) const
-    { return m_aliasMap.value(name, name); }
+    { return aliasMap.value(name, name); }
 
     QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &f, unsigned *priorityPtr) const;
@@ -106,11 +108,11 @@ private:
     void determineLevels();
     void raiseLevelRecursion(MimeMapEntry &e, int level);
 
-    QHash<QString, MimeMapEntry*> m_typeMimeTypeMap;
-    AliasMap m_aliasMap;
-    ParentChildrenMap m_parentChildrenMap;
-    int m_maxLevel;
-    QMutex m_mutex;
+    QHash<QString, MimeMapEntry*> typeMimeTypeMap;
+    AliasMap aliasMap;
+    ParentChildrenMap parentChildrenMap;
+    int maxLevel;
+    QMutex mutex;
 };
 
 QT_END_NAMESPACE

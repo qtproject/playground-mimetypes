@@ -52,6 +52,7 @@ private:
     int m_weight;
 };
 
+
 class QMimeTypeData;
 class QMIME_EXPORT QMimeType
 {
@@ -62,7 +63,7 @@ public:
               const QList<QMimeMagicRuleMatcher> &matchers,
               const QList<QMimeGlobPattern> &globPatterns = QList<QMimeGlobPattern>(),
               const QStringList &subClassOf = QStringList());
-    QMimeType(const QMimeType&);
+    QMimeType(const QMimeType &other);
     ~QMimeType();
 
     QMimeType &operator=(const QMimeType &other);
@@ -88,15 +89,15 @@ public:
     void setGenericIconName(const QString &genericIconName);
 
     QList<QMimeGlobPattern> globPatterns() const;
-    void setGlobPatterns(const QList<QMimeGlobPattern> &);
+    void setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
     QStringList subClassOf() const;
-    void setSubClassOf(const QStringList &);
+    void setSubClassOf(const QStringList &subClassOf);
 
     // Extension over standard mime data
     QStringList suffixes() const;
     QString preferredSuffix() const;
-    bool setPreferredSuffix(const QString&);
+    bool setPreferredSuffix(const QString &preferredSuffix);
 
     bool matchesType(const QString &type) const;
     unsigned matchesData(const QByteArray &data) const;
@@ -113,12 +114,12 @@ public:
 #endif
 
 private:
-    explicit QMimeType(const QMimeTypeData &d);
+    explicit QMimeType(const QMimeTypeData &dd);
 
     friend class BaseMimeTypeParser;
     friend class QMimeDatabasePrivate;
 
-    QSharedDataPointer<QMimeTypeData> m_d;
+    QSharedDataPointer<QMimeTypeData> d;
 };
 
 #ifndef QT_NO_DEBUG_STREAM
