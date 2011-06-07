@@ -190,7 +190,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
 {
     QMimeTypeData data;
     QMimeMagicRuleMatcher *ruleMatcher = 0;
-    int priority = 0;
+    int priority = 50;
     QList<QMimeMagicRule> rules;
     QXmlStreamReader reader(dev);
     ParseStage ps = ParseBeginning;
@@ -239,8 +239,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             }
                 break;
             case ParseMagic: {
-//                int priority = 0;
-                priority = 0;
+                priority = 50;
                 const QString priorityS = atts.value(QLatin1String(priorityAttributeC)).toString();
                 if (!priorityS.isEmpty()) {
                     if (!parseNumber(priorityS, &priority, errorMessage))

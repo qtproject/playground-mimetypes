@@ -256,12 +256,12 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
     // Hack
     // TODO: use low fallback priorities ( 2 and 1)?
     if (isTextFile(data))
-        candidate = findByName(QLatin1String(textTypeC), priorityPtr); // try to guess if it is text
+        candidate = findByType(QLatin1String(textTypeC)); // try to guess if it is text
 
     if (candidate.isValid())
         return candidate;
 
-    return findByName(QLatin1String(binaryTypeC), priorityPtr); // fallback to application/octet-stream
+    return findByType(QLatin1String(binaryTypeC)); // fallback to application/octet-stream
 }
 
 QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
