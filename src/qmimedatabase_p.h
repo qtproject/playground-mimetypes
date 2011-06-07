@@ -79,8 +79,6 @@ public:
                                                   int weight = QMimeGlobPattern::DefaultWeight);
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
-    static bool isTextFile(const QByteArray &data);
-
 private:
     typedef QHash<QString, QString> AliasMap;
     typedef QMultiHash<QString, QString> ParentChildrenMap;

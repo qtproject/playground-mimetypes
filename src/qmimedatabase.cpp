@@ -34,14 +34,6 @@
 
 QT_BEGIN_NAMESPACE
 
-// Types
-const char *const textTypeC = "text/plain";
-const char *const binaryTypeC = "application/octet-stream";
-
-// UTF16 byte order marks
-static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
-static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
-
 const QString QMimeDatabasePrivate::kModifiedMimeTypesFile(QLatin1String("modifiedmimetypes.xml"));
 QString QMimeDatabasePrivate::kModifiedMimeTypesPath;
 
@@ -182,7 +174,7 @@ QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
     return QMimeType();
 }
 
-static unsigned matchesBySuffix(const QMimeType &type, const QString &name, unsigned *length)
+static inline unsigned matchesBySuffix(const QMimeType &type, const QString &name, unsigned *length)
 {
     foreach (const QMimeGlobPattern &gp, type.globPatterns()) {
         if (gp.regExp().exactMatch(name)) {
@@ -222,6 +214,25 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priori
     return candidate;
 }
 
+static inline bool isTextFile(const QByteArray &data)
+{
+    // UTF16 byte order marks
+    static const char bigEndianBOM[] = "\xFE\xFF";
+    static const char littleEndianBOM[] = "\xFF\xFE";
+
+    const char *p = data.constData();
+    const char *e = p + data.size();
+    for ( ; p < e; ++p) {
+        if (*p >= 0x01 && *p < 0x09) // Sure-fire binary
+            return false;
+
+        if (*p == 0) // Check for UTF16
+            return data.startsWith(bigEndianBOM) || data.startsWith(littleEndianBOM);
+    }
+
+    return true;
+}
+
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
 {
     // Is the hierarchy set up in case we find several matches?
@@ -248,14 +259,14 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
         return candidate;
 
     // Hack
-    // TODO: use low fallback priorities ( 2 and 1)?
+    // TODO: use low fallback priorities (2 and 1)?
     if (isTextFile(data))
-        candidate = findByType(QLatin1String(textTypeC)); // try to guess if it is text
+        candidate = findByType(QLatin1String("text/plain")); // try to guess if it is text
 
     if (candidate.isValid())
         return candidate;
 
-    return findByType(QLatin1String(binaryTypeC)); // fallback to application/octet-stream
+    return findByType(QLatin1String("application/octet-stream")); // fallback to application/octet-stream
 }
 
 QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
@@ -397,20 +408,6 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
         patterns.append(globPattern.regExp().pattern());
 
     return patterns;
-}
-
-bool QMimeDatabasePrivate::isTextFile(const QByteArray &data)
-{
-    const int size = data.size();
-    for (int i = 0; i < size; i++) {
-        const char c = data.at(i);
-        if (c >= 0x01 && c < 0x09) // Sure-fire binary
-            return false;
-        if (c == 0)             // Check for UTF16
-            return data.startsWith(bigEndianByteOrderMarkC) ||
-                    data.startsWith(littleEndianByteOrderMarkC);
-    }
-    return true;
 }
 
 
