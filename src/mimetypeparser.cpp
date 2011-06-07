@@ -82,7 +82,7 @@ void BaseMimeTypeParser::addGlobPattern(const QString &pattern, const QString &w
         return;
     // Collect patterns as a QRegExp list and filter out the plain
     // suffix ones for our suffix list. Use first one as preferred
-    const QRegExp wildCard(pattern, Qt::CaseSensitive, QRegExp::WildcardUnix);
+    const QRegExp wildCard(pattern, Qt::CaseInsensitive, QRegExp::WildcardUnix);
     if (!wildCard.isValid()) {
         qWarning("%s: Invalid wildcard '%s'.", Q_FUNC_INFO, pattern.toLocal8Bit().constData());
         return;
