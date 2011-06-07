@@ -52,7 +52,6 @@ private:
     int m_weight;
 };
 
-
 class QMimeTypeData;
 class QMIME_EXPORT QMimeType
 {

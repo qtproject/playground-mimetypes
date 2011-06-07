@@ -33,20 +33,6 @@ static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
 static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
 
 /*!
-    \class IMagicMatcher
-
-    \brief Interface for a Mime type magic matcher (examinig file contents).
-
-    \sa MimeType, MimeDatabase, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
-    \sa BaseMimeTypeParser, MimeTypeParser
-*/
-
-//namespace Core {
-
-typedef QSharedPointer<QMimeMagicRuleMatcher> MagicRuleMatcherPtr;
-
-/*!
     \class FileMatchContext
 
     \brief Context passed on to the mime types when looking for a file match.
