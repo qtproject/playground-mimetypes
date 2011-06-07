@@ -63,7 +63,7 @@ const char *const matchMaskAttributeC = "mask";
     Populates MimeDataBase
 
     \sa MimeDatabase, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
+    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa MimeTypeParser
 */
 
@@ -75,7 +75,7 @@ const char *const matchMaskAttributeC = "mask";
     Calls abstract handler function process for MimeType it finds.
 
     \sa MimeDatabase, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
+    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa MimeTypeParser
 */
 

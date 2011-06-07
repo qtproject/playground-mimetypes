@@ -33,6 +33,7 @@ static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
 
 /*!
     \class FileMatchContext
+    \internal
 
     \brief Context passed on to the mime types when looking for a file match.
 
@@ -77,7 +78,7 @@ QByteArray FileMatchContext::data()
     It is used for rules parsed from XML files.
 
     \sa MimeType, MimeDatabase, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
+    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 

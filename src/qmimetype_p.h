@@ -29,8 +29,6 @@ QT_BEGIN_NAMESPACE
 
 class QTextStream;
 
-class FileMatchContext;
-
 class QMimeTypeData : public QSharedData
 {
 public:

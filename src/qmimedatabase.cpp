@@ -455,7 +455,7 @@ bool QMimeDatabasePrivate::isTextFile(const QByteArray &data)
     leaves is not suitable since it will hit parent nodes several times.
 
     \sa MimeType, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa FileMatchContext, BinaryMatcher, HeuristicTextMagicMatcher
+    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
