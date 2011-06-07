@@ -107,14 +107,9 @@ bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
     return true;
 }
 
-QString QMimeDatabasePrivate::resolveAlias(const QString &name) const
-{
-    return m_aliasMap.value(name, name);
-}
-
 void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
 {
-    if (e.level == Dangling || e.level < level)
+    if (e.level == MimeMapEntry::Dangling || e.level < level)
         e.level = level;
 
     if (m_maxLevel < level)
@@ -167,7 +162,7 @@ void QMimeDatabasePrivate::determineLevels()
 
     // move all danglings to top level
     foreach (MimeMapEntry *entry, m_typeMimeTypeMap) {
-        if (entry->level == Dangling)
+        if (entry->level == MimeMapEntry::Dangling)
             entry->level = 0;
     }
 }

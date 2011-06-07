@@ -13,16 +13,14 @@ QT_BEGIN_NAMESPACE
 
 #define MIN_MATCH_WEIGHT 50
 
-enum { Dangling = 32767 };
-
 // MimeMapEntry: Entry of a type map, consisting of type and level.
 struct MimeMapEntry
 {
-    explicit MimeMapEntry(const QMimeType &t = QMimeType(), int aLevel = Dangling) :
-        type(t),
-        level(aLevel)
-    {
-    }
+    static const int Dangling = 32767;
+
+    inline MimeMapEntry(const QMimeType &aType = QMimeType(), int aLevel = Dangling) :
+        type(aType), level(aLevel)
+    {}
 
     QMimeType type;
     int level; // hierachy level
@@ -77,7 +75,8 @@ private:
 
 
     bool addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage);
-    inline QString resolveAlias(const QString &name) const;
+    inline QString resolveAlias(const QString &name) const
+    { return m_aliasMap.value(name, name); }
 
     QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &f, unsigned *priorityPtr) const;
