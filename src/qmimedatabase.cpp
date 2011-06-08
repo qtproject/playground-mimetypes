@@ -214,25 +214,6 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priori
     return candidate;
 }
 
-static inline bool isTextFile(const QByteArray &data)
-{
-    // UTF16 byte order marks
-    static const char bigEndianBOM[] = "\xFE\xFF";
-    static const char littleEndianBOM[] = "\xFF\xFE";
-
-    const char *p = data.constData();
-    const char *e = p + data.size();
-    for ( ; p < e; ++p) {
-        if (*p >= 0x01 && *p < 0x09) // Sure-fire binary
-            return false;
-
-        if (*p == 0) // Check for UTF16
-            return data.startsWith(bigEndianBOM) || data.startsWith(littleEndianBOM);
-    }
-
-    return true;
-}
-
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
 {
     // Is the hierarchy set up in case we find several matches?
@@ -255,18 +236,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
         }
     }
 
-    if (candidate.isValid())
         return candidate;
-
-    // Hack
-    // TODO: use low fallback priorities (2 and 1)?
-    if (isTextFile(data))
-        candidate = findByType(QLatin1String("text/plain")); // try to guess if it is text
-
-    if (candidate.isValid())
-        return candidate;
-
-    return findByType(QLatin1String("application/octet-stream")); // fallback to application/octet-stream
 }
 
 QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
@@ -467,6 +437,27 @@ QMimeDatabase::~QMimeDatabase()
     delete d;
 }
 
+bool QMimeDatabase::addMimeType(const QMimeType &mt)
+{
+    QMutexLocker locker(&d->mutex);
+
+    return d->addMimeType(mt);
+}
+
+bool QMimeDatabase::addMimeTypes(const QString &fileName, QString *errorMessage)
+{
+    QMutexLocker locker(&d->mutex);
+
+    return d->addMimeTypes(fileName, errorMessage);
+}
+
+bool QMimeDatabase::addMimeTypes(QIODevice *device, QString *errorMessage)
+{
+    QMutexLocker locker(&d->mutex);
+
+    return d->addMimeTypes(device, errorMessage);
+}
+
 /*!
     Returns a mime type for \a typeOrAlias or Null one if none found.
 */
@@ -513,62 +504,11 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
     return d->findByData(data, &priority);
 }
 
-bool QMimeDatabase::addMimeType(const QMimeType &mt)
+QList<QMimeType> QMimeDatabase::mimeTypes() const
 {
     QMutexLocker locker(&d->mutex);
 
-    return d->addMimeType(mt);
-}
-
-bool QMimeDatabase::addMimeTypes(const QString &fileName, QString *errorMessage)
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->addMimeTypes(fileName, errorMessage);
-}
-
-bool QMimeDatabase::addMimeTypes(QIODevice *device, QString *errorMessage)
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->addMimeTypes(device, errorMessage);
-}
-
-QStringList QMimeDatabase::suffixes() const
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->suffixes();
-}
-
-QStringList QMimeDatabase::filterStrings() const
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->filterStrings();
-}
-
-QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
-{
-    if (allFilesFilter)
-        allFilesFilter->clear();
-
-    // Compile list of filter strings, sort, and remove duplicates (different mime types might
-    // generate the same filter).
-    QStringList filters = filterStrings();
-    if (filters.empty())
-        return QString();
-    filters.sort();
-    filters.erase(std::unique(filters.begin(), filters.end()), filters.end());
-
-    static const QString allFiles = QObject::tr("All Files (*)", "QMimeDatabase");
-    if (allFilesFilter)
-        *allFilesFilter = allFiles;
-
-    // Prepend all files filter (instead of appending to work around a bug in Qt/Mac).
-    filters.prepend(allFiles);
-
-    return filters.join(QLatin1String(";;"));
+    return d->mimeTypes();
 }
 
 QList<QMimeGlobPattern> QMimeDatabase::globPatterns() const
@@ -601,11 +541,64 @@ void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias,
     d->setMagicMatchers(typeOrAlias, matchers);
 }
 
-QList<QMimeType> QMimeDatabase::mimeTypes() const
+QStringList QMimeDatabase::suffixes() const
 {
     QMutexLocker locker(&d->mutex);
 
-    return d->mimeTypes();
+    return d->suffixes();
+}
+
+QString QMimeDatabase::preferredSuffixByType(const QString &type) const
+{
+    const QMimeType mt = findByType(type);
+    if (mt.isValid())
+        return mt.preferredSuffix(); // already does Mutex locking
+    return QString();
+}
+
+QString QMimeDatabase::preferredSuffixByFile(const QFileInfo &f) const
+{
+    const QMimeType mt = findByFile(f);
+    if (mt.isValid())
+        return mt.preferredSuffix(); // already does Mutex locking
+    return QString();
+}
+
+bool QMimeDatabase::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
+{
+    QMutexLocker locker(&d->mutex);
+
+    return d->setPreferredSuffix(typeOrAlias, suffix);
+}
+
+QStringList QMimeDatabase::filterStrings() const
+{
+    QMutexLocker locker(&d->mutex);
+
+    return d->filterStrings();
+}
+
+QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
+{
+    if (allFilesFilter)
+        allFilesFilter->clear();
+
+    // Compile list of filter strings, sort, and remove duplicates (different mime types might
+    // generate the same filter).
+    QStringList filters = filterStrings();
+    if (filters.empty())
+        return QString();
+    filters.sort();
+    filters.erase(std::unique(filters.begin(), filters.end()), filters.end());
+
+    static const QString allFiles = QObject::tr("All Files (*)", "QMimeDatabase");
+    if (allFilesFilter)
+        *allFilesFilter = allFiles;
+
+    // Prepend all files filter (instead of appending to work around a bug in Qt/Mac).
+    filters.prepend(allFiles);
+
+    return filters.join(QLatin1String(";;"));
 }
 
 void QMimeDatabase::syncUserModifiedMimeTypes()
@@ -630,29 +623,6 @@ QList<QMimeType> QMimeDatabase::readUserModifiedMimeTypes()
 void QMimeDatabase::writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes)
 {
     QMimeDatabasePrivate::writeUserModifiedMimeTypes(mimeTypes);
-}
-
-QString QMimeDatabase::preferredSuffixByType(const QString &type) const
-{
-    const QMimeType mt = findByType(type);
-    if (mt.isValid())
-        return mt.preferredSuffix(); // already does Mutex locking
-    return QString();
-}
-
-QString QMimeDatabase::preferredSuffixByFile(const QFileInfo &f) const
-{
-    const QMimeType mt = findByFile(f);
-    if (mt.isValid())
-        return mt.preferredSuffix(); // already does Mutex locking
-    return QString();
-}
-
-bool QMimeDatabase::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->setPreferredSuffix(typeOrAlias, suffix);
 }
 
 QList<QMimeGlobPattern> QMimeDatabase::toGlobPatterns(const QStringList &patterns, int weight)

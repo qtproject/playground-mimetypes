@@ -39,8 +39,9 @@ public:
     static const unsigned DefaultWeight = 50;
     static const unsigned MinWeight = 1;
 
-    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = DefaultWeight);
-    ~QMimeGlobPattern();
+    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = DefaultWeight) :
+        m_regExp(regExp), m_weight(weight) {}
+    ~QMimeGlobPattern() {}
 
     inline const QRegExp &regExp() const
     { return m_regExp; }
@@ -51,7 +52,6 @@ private:
     QRegExp m_regExp;
     int m_weight;
 };
-
 
 class QMimeTypeData;
 class QMIME_EXPORT QMimeType
@@ -95,6 +95,10 @@ public:
     QList<QMimeGlobPattern> globPatterns() const;
     void setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
+    QList<QMimeMagicRuleMatcher> magicMatchers() const;
+    void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
+    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
+
     QStringList subClassOf() const;
     void setSubClassOf(const QStringList &subClassOf);
 
@@ -106,12 +110,9 @@ public:
     bool matchesType(const QString &type) const;
     unsigned matchesData(const QByteArray &data) const;
     unsigned matchesFile(const QFileInfo &file) const;
+    unsigned matchesName(const QString &name) const;
 
     QString filterString() const;
-
-    QList<QMimeMagicRuleMatcher> magicMatchers() const;
-    void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
-    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
 
 private:
     explicit QMimeType(const QMimeTypeData &dd);

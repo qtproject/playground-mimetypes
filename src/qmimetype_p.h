@@ -57,7 +57,6 @@ public:
     QList<QMimeMagicRuleMatcher> magicMatchers;
 };
 
-
 QT_END_NAMESPACE
 
 #endif // QMIMETYPE_P_H

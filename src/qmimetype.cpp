@@ -37,16 +37,6 @@ QT_BEGIN_NAMESPACE
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-QMimeGlobPattern::QMimeGlobPattern(const QRegExp &regExp, unsigned weight) :
-    m_regExp(regExp), m_weight(weight)
-{
-}
-
-QMimeGlobPattern::~QMimeGlobPattern()
-{
-}
-
-
 QMimeTypeData::QMimeTypeData()
     // RE to match a suffix glob pattern: "*.ext" (and not sth like "Makefile" or
     // "*.log[1-9]"
@@ -95,10 +85,38 @@ unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
     return 0;
 }
 
+static inline bool isTextFile(const QByteArray &data)
+{
+    // UTF16 byte order marks
+    static const char bigEndianBOM[] = "\xFE\xFF";
+    static const char littleEndianBOM[] = "\xFF\xFE";
+
+    const char *p = data.constData();
+    const char *e = p + data.size();
+    for ( ; p < e; ++p) {
+        if (*p >= 0x01 && *p < 0x09) // Sure-fire binary
+            return false;
+
+        if (*p == 0) // Check for UTF16
+            return data.startsWith(bigEndianBOM) || data.startsWith(littleEndianBOM);
+    }
+
+    return true;
+}
+
 unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 {
     unsigned priority = 0;
     if (!data.isEmpty()) {
+        // TODO: discuss - this code is slow :(
+        // Hack for text/plain and application/octet-stream
+        if (magicMatchers.isEmpty()) {
+            if (type == QLatin1String("text/plain") && isTextFile(data))
+                priority = 2;
+            else if (type == QLatin1String("application/octet-stream")) {
+                priority = 1;
+            }
+        }
         foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
             if (matcher.priority() > priority && matcher.matches(data))
                 priority = matcher.priority();
@@ -106,7 +124,6 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     }
     return priority;
 }
-
 
 /*!
     \class MimeType
@@ -131,9 +148,7 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     </mime-info>
     \endcode
 
-    \sa QMimeDatabase, MagicRuleMatcher, QMimeMagicRule, QMimeGlobPattern
-    \sa BinaryMatcher, HeuristicTextMagicMatcher
-    \sa BaseMimeTypeParser, MimeTypeParser
+    \sa QMimeDatabase, QMimeMagicRuleMatcher, QMimeMagicRule, QMimeGlobPattern
 */
 
 QMimeType::QMimeType()
@@ -282,6 +297,21 @@ void QMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
         d->preferredSuffix = oldPrefferedSuffix;
 }
 
+QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
+{
+    return d->magicMatchers;
+}
+
+void QMimeType::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
+{
+    d->magicMatchers.append(matcher);
+}
+
+void QMimeType::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
+{
+    d->magicMatchers = matchers;
+}
+
 QStringList QMimeType::subClassOf() const
 {
     return d->subClassOf;
@@ -290,6 +320,11 @@ QStringList QMimeType::subClassOf() const
 void QMimeType::setSubClassOf(const QStringList &subClassOf)
 {
     d->subClassOf = subClassOf;
+}
+
+QStringList QMimeType::suffixes() const
+{
+    return d->suffixes;
 }
 
 QString QMimeType::preferredSuffix() const
@@ -308,27 +343,6 @@ bool QMimeType::setPreferredSuffix(const QString &preferredSuffix)
     }
     d->preferredSuffix = preferredSuffix;
     return true;
-}
-
-/*!
-    Returns a filter string usable for a file dialog.
-*/
-QString QMimeType::filterString() const
-{
-    QString filter;
-
-    if (!d->globPatterns.empty()) { // !Binary files
-        // ### todo: Use localeComment() once creator is shipped with translations
-        filter += d->comment + QLatin1String(" (");
-        for (int i = 0; i < d->globPatterns.size(); ++i) {
-            if (i != 0)
-                filter += QLatin1Char(' ');
-            filter += d->globPatterns.at(i).regExp().pattern();
-        }
-        filter +=  QLatin1Char(')');
-    }
-
-    return filter;
 }
 
 /*!
@@ -357,24 +371,33 @@ unsigned QMimeType::matchesFile(const QFileInfo &file) const
     return qMax(suffixPriority, d->matchesData(context.data()));
 }
 
-QStringList QMimeType::suffixes() const
+/*!
+    Performs search by glob patterns.
+*/
+unsigned QMimeType::matchesName(const QString &name) const
 {
-    return d->suffixes;
+    return d->matchesFileBySuffix(name);
 }
 
-void QMimeType::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
+/*!
+    Returns a filter string usable for a file dialog.
+*/
+QString QMimeType::filterString() const
 {
-    d->magicMatchers.append(matcher);
-}
+    QString filter;
 
-QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
-{
-    return d->magicMatchers;
-}
+    if (!d->globPatterns.empty()) { // !Binary files
+        // ### todo: Use localeComment() once creator is shipped with translations
+        filter += d->comment + QLatin1String(" (");
+        for (int i = 0; i < d->globPatterns.size(); ++i) {
+            if (i != 0)
+                filter += QLatin1Char(' ');
+            filter += d->globPatterns.at(i).regExp().pattern();
+        }
+        filter +=  QLatin1Char(')');
+    }
 
-void QMimeType::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
-{
-    d->magicMatchers = matchers;
+    return filter;
 }
 
 QT_END_NAMESPACE
