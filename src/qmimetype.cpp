@@ -176,9 +176,14 @@ QMimeType::~QMimeType()
 
 QMimeType &QMimeType::operator=(const QMimeType &other)
 {
-    if (this != &other)
+    if (d != other.d)
         d = other.d;
     return *this;
+}
+
+bool QMimeType::operator==(const QMimeType &other) const
+{
+    return d == other.d;
 }
 
 void QMimeType::clear()

@@ -68,6 +68,10 @@ public:
 
     QMimeType &operator=(const QMimeType &other);
 
+    bool operator==(const QMimeType &other) const;
+    inline bool operator!=(const QMimeType &other) const
+    { return operator==(other); }
+
     void clear();
 
     bool isValid() const;
