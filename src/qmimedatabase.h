@@ -41,24 +41,16 @@ public:
     QMimeDatabase();
     ~QMimeDatabase();
 
+    bool addMimeType(const QMimeType &mt);
     bool addMimeTypes(const QString &fileName, QString *errorMessage);
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
-    bool addMimeType(const QMimeType &mt);
 
     QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &fileInfo) const;
     QMimeType findByName(const QString &name) const;
     QMimeType findByData(const QByteArray &data) const;
 
-    // Return all known suffixes
-    QStringList suffixes() const;
-    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
-    QString preferredSuffixByType(const QString &type) const;
-    QString preferredSuffixByFile(const QFileInfo &f) const;
-
-    QStringList filterStrings() const;
-    // Return a string with all the possible file filters, for use with file dialogs
-    QString allFiltersString(QString *allFilesFilter = 0) const;
+    QList<QMimeType> mimeTypes() const;
 
     QList<QMimeGlobPattern> globPatterns() const;
     void setGlobPatterns(const QString &typeOrAlias, const QList<QMimeGlobPattern> &globPatterns);
@@ -66,7 +58,15 @@ public:
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
     void setMagicMatchers(const QString &typeOrAlias, const QList<QMimeMagicRuleMatcher> &matchers);
 
-    QList<QMimeType> mimeTypes() const;
+    // Return all known suffixes
+    QStringList suffixes() const;
+    QString preferredSuffixByType(const QString &type) const;
+    QString preferredSuffixByFile(const QFileInfo &f) const;
+    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
+
+    QStringList filterStrings() const;
+    // Return a string with all the possible file filters, for use with file dialogs
+    QString allFiltersString(QString *allFilesFilter = 0) const;
 
     // The mime types from the functions bellow are considered only in regard to
     // their glob patterns and rule-based magic matchers.
