@@ -14,7 +14,7 @@ class FileMatchContext
 
 public:
     // Max data to be read from a file
-    enum { MaxData = 2048 };
+    enum { MaxData = 2500 };
 
     explicit FileMatchContext(const QFileInfo &fi);
 
