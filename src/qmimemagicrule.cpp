@@ -77,8 +77,8 @@ struct QMimeMagicRulePrivate
 static bool matchString(QMimeMagicRulePrivate *d, const QByteArray &data)
 {
     const char *p = data.constData() + d->startPos;
-    const char *e = p + qMin(data.size() - d->pattern.size(), d->endPos);
-    for ( ; p <= e; ++p) {
+    const char *e = data.constData() + qMin(data.size() - d->pattern.size(), d->endPos + 1);
+    for ( ; p < e; ++p) {
         int i = 0;
         while (i < d->pattern.size() && (p[i] & d->mask.at(i)) == d->pattern.at(i))
             ++i;
@@ -96,8 +96,8 @@ static bool matchNumber(QMimeMagicRulePrivate *d, const QByteArray &data)
     const T mask(d->numberMask);
 
     const char *p = data.constData() + d->startPos;
-    const char *e = p + qMin(data.size() - int(sizeof(T)), d->endPos);
-    for ( ; p <= e; ++p) {
+    const char *e = data.constData() + qMin(data.size() - int(sizeof(T)), d->endPos + 1);
+    for ( ; p < e; ++p) {
         if ((*reinterpret_cast<const T*>(p) & mask) == value)
             return true;
     }
