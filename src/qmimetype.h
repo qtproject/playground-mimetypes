@@ -91,6 +91,10 @@ public:
     QList<QMimeGlobPattern> globPatterns() const;
     void setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
+    QList<QMimeMagicRuleMatcher> magicMatchers() const;
+    void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
+    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
+
     QStringList subClassOf() const;
     void setSubClassOf(const QStringList &subClassOf);
 
@@ -102,12 +106,9 @@ public:
     bool matchesType(const QString &type) const;
     unsigned matchesData(const QByteArray &data) const;
     unsigned matchesFile(const QFileInfo &file) const;
+    unsigned matchesName(const QString &name) const;
 
     QString filterString() const;
-
-    QList<QMimeMagicRuleMatcher> magicMatchers() const;
-    void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
-    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
 
 private:
     explicit QMimeType(const QMimeTypeData &dd);
