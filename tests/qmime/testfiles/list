@@ -252,6 +252,9 @@ archive.tar application/x-tar
 comics.cbt application/x-cbt ox
 # Created using lcab
 copying.cab application/vnd.ms-cab-compressed
+# GZ test case
+archive.gz application/x-gzip
+archive.tar.gz application/x-compressed-tar ox
 # XZ test case found in the test cases in the sources
 good-1-delta-lzma2.tiff.xz application/x-xz
 spinboxes-0.1.1-Linux.tar.xz application/x-xz-compressed-tar ox
@@ -322,3 +325,6 @@ bluish.icc application/vnd.iccprofile
 test.it87 application/x-it87
 test.hdf4 application/x-hdf
 test.h5 application/x-hdf
+
+# no glob matches
+without_an_extension image/vnd.djvu x
