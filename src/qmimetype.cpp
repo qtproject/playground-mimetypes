@@ -112,13 +112,13 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
         if (magicMatchers.isEmpty()) {
             if (type == QLatin1String("text/plain") && isTextFile(data))
                 priority = 2;
-            else if (type == QLatin1String("application/octet-stream")) {
+            else if (type == QLatin1String("application/octet-stream"))
                 priority = 1;
+        } else {
+            foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
+                if (matcher.priority() > priority && matcher.matches(data))
+                    priority = matcher.priority();
             }
-        }
-        foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
-            if (matcher.priority() > priority && matcher.matches(data))
-                priority = matcher.priority();
         }
     }
     return priority;
