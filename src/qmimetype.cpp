@@ -76,7 +76,6 @@ void QMimeTypeData::assignSuffixes(const QStringList &patterns)
 
 unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 {
-    // check globs
     foreach (const QMimeGlobPattern &glob, globPatterns) {
         if (glob.regExp().exactMatch(name))
             return glob.weight();

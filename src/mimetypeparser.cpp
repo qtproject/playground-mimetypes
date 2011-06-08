@@ -253,15 +253,12 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                         return false;
 
                 }
-//                ruleMatcher = MagicRuleMatcherPtr(new MagicRuleMatcher);
-//                ruleMatcher->setPriority(priority);
+                if (!ruleMatcher)
+                    ruleMatcher = new QMimeMagicRuleMatcher;
+                ruleMatcher->setPriority(priority);
             }
                 break;
             case ParseMagicMatchRule: {
-//                if (ruleMatcher.isNull()) {
-//                    qWarning() << "BaseMimeTypeParser::parse : ruleMatcher unexpectedly null";
-//                    return false;
-//                }
                 if (!ruleMatcher) {
                     ruleMatcher = new QMimeMagicRuleMatcher;
                     ruleMatcher->setPriority(priority);
@@ -289,16 +286,6 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                     return false;
                 data.clear();
             } else {
-                // Finished a match sequence
-//                if (reader.name() == QLatin1String(magicTagC)) {
-//                    if (ruleMatcher.isNull()) {
-//                        qWarning() << "BaseMimeTypeParser::parse : ruleMatcher unexpectedly null";
-//                        return false;
-//                    }
-//                    data.magicMatchers.append(ruleMatcher);
-//                    ruleMatcher = MagicRuleMatcherPtr();
-//                }
-
                 // Finished a match sequence
                 if (reader.name() == QLatin1String(matchTagC)) {
                     if (ruleMatcher) {
