@@ -550,18 +550,21 @@ QStringList QMimeDatabase::suffixes() const
 
 QString QMimeDatabase::preferredSuffixByType(const QString &type) const
 {
-    const QMimeType mt = findByType(type);
-    if (mt.isValid())
-        return mt.preferredSuffix(); // already does Mutex locking
-    return QString();
+    QMutexLocker locker(&d->mutex);
+
+    const QMimeType mt = d->findByType(typeOrAlias);
+
+    return mt.isValid() ? mt.preferredSuffix() : QString();
 }
 
 QString QMimeDatabase::preferredSuffixByFile(const QFileInfo &f) const
 {
-    const QMimeType mt = findByFile(f);
-    if (mt.isValid())
-        return mt.preferredSuffix(); // already does Mutex locking
-    return QString();
+    QMutexLocker locker(&d->mutex);
+
+    unsigned priority = 0;
+    const QMimeType mt = d->findByFile(f, &priority);
+
+    return mt.isValid() ? mt.preferredSuffix() : QString();
 }
 
 bool QMimeDatabase::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
