@@ -85,10 +85,38 @@ unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
     return 0;
 }
 
+static inline bool isTextFile(const QByteArray &data)
+{
+    // UTF16 byte order marks
+    static const char bigEndianBOM[] = "\xFE\xFF";
+    static const char littleEndianBOM[] = "\xFF\xFE";
+
+    const char *p = data.constData();
+    const char *e = p + data.size();
+    for ( ; p < e; ++p) {
+        if (*p >= 0x01 && *p < 0x09) // Sure-fire binary
+            return false;
+
+        if (*p == 0) // Check for UTF16
+            return data.startsWith(bigEndianBOM) || data.startsWith(littleEndianBOM);
+    }
+
+    return true;
+}
+
 unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 {
     unsigned priority = 0;
     if (!data.isEmpty()) {
+        // TODO: discuss - this code is slow :(
+        // Hack for text/plain and application/octet-stream
+        if (magicMatchers.isEmpty()) {
+            if (type == QLatin1String("text/plain") && isTextFile(data))
+                priority = 2;
+            else if (type == QLatin1String("application/octet-stream")) {
+                priority = 1;
+            }
+        }
         foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
             if (matcher.priority() > priority && matcher.matches(data))
                 priority = matcher.priority();

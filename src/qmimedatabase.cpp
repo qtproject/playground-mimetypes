@@ -214,25 +214,6 @@ QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priori
     return candidate;
 }
 
-static inline bool isTextFile(const QByteArray &data)
-{
-    // UTF16 byte order marks
-    static const char bigEndianBOM[] = "\xFE\xFF";
-    static const char littleEndianBOM[] = "\xFF\xFE";
-
-    const char *p = data.constData();
-    const char *e = p + data.size();
-    for ( ; p < e; ++p) {
-        if (*p >= 0x01 && *p < 0x09) // Sure-fire binary
-            return false;
-
-        if (*p == 0) // Check for UTF16
-            return data.startsWith(bigEndianBOM) || data.startsWith(littleEndianBOM);
-    }
-
-    return true;
-}
-
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
 {
     // Is the hierarchy set up in case we find several matches?
@@ -255,18 +236,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
         }
     }
 
-    if (candidate.isValid())
         return candidate;
-
-    // Hack
-    // TODO: use low fallback priorities (2 and 1)?
-    if (isTextFile(data))
-        candidate = findByType(QLatin1String("text/plain")); // try to guess if it is text
-
-    if (candidate.isValid())
-        return candidate;
-
-    return findByType(QLatin1String("application/octet-stream")); // fallback to application/octet-stream
 }
 
 QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
