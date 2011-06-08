@@ -80,7 +80,7 @@ static bool matchString(QMimeMagicRulePrivate *d, const QByteArray &data)
     const char *e = p + qMin(data.size() - d->pattern.size(), d->endPos);
     for ( ; p <= e; ++p) {
         int i = 0;
-        while (i < d->pattern.size() && (p[i] & d->mask.at(i)) == (d->pattern.at(i) & d->mask.at(i)))
+        while (i < d->pattern.size() && (p[i] & d->mask.at(i)) == d->pattern.at(i))
             ++i;
         if (i == d->pattern.size())
             return true;
@@ -175,6 +175,13 @@ QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type type, const QByteArray &valu
             Q_ASSERT(d->mask.size() >= 4 && d->mask.startsWith("0x"));
             d->mask = QByteArray::fromHex(QByteArray::fromRawData(d->mask.constData() + 2, d->mask.size() - 2));
             Q_ASSERT(d->mask.size() == d->pattern.size());
+
+            // apply mask to pattern
+            const char *m = d->mask.constData();
+            char *p = d->pattern.data();
+            const char *e = p + d->pattern.size();
+            while (p < e)
+                *p++ &= *m++;
         } else {
             d->mask.fill(0xff, d->pattern.size());
         }
