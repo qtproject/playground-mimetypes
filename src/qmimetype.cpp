@@ -37,16 +37,6 @@ QT_BEGIN_NAMESPACE
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-QMimeGlobPattern::QMimeGlobPattern(const QRegExp &regExp, unsigned weight) :
-    m_regExp(regExp), m_weight(weight)
-{
-}
-
-QMimeGlobPattern::~QMimeGlobPattern()
-{
-}
-
-
 QMimeTypeData::QMimeTypeData()
     // RE to match a suffix glob pattern: "*.ext" (and not sth like "Makefile" or
     // "*.log[1-9]"
@@ -106,7 +96,6 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     }
     return priority;
 }
-
 
 /*!
     \class MimeType

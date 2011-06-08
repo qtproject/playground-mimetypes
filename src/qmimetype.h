@@ -39,8 +39,9 @@ public:
     static const unsigned DefaultWeight = 50;
     static const unsigned MinWeight = 1;
 
-    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = DefaultWeight);
-    ~QMimeGlobPattern();
+    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = DefaultWeight) :
+        m_regExp(regExp), m_weight(weight) {}
+    ~QMimeGlobPattern() {}
 
     inline const QRegExp &regExp() const
     { return m_regExp; }
@@ -51,7 +52,6 @@ private:
     QRegExp m_regExp;
     int m_weight;
 };
-
 
 class QMimeTypeData;
 class QMIME_EXPORT QMimeType
