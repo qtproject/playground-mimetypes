@@ -552,7 +552,7 @@ QString QMimeDatabase::preferredSuffixByType(const QString &type) const
 {
     QMutexLocker locker(&d->mutex);
 
-    const QMimeType mt = d->findByType(typeOrAlias);
+    const QMimeType mt = d->findByType(type);
 
     return mt.isValid() ? mt.preferredSuffix() : QString();
 }
