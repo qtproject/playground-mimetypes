@@ -14,6 +14,9 @@ class FileMatchContext
 
 public:
     // Max data to be read from a file
+
+    // TODO: hardcoded values are no good, this should be done on demand
+    // in order to respect the spec. Use QIODevice-based code from KMimeMagicRule.
     enum { MaxData = 2500 };
 
     explicit FileMatchContext(const QFileInfo &fi);
