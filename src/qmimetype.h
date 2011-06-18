@@ -32,28 +32,8 @@ QT_BEGIN_NAMESPACE
 
 class QFileInfo;
 
-class QMIME_EXPORT QMimeGlobPattern
-{
-public:
-    static const unsigned MaxWeight = 100;
-    static const unsigned DefaultWeight = 50;
-    static const unsigned MinWeight = 1;
-
-    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = DefaultWeight) :
-        m_regExp(regExp), m_weight(weight) {}
-    ~QMimeGlobPattern() {}
-
-    inline const QRegExp &regExp() const
-    { return m_regExp; }
-    inline unsigned weight() const
-    { return m_weight; }
-
-private:
-    QRegExp m_regExp;
-    int m_weight;
-};
-
 class QMimeTypeData;
+class QMimeGlobPattern;
 class QMIME_EXPORT QMimeType
 {
 public:
@@ -69,7 +49,6 @@ public:
     void clear();
 
     bool isValid() const;
-    bool isTopLevel() const;
 
     QString type() const;
 
@@ -81,7 +60,8 @@ public:
 
     QString genericIconName() const;
 
-    QList<QMimeGlobPattern> globPatterns() const;
+    QStringList globPatterns() const;
+    QList<QMimeGlobPattern> weightedGlobPatterns() const;
 
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
 
@@ -133,7 +113,7 @@ public:
 
     void setGenericIconName(const QString &genericIconName);
 
-    void setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
+    void setWeightedGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
     void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
     void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
@@ -141,6 +121,8 @@ public:
     void setSubClassOf(const QStringList &subClassOf);
 
     bool setPreferredSuffix(const QString &preferredSuffix);
+
+    QSharedDataPointer<QMimeTypeData> d;
 };
 
 QT_END_NAMESPACE

@@ -24,6 +24,7 @@
 #include <QtCore/QLocale>
 
 #include "qmimedatabase.h"
+#include "qmimedatabase_p.h"
 #include "magicmatcher_p.h"
 
 QT_BEGIN_NAMESPACE
@@ -160,8 +161,8 @@ QMimeType::QMimeType(const QMimeType &other) :
 {
 }
 
-QMimeType::QMimeType(const QMimeTypeData &dd) :
-    d(new QMimeTypeData(dd))
+QMimeType::QMimeType(const QMimeTypeData &dd)
+    : d(new QMimeTypeData(dd))
 {
 }
 
@@ -189,11 +190,6 @@ void QMimeType::clear()
 bool QMimeType::isValid() const
 {
     return !d->type.isEmpty();
-}
-
-bool QMimeType::isTopLevel() const
-{
-    return d->subClassOf.empty();
 }
 
 QString QMimeType::type() const
@@ -232,9 +228,14 @@ QString QMimeType::genericIconName() const
     return d->genericIconName;
 }
 
-QList<QMimeGlobPattern> QMimeType::globPatterns() const
+QList<QMimeGlobPattern> QMimeType::weightedGlobPatterns() const
 {
     return d->globPatterns;
+}
+
+QStringList QMimeType::globPatterns() const
+{
+    return QMimeDatabasePrivate::fromGlobPatterns(d->globPatterns);
 }
 
 QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
@@ -332,7 +333,7 @@ QMutableMimeType::QMutableMimeType(const QString &type,
     if (!matchers.isEmpty())
         setMagicMatchers(matchers);
     if (!globPatterns.isEmpty())
-        setGlobPatterns(globPatterns);
+        setWeightedGlobPatterns(globPatterns);
     setSubClassOf(subClassOf);
 }
 
@@ -379,14 +380,14 @@ void QMutableMimeType::setGenericIconName(const QString &genericIconName)
     d->genericIconName = genericIconName;
 }
 
-void QMutableMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
+void QMutableMimeType::setWeightedGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
 {
     d->globPatterns = globPatterns;
 
     QString oldPrefferedSuffix = d->preferredSuffix;
     d->suffixes.clear();
     d->preferredSuffix.clear();
-    d->assignSuffixes(QMimeDatabase::fromGlobPatterns(globPatterns));
+    d->assignSuffixes(QMimeDatabasePrivate::fromGlobPatterns(globPatterns));
     if (d->preferredSuffix != oldPrefferedSuffix && d->suffixes.contains(oldPrefferedSuffix))
         d->preferredSuffix = oldPrefferedSuffix;
 }

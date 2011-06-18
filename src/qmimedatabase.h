@@ -51,10 +51,13 @@ public:
     QMimeType findByData(const QByteArray &data) const;
 
     QList<QMimeType> mimeTypes() const;
-    QList<QMimeGlobPattern> globPatterns() const;
+
+    void setGlobPatterns(const QString &typeOrAlias, const QList<QMimeGlobPattern> &globPatterns);
+
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
 
-    QStringList suffixes() const;
+    QString preferredSuffixByType(const QString &type) const;
+    QString preferredSuffixByFile(const QFileInfo &f) const;
 
     QStringList filterStrings() const;
     QString allFiltersString(QString *allFilesFilter = 0) const;
@@ -65,10 +68,6 @@ public:
     void clearUserModifiedMimeTypes();
     static QList<QMimeType> readUserModifiedMimeTypes();
     static void writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes);
-
-    static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
-                                                  int weight = QMimeGlobPattern::DefaultWeight);
-    static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
 private:
     QMimeDatabasePrivate *const d;

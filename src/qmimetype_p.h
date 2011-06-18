@@ -29,6 +29,28 @@ QT_BEGIN_NAMESPACE
 
 class QTextStream;
 
+class QMimeGlobPattern
+{
+public:
+    static const unsigned MaxWeight = 100;
+    static const unsigned DefaultWeight = 50;
+    static const unsigned MinWeight = 1;
+
+    explicit QMimeGlobPattern(const QRegExp &regExp, unsigned weight = DefaultWeight) :
+        m_regExp(regExp), m_weight(weight) {}
+    ~QMimeGlobPattern() {}
+
+    inline const QRegExp &regExp() const
+    { return m_regExp; }
+    inline unsigned weight() const
+    { return m_weight; }
+
+private:
+    QRegExp m_regExp;
+    int m_weight;
+};
+
+
 class QMimeTypeData : public QSharedData
 {
 public:

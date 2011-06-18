@@ -25,6 +25,7 @@
 #include <QtCore/QMutex>
 
 #include "qmimetype.h"
+#include "qmimetype_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -59,9 +60,7 @@ public:
 
     QStringList filterStrings() const;
 
-    QStringList suffixes() const;
-
-    QList<QMimeGlobPattern> globPatterns() const;
+    //QList<QMimeGlobPattern> globPatterns() const;
 
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
 
@@ -91,6 +90,8 @@ private:
     QMimeType findByFile(const QFileInfo &f, unsigned *priorityPtr) const;
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr) const;
     QMimeType findByName(const QString &name, unsigned *priorityPtr) const;
+
+    unsigned matchesBySuffix(const QMimeType &type, const QString &name, unsigned *length) const;
 
     void determineLevels();
     void raiseLevelRecursion(MimeMapEntry &e, int level);

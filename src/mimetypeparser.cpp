@@ -340,7 +340,7 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
                 if (reader.name() == mimeTypeTagC) {
                     mimeType.setType(atts.value(QLatin1String(mimeTypeAttributeC)).toString());
                     const QString &patterns = atts.value(QLatin1String(patternAttributeC)).toString();
-                    mimeType.setGlobPatterns(toGlobPatterns(patterns.split(QLatin1Char(';'))));
+                    mimeType.setWeightedGlobPatterns(toGlobPatterns(patterns.split(QLatin1Char(';'))));
                 } else if (reader.name() == matchTagC) {
                     const QString value = atts.value(QLatin1String(matchValueAttributeC)).toString();
                     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
@@ -408,7 +408,7 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
                 writer.writeStartElement(QLatin1String(mimeTypeTagC));
                 writer.writeAttribute(QLatin1String(mimeTypeAttributeC), mimeType.type());
                 writer.writeAttribute(QLatin1String(patternAttributeC),
-                                      fromGlobPatterns(mimeType.globPatterns()).join(QLatin1String(";")));
+                                      fromGlobPatterns(mimeType.weightedGlobPatterns()).join(QLatin1String(";")));
                 foreach (const QMimeMagicRuleMatcher &matcher, mimeType.magicMatchers()) {
                     // Only care about rule-based matchers.
                     const QMimeMagicRuleMatcher *ruleMatcher = &matcher;
