@@ -51,6 +51,7 @@ class QMimeDatabasePrivate
 
 public:
     QMimeDatabasePrivate();
+    ~QMimeDatabasePrivate();
 
     bool addMimeTypes(const QString &fileName, QString *errorMessage);
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
@@ -81,7 +82,6 @@ private:
 
     static const QString kModifiedMimeTypesFile;
     static QString kModifiedMimeTypesPath;
-
 
     bool addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage);
     inline QString resolveAlias(const QString &name) const

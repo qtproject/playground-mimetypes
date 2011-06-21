@@ -34,15 +34,22 @@
 
 QT_BEGIN_NAMESPACE
 
+Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticMimeDataBase)
+
 const QString QMimeDatabasePrivate::kModifiedMimeTypesFile(QLatin1String("modifiedmimetypes.xml"));
 QString QMimeDatabasePrivate::kModifiedMimeTypesPath;
 
-QMimeDatabasePrivate::QMimeDatabasePrivate()
-    : maxLevel(-1)
+QMimeDatabasePrivate::QMimeDatabasePrivate() :
+    maxLevel(-1)
 {
     // Assign here to avoid non-local static data initialization issues.
 //    kModifiedMimeTypesPath = ICore::instance()->userResourcePath() + QLatin1String("/mimetypes/");
 #warning TODO: FIX!!!
+}
+
+QMimeDatabasePrivate::~QMimeDatabasePrivate()
+{
+    qDeleteAll(typeMimeTypeMap);
 }
 
 bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage)
@@ -404,15 +411,13 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-QMimeDatabase::QMimeDatabase()
-    : d(new QMimeDatabasePrivate)
+QMimeDatabase::QMimeDatabase() :
+    d(staticMimeDataBase())
 {
 }
 
 QMimeDatabase::~QMimeDatabase()
 {
-    qDeleteAll(d->typeMimeTypeMap);
-    delete d;
 }
 
 bool QMimeDatabase::addMimeType(const QMimeType &mt)
@@ -503,6 +508,9 @@ QList<QMimeMagicRuleMatcher> QMimeDatabase::magicMatchers() const
     return d->magicMatchers();
 }
 
+/*!
+    Returns all known suffixes
+*/
 QStringList QMimeDatabase::suffixes() const
 {
     QMutexLocker locker(&d->mutex);
@@ -517,6 +525,9 @@ QStringList QMimeDatabase::filterStrings() const
     return d->filterStrings();
 }
 
+/*!
+    Returns a string with all the possible file filters, for use with file dialogs
+*/
 QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
 {
     if (allFilesFilter)

@@ -56,7 +56,6 @@ QByteArray QMimeMagicRule::typeName(QMimeMagicRule::Type type)
     return magicRuleTypes_string + magicRuleTypes_indices[type];
 }
 
-
 struct QMimeMagicRulePrivate
 {
     QMimeMagicRule::Type type;
@@ -72,7 +71,6 @@ struct QMimeMagicRulePrivate
     typedef bool (*MatchFunction)(QMimeMagicRulePrivate *d, const QByteArray &data);
     MatchFunction matchFunction;
 };
-
 
 static bool matchString(QMimeMagicRulePrivate *d, const QByteArray &data)
 {
@@ -148,8 +146,11 @@ static inline QByteArray makePattern(const QByteArray &value)
     return pattern;
 }
 
-QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type type, const QByteArray &value, int startPos, int endPos, const QByteArray &mask)
-    : d(new QMimeMagicRulePrivate)
+QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type type,
+                               const QByteArray &value,
+                               int startPos, int endPos,
+                               const QByteArray &mask) :
+    d(new QMimeMagicRulePrivate)
 {
     Q_ASSERT(!value.isEmpty());
 
@@ -220,8 +221,8 @@ QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type type, const QByteArray &valu
     }
 }
 
-QMimeMagicRule::QMimeMagicRule(const QMimeMagicRule &other)
-    : d(new QMimeMagicRulePrivate(*other.d))
+QMimeMagicRule::QMimeMagicRule(const QMimeMagicRule &other) :
+    d(new QMimeMagicRulePrivate(*other.d))
 {
 }
 

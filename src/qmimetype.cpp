@@ -150,18 +150,18 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     \sa QMimeDatabase, QMimeMagicRuleMatcher, QMimeMagicRule, QMimeGlobPattern
 */
 
-QMimeType::QMimeType()
-    : d(new QMimeTypeData)
+QMimeType::QMimeType() :
+    d(new QMimeTypeData)
 {
 }
 
-QMimeType::QMimeType(const QMimeType &other)
-    : d(other.d)
+QMimeType::QMimeType(const QMimeType &other) :
+    d(other.d)
 {
 }
 
-QMimeType::QMimeType(const QMimeTypeData &dd)
-    : d(new QMimeTypeData(dd))
+QMimeType::QMimeType(const QMimeTypeData &dd) :
+    d(new QMimeTypeData(dd))
 {
 }
 
@@ -312,6 +312,11 @@ QString QMimeType::filterString() const
     return filter;
 }
 
+/*!
+    \class QMutableMimeType
+
+    \brief Class is used to create user mime types.
+*/
 QMutableMimeType::QMutableMimeType() :
     QMimeType()
 {

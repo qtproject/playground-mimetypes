@@ -51,16 +51,12 @@ public:
     QMimeType findByData(const QByteArray &data) const;
 
     QList<QMimeType> mimeTypes() const;
-
     QList<QMimeGlobPattern> globPatterns() const;
-
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
 
-    // Return all known suffixes
     QStringList suffixes() const;
 
     QStringList filterStrings() const;
-    // Return a string with all the possible file filters, for use with file dialogs
     QString allFiltersString(QString *allFilesFilter = 0) const;
 
     // The mime types from the functions bellow are considered only in regard to

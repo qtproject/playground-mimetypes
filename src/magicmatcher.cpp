@@ -82,8 +82,8 @@ QByteArray FileMatchContext::data()
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(unsigned priority)
-    : m_priority(priority)
+QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(unsigned priority) :
+    m_priority(priority)
 {
 }
 
