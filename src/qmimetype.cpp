@@ -331,9 +331,10 @@ QMutableMimeType::QMutableMimeType(const QString &type,
     setSubClassOf(subClassOf);
 }
 
-QMutableMimeType::QMutableMimeType(QMimeType &other) :
+QMutableMimeType::QMutableMimeType(const QMimeType &other) :
     QMimeType(other)
 {
+    d.detach();
 }
 
 QMutableMimeType::QMutableMimeType(const QMutableMimeType &other) :

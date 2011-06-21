@@ -118,7 +118,7 @@ public:
                               QList<QMimeMagicRuleMatcher>(),
                               const QList<QMimeGlobPattern> &globPatterns = QList<QMimeGlobPattern>(),
                               const QStringList &subClassOf = QStringList());
-    explicit QMutableMimeType(QMimeType &other);
+    QMutableMimeType(const QMimeType &other);
 
     QMutableMimeType(const QMutableMimeType &other);
     ~QMutableMimeType();
