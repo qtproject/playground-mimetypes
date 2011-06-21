@@ -53,16 +53,13 @@ public:
     QList<QMimeType> mimeTypes() const;
 
     QList<QMimeGlobPattern> globPatterns() const;
-    void setGlobPatterns(const QString &typeOrAlias, const QList<QMimeGlobPattern> &globPatterns);
 
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
-    void setMagicMatchers(const QString &typeOrAlias, const QList<QMimeMagicRuleMatcher> &matchers);
 
     // Return all known suffixes
     QStringList suffixes() const;
     QString preferredSuffixByType(const QString &type) const;
     QString preferredSuffixByFile(const QFileInfo &f) const;
-    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
 
     QStringList filterStrings() const;
     // Return a string with all the possible file filters, for use with file dialogs
