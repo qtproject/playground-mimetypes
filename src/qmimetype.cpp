@@ -374,11 +374,6 @@ void QMutableMimeType::setGenericIconName(const QString &genericIconName)
     d->genericIconName = genericIconName;
 }
 
-QList<QMimeGlobPattern> QMutableMimeType::globPatterns() const
-{
-    return d->globPatterns;
-}
-
 void QMutableMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
 {
     d->globPatterns = globPatterns;

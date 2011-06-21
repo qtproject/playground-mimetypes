@@ -133,7 +133,6 @@ public:
 
     void setGenericIconName(const QString &genericIconName);
 
-    QList<QMimeGlobPattern> globPatterns() const;
     void setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
     void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
