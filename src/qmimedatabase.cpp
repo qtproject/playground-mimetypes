@@ -510,25 +510,6 @@ QStringList QMimeDatabase::suffixes() const
     return d->suffixes();
 }
 
-QString QMimeDatabase::preferredSuffixByType(const QString &type) const
-{
-    QMutexLocker locker(&d->mutex);
-
-    const QMimeType mt = d->findByType(type);
-
-    return mt.isValid() ? mt.preferredSuffix() : QString();
-}
-
-QString QMimeDatabase::preferredSuffixByFile(const QFileInfo &f) const
-{
-    QMutexLocker locker(&d->mutex);
-
-    unsigned priority = 0;
-    const QMimeType mt = d->findByFile(f, &priority);
-
-    return mt.isValid() ? mt.preferredSuffix() : QString();
-}
-
 QStringList QMimeDatabase::filterStrings() const
 {
     QMutexLocker locker(&d->mutex);

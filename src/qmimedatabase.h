@@ -58,8 +58,6 @@ public:
 
     // Return all known suffixes
     QStringList suffixes() const;
-    QString preferredSuffixByType(const QString &type) const;
-    QString preferredSuffixByFile(const QFileInfo &f) const;
 
     QStringList filterStrings() const;
     // Return a string with all the possible file filters, for use with file dialogs
