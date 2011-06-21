@@ -155,25 +155,6 @@ QMimeType::QMimeType()
 {
 }
 
-QMimeType::QMimeType(const QString &type)
-    : d(new QMimeTypeData)
-{
-    d->type = type;
-}
-
-QMimeType::QMimeType(const QString &type,
-                     const QList<QMimeMagicRuleMatcher> &matchers,
-                     const QList<QMimeGlobPattern> &globPatterns,
-                     const QStringList &subClassOf)
-    : d(new QMimeTypeData)
-{
-    d->type = type;
-    d->magicMatchers = matchers;
-    if (!globPatterns.isEmpty())
-        setGlobPatterns(globPatterns);
-    d->subClassOf = subClassOf;
-}
-
 QMimeType::QMimeType(const QMimeType &other)
     : d(other.d)
 {
@@ -220,19 +201,9 @@ QString QMimeType::type() const
     return d->type;
 }
 
-void QMimeType::setType(const QString &type)
-{
-    d->type = type;
-}
-
 QString QMimeType::comment() const
 {
     return d->comment;
-}
-
-void QMimeType::setComment(const QString &comment)
-{
-    d->comment = comment;
 }
 
 // Return "en", "de", etc. derived from "en_US", de_DE".
@@ -251,22 +222,9 @@ QString QMimeType::localeComment(const QString &localeArg) const
     return d->localeComments.value(locale, d->comment);
 }
 
-void QMimeType::setLocaleComment(const QString &locale, const QString &comment)
-{
-    if (locale.isEmpty())
-        return;
-
-     d->localeComments[locale] = comment;
-}
-
 QStringList QMimeType::aliases() const
 {
     return d->aliases;
-}
-
-void QMimeType::setAliases(const QStringList &aliases)
-{
-     d->aliases = aliases;
 }
 
 QString QMimeType::genericIconName() const
@@ -274,26 +232,9 @@ QString QMimeType::genericIconName() const
     return d->genericIconName;
 }
 
-void QMimeType::setGenericIconName(const QString &genericIconName)
-{
-    d->genericIconName = genericIconName;
-}
-
 QList<QMimeGlobPattern> QMimeType::globPatterns() const
 {
     return d->globPatterns;
-}
-
-void QMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
-{
-    d->globPatterns = globPatterns;
-
-    QString oldPrefferedSuffix = d->preferredSuffix;
-    d->suffixes.clear();
-    d->preferredSuffix.clear();
-    d->assignSuffixes(QMimeDatabase::fromGlobPatterns(globPatterns));
-    if (d->preferredSuffix != oldPrefferedSuffix && d->suffixes.contains(oldPrefferedSuffix))
-        d->preferredSuffix = oldPrefferedSuffix;
 }
 
 QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
@@ -301,24 +242,9 @@ QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
     return d->magicMatchers;
 }
 
-void QMimeType::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
-{
-    d->magicMatchers.append(matcher);
-}
-
-void QMimeType::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
-{
-    d->magicMatchers = matchers;
-}
-
 QStringList QMimeType::subClassOf() const
 {
     return d->subClassOf;
-}
-
-void QMimeType::setSubClassOf(const QStringList &subClassOf)
-{
-    d->subClassOf = subClassOf;
 }
 
 QStringList QMimeType::suffixes() const
@@ -329,19 +255,6 @@ QStringList QMimeType::suffixes() const
 QString QMimeType::preferredSuffix() const
 {
     return d->preferredSuffix;
-}
-
-bool QMimeType::setPreferredSuffix(const QString &preferredSuffix)
-{
-    if (!d->suffixes.contains(preferredSuffix)) {
-        qWarning("%s: Attempt to set preferred suffix to '%s', which is not in the list of suffixes: %s.",
-                 d->type.toLocal8Bit().constData(),
-                 preferredSuffix.toLocal8Bit().constData(),
-                 d->suffixes.join(QLatin1String(", ")).toLocal8Bit().constData());
-        return false;
-    }
-    d->preferredSuffix = preferredSuffix;
-    return true;
 }
 
 /*!
@@ -397,6 +310,112 @@ QString QMimeType::filterString() const
     }
 
     return filter;
+}
+
+QMutableMimeType::QMutableMimeType() :
+    QMimeType()
+{
+}
+
+QMutableMimeType::QMutableMimeType(const QString &type,
+                                   const QList<QMimeMagicRuleMatcher> &matchers,
+                                   const QList<QMimeGlobPattern> &globPatterns,
+                                   const QStringList &subClassOf) :
+    QMimeType()
+{
+    setType(type);
+    if (!matchers.isEmpty())
+        setMagicMatchers(matchers);
+    if (!globPatterns.isEmpty())
+        setGlobPatterns(globPatterns);
+    setSubClassOf(subClassOf);
+}
+
+QMutableMimeType::QMutableMimeType(QMimeType &other) :
+    QMimeType(other)
+{
+}
+
+QMutableMimeType::QMutableMimeType(const QMutableMimeType &other) :
+    QMimeType(other)
+{
+}
+
+QMutableMimeType::~QMutableMimeType()
+{
+}
+
+void QMutableMimeType::setType(const QString &type)
+{
+    d->type = type;
+}
+
+void QMutableMimeType::setComment(const QString &comment)
+{
+    d->comment = comment;
+}
+
+void QMutableMimeType::setLocaleComment(const QString &locale, const QString &comment)
+{
+    if (locale.isEmpty())
+        return;
+
+     d->localeComments[locale] = comment;
+}
+
+void QMutableMimeType::setAliases(const QStringList &aliases)
+{
+     d->aliases = aliases;
+}
+
+void QMutableMimeType::setGenericIconName(const QString &genericIconName)
+{
+    d->genericIconName = genericIconName;
+}
+
+QList<QMimeGlobPattern> QMutableMimeType::globPatterns() const
+{
+    return d->globPatterns;
+}
+
+void QMutableMimeType::setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
+{
+    d->globPatterns = globPatterns;
+
+    QString oldPrefferedSuffix = d->preferredSuffix;
+    d->suffixes.clear();
+    d->preferredSuffix.clear();
+    d->assignSuffixes(QMimeDatabase::fromGlobPatterns(globPatterns));
+    if (d->preferredSuffix != oldPrefferedSuffix && d->suffixes.contains(oldPrefferedSuffix))
+        d->preferredSuffix = oldPrefferedSuffix;
+}
+
+void QMutableMimeType::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
+{
+    d->magicMatchers.append(matcher);
+}
+
+void QMutableMimeType::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
+{
+    d->magicMatchers = matchers;
+}
+
+void QMutableMimeType::setSubClassOf(const QStringList &subClassOf)
+{
+    d->subClassOf = subClassOf;
+}
+
+bool QMutableMimeType::setPreferredSuffix(const QString &preferredSuffix)
+{
+    if (!d->suffixes.contains(preferredSuffix)) {
+        qWarning("%s: Attempt to set preferred suffix to '%s', which is not in the list of suffixes: %s.",
+                 d->type.toLocal8Bit().constData(),
+                 preferredSuffix.toLocal8Bit().constData(),
+                 d->suffixes.join(QLatin1String(", ")).toLocal8Bit().constData());
+        return false;
+    }
+    d->preferredSuffix = preferredSuffix;
+    return true;
 }
 
 QT_END_NAMESPACE

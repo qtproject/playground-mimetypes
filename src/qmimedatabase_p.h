@@ -59,14 +59,14 @@ public:
     QStringList filterStrings() const;
 
     QStringList suffixes() const;
-    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
+//    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
 
     QList<QMimeGlobPattern> globPatterns() const;
-    void setGlobPatterns(const QString &typeOrAlias, const QList<QMimeGlobPattern> &globPatterns);
+//    void setGlobPatterns(const QString &typeOrAlias, const QList<QMimeGlobPattern> &globPatterns);
 
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
-    void setMagicMatchers(const QString &typeOrAlias,
-                          const QList<QMimeMagicRuleMatcher> &matchers);
+//    void setMagicMatchers(const QString &typeOrAlias,
+//                          const QList<QMimeMagicRuleMatcher> &matchers);
 
     QList<QMimeType> mimeTypes() const;
 

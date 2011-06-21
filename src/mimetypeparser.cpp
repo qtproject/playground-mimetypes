@@ -329,7 +329,7 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
     QList<QMimeType> mimeTypes;
     QFile file(kModifiedMimeTypesPath + kModifiedMimeTypesFile);
     if (file.open(QFile::ReadOnly)) {
-        QMimeType mimeType;
+        QMutableMimeType mimeType;
         QHash<int, QList<QMimeMagicRule> > rules;
         QXmlStreamReader reader(&file);
         QXmlStreamAttributes atts;

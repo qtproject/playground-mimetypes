@@ -57,12 +57,6 @@ class QMimeTypeData;
 class QMIME_EXPORT QMimeType
 {
 public:
-    QMimeType();
-    explicit QMimeType(const QString &type);
-    QMimeType(const QString &type,
-              const QList<QMimeMagicRuleMatcher> &matchers,
-              const QList<QMimeGlobPattern> &globPatterns = QList<QMimeGlobPattern>(),
-              const QStringList &subClassOf = QStringList());
     QMimeType(const QMimeType &other);
     ~QMimeType();
 
@@ -78,34 +72,24 @@ public:
     bool isTopLevel() const;
 
     QString type() const;
-    void setType(const QString &type);
 
     QStringList aliases() const;
-    void setAliases(const QStringList &aliases);
 
     QString comment() const;
-    void setComment(const QString &comment);
 
     QString localeComment(const QString &locale = QString() /* en, de...*/) const;
-    void setLocaleComment(const QString &locale, const QString &comment);
 
     QString genericIconName() const;
-    void setGenericIconName(const QString &genericIconName);
 
     QList<QMimeGlobPattern> globPatterns() const;
-    void setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
-    void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
-    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
 
     QStringList subClassOf() const;
-    void setSubClassOf(const QStringList &subClassOf);
 
     // Extension over standard mime data
     QStringList suffixes() const;
     QString preferredSuffix() const;
-    bool setPreferredSuffix(const QString &preferredSuffix);
 
     bool matchesType(const QString &type) const;
     unsigned matchesData(const QByteArray &data) const;
@@ -114,13 +98,50 @@ public:
 
     QString filterString() const;
 
-private:
+protected:
+    QMimeType();
     explicit QMimeType(const QMimeTypeData &dd);
 
     friend class BaseMimeTypeParser;
+    friend class MimeMapEntry;
     friend class QMimeDatabasePrivate;
 
-    QSharedDataPointer<QMimeTypeData> d;
+    QExplicitlySharedDataPointer<QMimeTypeData> d;
+};
+
+class QMIME_EXPORT QMutableMimeType : public QMimeType
+{
+public:
+    QMutableMimeType();
+    explicit QMutableMimeType(const QString &type,
+                              const QList<QMimeMagicRuleMatcher> &matchers =
+                              QList<QMimeMagicRuleMatcher>(),
+                              const QList<QMimeGlobPattern> &globPatterns = QList<QMimeGlobPattern>(),
+                              const QStringList &subClassOf = QStringList());
+    explicit QMutableMimeType(QMimeType &other);
+
+    QMutableMimeType(const QMutableMimeType &other);
+    ~QMutableMimeType();
+
+    void setType(const QString &type);
+
+    void setAliases(const QStringList &aliases);
+
+    void setComment(const QString &comment);
+
+    void setLocaleComment(const QString &locale, const QString &comment);
+
+    void setGenericIconName(const QString &genericIconName);
+
+    QList<QMimeGlobPattern> globPatterns() const;
+    void setGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
+
+    void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
+    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
+
+    void setSubClassOf(const QStringList &subClassOf);
+
+    bool setPreferredSuffix(const QString &preferredSuffix);
 };
 
 QT_END_NAMESPACE

@@ -158,13 +158,13 @@ void QMimeDatabasePrivate::determineLevels()
     }
 }
 
-bool QMimeDatabasePrivate::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
-{
-    MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
-    if (entry)
-        return entry->type.setPreferredSuffix(suffix);
-    return false;
-}
+//bool QMimeDatabasePrivate::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
+//{
+//    MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
+//    if (entry)
+//        return entry->type.setPreferredSuffix(suffix);
+//    return false;
+//}
 
 QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
 {
@@ -299,13 +299,13 @@ QList<QMimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
     return globPatterns;
 }
 
-void QMimeDatabasePrivate::setGlobPatterns(const QString &typeOrAlias,
-                                          const QList<QMimeGlobPattern> &globPatterns)
-{
-    MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
-    if (entry)
-        entry->type.setGlobPatterns(globPatterns);
-}
+//void QMimeDatabasePrivate::setGlobPatterns(const QString &typeOrAlias,
+//                                          const QList<QMimeGlobPattern> &globPatterns)
+//{
+//    MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
+//    if (entry)
+//        entry->type.setGlobPatterns(globPatterns);
+//}
 
 QList<QMimeMagicRuleMatcher > QMimeDatabasePrivate::magicMatchers() const
 {
@@ -317,13 +317,13 @@ QList<QMimeMagicRuleMatcher > QMimeDatabasePrivate::magicMatchers() const
     return magicMatchers;
 }
 
-void QMimeDatabasePrivate::setMagicMatchers(const QString &typeOrAlias,
-                                            const QList<QMimeMagicRuleMatcher> &matchers)
-{
-    MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
-    if (entry)
-        entry->type.setMagicMatchers(matchers);
-}
+//void QMimeDatabasePrivate::setMagicMatchers(const QString &typeOrAlias,
+//                                            const QList<QMimeMagicRuleMatcher> &matchers)
+//{
+//    MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
+//    if (entry)
+//        entry->type.setMagicMatchers(matchers);
+//}
 
 QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 {
@@ -345,8 +345,10 @@ void QMimeDatabasePrivate::syncUserModifiedMimeTypes()
     foreach (MimeMapEntry *entry, typeMimeTypeMap) {
         QHash<QString, QMimeType>::const_iterator userMimeIt = userModified.constFind(entry->type.type());
         if (userMimeIt != userModified.constEnd()) {
-            entry->type.setGlobPatterns(userMimeIt.value().globPatterns());
-            entry->type.setMagicMatchers(userMimeIt.value().magicMatchers());
+            QMutableMimeType mt = QMutableMimeType(entry->type);
+            mt.setGlobPatterns(userMimeIt.value().globPatterns());
+            mt.setMagicMatchers(userMimeIt.value().magicMatchers());
+            entry->type = mt;
         }
     }
 }
@@ -518,13 +520,13 @@ QList<QMimeGlobPattern> QMimeDatabase::globPatterns() const
     return d->globPatterns();
 }
 
-void QMimeDatabase::setGlobPatterns(const QString &typeOrAlias,
-                                   const QList<QMimeGlobPattern> &globPatterns)
-{
-    QMutexLocker locker(&d->mutex);
+//void QMimeDatabase::setGlobPatterns(const QString &typeOrAlias,
+//                                   const QList<QMimeGlobPattern> &globPatterns)
+//{
+//    QMutexLocker locker(&d->mutex);
 
-    d->setGlobPatterns(typeOrAlias, globPatterns);
-}
+//    d->setGlobPatterns(typeOrAlias, globPatterns);
+//}
 
 QList<QMimeMagicRuleMatcher> QMimeDatabase::magicMatchers() const
 {
@@ -533,13 +535,13 @@ QList<QMimeMagicRuleMatcher> QMimeDatabase::magicMatchers() const
     return d->magicMatchers();
 }
 
-void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias,
-                                     const QList<QMimeMagicRuleMatcher> &matchers)
-{
-    QMutexLocker locker(&d->mutex);
+//void QMimeDatabase::setMagicMatchers(const QString &typeOrAlias,
+//                                     const QList<QMimeMagicRuleMatcher> &matchers)
+//{
+//    QMutexLocker locker(&d->mutex);
 
-    d->setMagicMatchers(typeOrAlias, matchers);
-}
+//    d->setMagicMatchers(typeOrAlias, matchers);
+//}
 
 QStringList QMimeDatabase::suffixes() const
 {
@@ -567,12 +569,12 @@ QString QMimeDatabase::preferredSuffixByFile(const QFileInfo &f) const
     return mt.isValid() ? mt.preferredSuffix() : QString();
 }
 
-bool QMimeDatabase::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
-{
-    QMutexLocker locker(&d->mutex);
+//bool QMimeDatabase::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
+//{
+//    QMutexLocker locker(&d->mutex);
 
-    return d->setPreferredSuffix(typeOrAlias, suffix);
-}
+//    return d->setPreferredSuffix(typeOrAlias, suffix);
+//}
 
 QStringList QMimeDatabase::filterStrings() const
 {
