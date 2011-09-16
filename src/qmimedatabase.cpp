@@ -367,7 +367,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
 
 
 /*!
-    \class MimeDatabase
+    \class QMimeDatabase
     \brief Mime data base to which the plugins can add the mime types they handle.
 
     The class is protected by a QMutex and can therefore be accessed by threads.
@@ -392,7 +392,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
     \list
     \o An alias map QString->QString for mapping aliases to types
     \o A Map QString->MimeMapEntry for the types (MimeMapEntry being a pair of
-       MimeType and (hierarchy) level.
+       QMimeType and (hierarchy) level.
     \o A map  QString->QString representing parent->child relations (enabling
        recursing over children)
     \o Using strings avoids dangling pointers.
@@ -406,7 +406,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
     to check the most specific types first). Starting a recursion from the
     leaves is not suitable since it will hit parent nodes several times.
 
-    \sa MimeType, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
+    \sa QMimeType, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */

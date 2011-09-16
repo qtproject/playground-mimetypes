@@ -62,7 +62,7 @@ const char *const matchMaskAttributeC = "mask";
 
     Populates MimeDataBase
 
-    \sa MimeDatabase, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
+    \sa QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa MimeTypeParser
 */
@@ -72,9 +72,9 @@ const char *const matchMaskAttributeC = "mask";
     \class BaseMimeTypeParser
     \brief Generic parser for a sequence of <mime-type>.
 
-    Calls abstract handler function process for MimeType it finds.
+    Calls abstract handler function process for QMimeType it finds.
 
-    \sa MimeDatabase, MagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
+    \sa QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa MimeTypeParser
 */

@@ -61,7 +61,7 @@ private:
 };
 
 
-// Parser that builds MimeDB hierarchy by adding to MimeDatabasePrivate
+// Parser that builds MimeDB hierarchy by adding to QMimeDatabasePrivate
 class MimeTypeParser : public BaseMimeTypeParser
 {
 public:

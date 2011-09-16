@@ -32,7 +32,7 @@ QT_BEGIN_NAMESPACE
     \class QMimeGlobPattern
     \brief Glob pattern for file names for mime type matching.
 
-    \sa QMimeType, QMimeDatabase, MagicRuleMatcher, QMimeMagicRule
+    \sa QMimeType, QMimeDatabase, QMimeMagicRuleMatcher, QMimeMagicRule
     \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
@@ -125,7 +125,7 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 }
 
 /*!
-    \class MimeType
+    \class QMimeType
 
     \brief Mime type data used in Qt Creator.
 
