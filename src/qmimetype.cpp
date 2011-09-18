@@ -323,18 +323,10 @@ QMutableMimeType::QMutableMimeType() :
 {
 }
 
-QMutableMimeType::QMutableMimeType(const QString &type,
-                                   const QList<QMimeMagicRuleMatcher> &matchers,
-                                   const QList<QMimeGlobPattern> &globPatterns,
-                                   const QStringList &subClassOf) :
+QMutableMimeType::QMutableMimeType(const QString &type) :
     QMimeType()
 {
     setType(type);
-    if (!matchers.isEmpty())
-        setMagicMatchers(matchers);
-    if (!globPatterns.isEmpty())
-        setWeightedGlobPatterns(globPatterns);
-    setSubClassOf(subClassOf);
 }
 
 QMutableMimeType::QMutableMimeType(const QMimeType &other) :

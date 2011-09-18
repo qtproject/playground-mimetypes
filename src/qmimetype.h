@@ -93,11 +93,7 @@ class QMIME_EXPORT QMutableMimeType : public QMimeType
 {
 public:
     QMutableMimeType();
-    explicit QMutableMimeType(const QString &type,
-                              const QList<QMimeMagicRuleMatcher> &matchers =
-                              QList<QMimeMagicRuleMatcher>(),
-                              const QList<QMimeGlobPattern> &globPatterns = QList<QMimeGlobPattern>(),
-                              const QStringList &subClassOf = QStringList());
+    explicit QMutableMimeType(const QString &type);
     QMutableMimeType(const QMimeType &other);
 
     QMutableMimeType(const QMutableMimeType &other);
