@@ -23,7 +23,6 @@
 
 #include <QtCore/QLocale>
 
-#include "qmimedatabase.h"
 #include "magicmatcher_p.h"
 
 QT_BEGIN_NAMESPACE
