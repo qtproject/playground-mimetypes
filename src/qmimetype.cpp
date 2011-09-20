@@ -31,16 +31,19 @@ QT_BEGIN_NAMESPACE
 
 /*!
     \class QMimeGlobPattern
-    \brief Glob pattern for file names for mime type matching.
+    \brief Glob pattern for file names for MIME type matching.
 
     \sa QMimeType, QMimeDatabase, QMimeMagicRuleMatcher, QMimeMagicRule
     \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
+/*!
+    \var QMimeTypeData::suffixPattern
+    \brief Regular expression to match a suffix glob pattern: "*.ext" (and not sth like "Makefile" or "*.log[1-9]"
+*/
+
 QMimeTypeData::QMimeTypeData()
-    // RE to match a suffix glob pattern: "*.ext" (and not sth like "Makefile" or
-    // "*.log[1-9]"
     : suffixPattern(QLatin1String("^\\*\\.[\\w+]+$"))
 {
     if (!suffixPattern.isValid())
@@ -128,19 +131,19 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 /*!
     \class QMimeType
 
-    \brief Mime type data used in Qt Creator.
+    \brief MIME type data used in Qt Creator.
 
-    Contains most information from standard mime type XML database files.
+    Contains most information from standard MIME type XML database files.
 
     In addition, the class provides a list of suffixes and a concept of the
     'preferred suffix' (derived from glob patterns). This is used for example
     to be able to configure the suffix used for C++-files in Qt Creator.
 
-    Mime XML looks like:
+    MIME XML looks like:
     \code
     <?xml version="1.0" encoding="UTF-8"?>
     <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-    <!-- Mime types must match the desktop file associations -->
+    <!-- MIME types must match the desktop file associations -->
       <mime-type type="application/vnd.nokia.qt.qmakeprofile">
         <comment xml:lang="en">Qt qmake Profile</comment>
         <glob pattern="*.pro" weight="50"/>
@@ -212,6 +215,9 @@ static inline QString systemLanguage()
     return name;
 }
 
+/*!
+    \param localeArg en, de...
+*/
 QString QMimeType::localeComment(const QString &localeArg) const
 {
     const QString locale = localeArg.isEmpty() ? systemLanguage() : localeArg;
@@ -248,11 +254,21 @@ QStringList QMimeType::subClassOf() const
     return d->subClassOf;
 }
 
+/*!
+    Returns the known suffixes for the MIME type.
+
+    Extension over standard MIME data
+*/
 QStringList QMimeType::suffixes() const
 {
     return d->suffixes;
 }
 
+/*!
+    Returns the preferred suffix for the MIME type.
+
+    Extension over standard MIME data
+*/
 QString QMimeType::preferredSuffix() const
 {
     return d->preferredSuffix;
@@ -316,7 +332,7 @@ QString QMimeType::filterString() const
 /*!
     \class QMutableMimeType
 
-    \brief Class is used to create user mime types.
+    \brief Class is used to create user MIME types.
 */
 QMutableMimeType::QMutableMimeType() :
     QMimeType()

@@ -35,10 +35,10 @@ static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
     \class FileMatchContext
     \internal
 
-    \brief Context passed on to the mime types when looking for a file match.
+    \brief Context passed on to the MIME types when looking for a file match.
 
     It exists to enable reading the file contents "on demand"
-    (as opposed to each mime type trying to open and read while checking).
+    (as opposed to each MIME type trying to open and read while checking).
 
     \sa QMimeType, QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa BinaryMatcher, HeuristicTextMagicMatcher

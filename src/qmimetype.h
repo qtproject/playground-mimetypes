@@ -56,7 +56,7 @@ public:
 
     QString comment() const;
 
-    QString localeComment(const QString &locale = QString() /* en, de...*/) const;
+    QString localeComment(const QString &locale = QString()) const;
 
     QString genericIconName() const;
 
@@ -67,7 +67,6 @@ public:
 
     QStringList subClassOf() const;
 
-    // Extension over standard mime data
     QStringList suffixes() const;
     QString preferredSuffix() const;
 

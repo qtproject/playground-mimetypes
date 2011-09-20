@@ -62,7 +62,7 @@ public:
     QStringList filterStrings() const;
     QString allFiltersString(QString *allFilesFilter = 0) const;
 
-    // The mime types from the functions bellow are considered only in regard to
+    // The MIME types from the functions bellow are considered only in regard to
     // their glob patterns and rule-based magic matchers.
     void syncUserModifiedMimeTypes();
     void clearUserModifiedMimeTypes();

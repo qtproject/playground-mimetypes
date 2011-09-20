@@ -32,7 +32,7 @@
 
 QT_BEGIN_NAMESPACE
 
-// XML tags in mime files
+// XML tags in MIME files
 const char *const mimeInfoTagC = "mime-info";
 const char *const mimeTypeTagC = "mime-type";
 const char *const mimeTypeAttributeC = "type";
@@ -58,7 +58,7 @@ const char *const matchMaskAttributeC = "mask";
 
 /*!
     \class MimeTypeParser
-    \brief Mime type parser
+    \brief MIME type parser
 
     Populates MimeDataBase
 
@@ -384,7 +384,7 @@ QList<QMimeType> QMimeDatabasePrivate::readUserModifiedMimeTypes()
 
 void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes)
 {
-    // Keep mime types modified which are already on file, unless they are part of the current set.
+    // Keep MIME types modified which are already on file, unless they are part of the current set.
     QSet<QString> currentMimeTypes;
     foreach (const QMimeType &mimeType, mimeTypes)
         currentMimeTypes.insert(mimeType.type());
@@ -399,7 +399,7 @@ void QMimeDatabasePrivate::writeUserModifiedMimeTypes(const QList<QMimeType> &mi
         if (file.open(QFile::WriteOnly | QFile::Truncate)) {
             // Notice this file only represents user modifications. It is writen in a
             // convienient way for synchronization, which is similar to but not exactly the
-            // same format we use for the embedded mime type files.
+            // same format we use for the embedded MIME type files.
             QXmlStreamWriter writer(&file);
             writer.setAutoFormatting(true);
             writer.writeStartDocument();

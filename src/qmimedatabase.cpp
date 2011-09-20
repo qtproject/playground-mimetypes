@@ -118,11 +118,11 @@ void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
         maxLevel = level;
 
     // At all events recurse over children since nodes might have been added;
-    // look them up in the type->mime type map
+    // look them up in the type->MIME type map
     foreach (const QString &alias, parentChildrenMap.values(e.type.type())) {
         MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(alias));
         if (!entry) {
-            qWarning("%s: Inconsistent mime hierarchy detected, child %s of %s cannot be found.",
+            qWarning("%s: Inconsistent MIME hierarchy detected, child %s of %s cannot be found.",
                      Q_FUNC_INFO, alias.toLocal8Bit().constData(), e.type.type().toLocal8Bit().constData());
         } else {
             raiseLevelRecursion(*entry, level + 1);
@@ -151,7 +151,7 @@ void QMimeDatabasePrivate::determineLevels()
     foreach (const QString &topLevel, parentSet.subtract(childrenSet)) {
         MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(topLevel));
         if (!entry) {
-            qWarning("%s: Inconsistent mime hierarchy detected, top level element %s cannot be found.",
+            qWarning("%s: Inconsistent MIME hierarchy detected, top level element %s cannot be found.",
                      Q_FUNC_INFO, topLevel.toLocal8Bit().constData());
         } else {
             raiseLevelRecursion(*entry, 0);
@@ -328,7 +328,7 @@ void QMimeDatabasePrivate::syncUserModifiedMimeTypes()
 void QMimeDatabasePrivate::clearUserModifiedMimeTypes()
 {
     // This removes the user's file. However, the operation will actually take place the next time
-    // Creator starts, since we currently don't support removing stuff from the mime database.
+    // Creator starts, since we currently don't support removing stuff from the MIME database.
     QFile::remove(kModifiedMimeTypesPath + kModifiedMimeTypesFile);
 }
 
@@ -357,7 +357,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
 
 /*!
     \class QMimeDatabase
-    \brief Mime data base to which the plugins can add the mime types they handle.
+    \brief MIME database to which the plugins can add the MIME types they handle.
 
     The class is protected by a QMutex and can therefore be accessed by threads.
 
@@ -371,7 +371,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
     Storage requirements:
     \list
     \o Must be robust in case of incomplete hierarchies, dangling entries
-    \o Plugins will not load and register their mime types in order of inheritance.
+    \o Plugins will not load and register their MIME types in order of inheritance.
     \o Multiple inheritance (several subClassesOf) can occur
     \o Provide quick lookup by name
     \o Provide quick lookup by file type.
@@ -431,7 +431,7 @@ bool QMimeDatabase::addMimeTypes(QIODevice *device, QString *errorMessage)
 }
 
 /*!
-    Returns a mime type for \a typeOrAlias or Null one if none found.
+    Returns a MIME type for \a typeOrAlias or Null one if none found.
 */
 QMimeType QMimeDatabase::findByType(const QString &typeOrAlias) const
 {
@@ -441,7 +441,7 @@ QMimeType QMimeDatabase::findByType(const QString &typeOrAlias) const
 }
 
 /*!
-    Returns a mime type for \a fileInfo or Null one if none found.
+    Returns a MIME type for \a fileInfo or Null one if none found.
 */
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
@@ -452,8 +452,8 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 }
 
 /*!
-    Returns a mime type for \a name or Null one if none found.
-    This function does not tries to open file to determine mime type by it's content, use
+    Returns a MIME type for \a name or Null one if none found.
+    This function does not tries to open file to determine MIME type by it's content, use
     QMimeDatabase::findByFile instead.
 */
 QMimeType QMimeDatabase::findByName(const QString &name) const
@@ -465,7 +465,7 @@ QMimeType QMimeDatabase::findByName(const QString &name) const
 }
 
 /*!
-    Returns a mime type for \a data or Null one if none found. This function reads content of a file
+    Returns a MIME type for \a data or Null one if none found. This function reads content of a file
     and tries to determine it's type using magic sequencies.
 */
 QMimeType QMimeDatabase::findByData(const QByteArray &data) const
@@ -543,7 +543,7 @@ QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
     if (allFilesFilter)
         allFilesFilter->clear();
 
-    // Compile list of filter strings, sort, and remove duplicates (different mime types might
+    // Compile list of filter strings, sort, and remove duplicates (different MIME types might
     // generate the same filter).
     QStringList filters = filterStrings();
     if (filters.empty())
