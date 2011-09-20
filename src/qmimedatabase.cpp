@@ -317,10 +317,10 @@ void QMimeDatabasePrivate::syncUserModifiedMimeTypes()
     foreach (MimeMapEntry *entry, typeMimeTypeMap) {
         QHash<QString, QMimeType>::const_iterator userMimeIt = userModified.constFind(entry->type.type());
         if (userMimeIt != userModified.constEnd()) {
-            QMutableMimeType mt = entry->type;
+            QMimeTypeData mt = *entry->type.d;
             mt.setWeightedGlobPatterns(userMimeIt.value().weightedGlobPatterns());
             mt.setMagicMatchers(userMimeIt.value().magicMatchers());
-            entry->type = mt;
+            entry->type = QMimeType(mt);
         }
     }
 }

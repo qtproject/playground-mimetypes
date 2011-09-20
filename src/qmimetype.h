@@ -88,38 +88,6 @@ protected:
     QExplicitlySharedDataPointer<QMimeTypeData> d;
 };
 
-class QMIME_EXPORT QMutableMimeType : public QMimeType
-{
-public:
-    QMutableMimeType();
-    explicit QMutableMimeType(const QString &type);
-    QMutableMimeType(const QMimeType &other);
-
-    QMutableMimeType(const QMutableMimeType &other);
-    ~QMutableMimeType();
-
-    void setType(const QString &type);
-
-    void setAliases(const QStringList &aliases);
-
-    void setComment(const QString &comment);
-
-    void setLocaleComment(const QString &locale, const QString &comment);
-
-    void setGenericIconName(const QString &genericIconName);
-
-    void setWeightedGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
-
-    void addMagicMatcher(const QMimeMagicRuleMatcher &matcher);
-    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
-
-    void setSubClassOf(const QStringList &subClassOf);
-
-    bool setPreferredSuffix(const QString &preferredSuffix);
-
-    QSharedDataPointer<QMimeTypeData> d;
-};
-
 QT_END_NAMESPACE
 
 #endif // QMIMETYPE_H

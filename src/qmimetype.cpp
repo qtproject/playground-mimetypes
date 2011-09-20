@@ -329,67 +329,17 @@ QString QMimeType::filterString() const
     return filter;
 }
 
-/*!
-    \class QMutableMimeType
-
-    \brief Class is used to create user MIME types.
-*/
-QMutableMimeType::QMutableMimeType() :
-    QMimeType()
+void QMimeTypeData::setType(const QString &type)
 {
-}
+    QMimeTypeData *d = this;
 
-QMutableMimeType::QMutableMimeType(const QString &type) :
-    QMimeType()
-{
-    setType(type);
-}
-
-QMutableMimeType::QMutableMimeType(const QMimeType &other) :
-    QMimeType(other)
-{
-    d.detach();
-}
-
-QMutableMimeType::QMutableMimeType(const QMutableMimeType &other) :
-    QMimeType(other)
-{
-}
-
-QMutableMimeType::~QMutableMimeType()
-{
-}
-
-void QMutableMimeType::setType(const QString &type)
-{
     d->type = type;
 }
 
-void QMutableMimeType::setComment(const QString &comment)
+void QMimeTypeData::setWeightedGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
 {
-    d->comment = comment;
-}
+    QMimeTypeData *d = this;
 
-void QMutableMimeType::setLocaleComment(const QString &locale, const QString &comment)
-{
-    if (locale.isEmpty())
-        return;
-
-     d->localeComments[locale] = comment;
-}
-
-void QMutableMimeType::setAliases(const QStringList &aliases)
-{
-     d->aliases = aliases;
-}
-
-void QMutableMimeType::setGenericIconName(const QString &genericIconName)
-{
-    d->genericIconName = genericIconName;
-}
-
-void QMutableMimeType::setWeightedGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
-{
     d->globPatterns = globPatterns;
 
     QString oldPrefferedSuffix = d->preferredSuffix;
@@ -400,32 +350,11 @@ void QMutableMimeType::setWeightedGlobPatterns(const QList<QMimeGlobPattern> &gl
         d->preferredSuffix = oldPrefferedSuffix;
 }
 
-void QMutableMimeType::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
+void QMimeTypeData::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
 {
-    d->magicMatchers.append(matcher);
-}
+    QMimeTypeData *d = this;
 
-void QMutableMimeType::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
-{
     d->magicMatchers = matchers;
-}
-
-void QMutableMimeType::setSubClassOf(const QStringList &subClassOf)
-{
-    d->subClassOf = subClassOf;
-}
-
-bool QMutableMimeType::setPreferredSuffix(const QString &preferredSuffix)
-{
-    if (!d->suffixes.contains(preferredSuffix)) {
-        qWarning("%s: Attempt to set preferred suffix to '%s', which is not in the list of suffixes: %s.",
-                 d->type.toLocal8Bit().constData(),
-                 preferredSuffix.toLocal8Bit().constData(),
-                 d->suffixes.join(QLatin1String(", ")).toLocal8Bit().constData());
-        return false;
-    }
-    d->preferredSuffix = preferredSuffix;
-    return true;
 }
 
 QT_END_NAMESPACE
