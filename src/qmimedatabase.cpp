@@ -332,28 +332,6 @@ void QMimeDatabasePrivate::clearUserModifiedMimeTypes()
     QFile::remove(kModifiedMimeTypesPath + kModifiedMimeTypesFile);
 }
 
-QList<QMimeGlobPattern> QMimeDatabasePrivate::toGlobPatterns(const QStringList &patterns, int weight)
-{
-    QList<QMimeGlobPattern> globPatterns;
-
-    foreach (const QString &pattern, patterns) {
-        const QRegExp wildcard(pattern, Qt::CaseSensitive, QRegExp::WildcardUnix);
-        globPatterns.append(QMimeGlobPattern(wildcard, weight));
-    }
-
-    return globPatterns;
-}
-
-QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
-{
-    QStringList patterns;
-
-    foreach (const QMimeGlobPattern &globPattern, globPatterns)
-        patterns.append(globPattern.regExp().pattern());
-
-    return patterns;
-}
-
 
 /*!
     \class QMimeDatabase

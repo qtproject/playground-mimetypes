@@ -24,7 +24,6 @@
 #include <QtCore/QLocale>
 
 #include "qmimedatabase.h"
-#include "qmimedatabase_p.h"
 #include "magicmatcher_p.h"
 
 QT_BEGIN_NAMESPACE
@@ -86,6 +85,28 @@ unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
     }
 
     return 0;
+}
+
+QList<QMimeGlobPattern> QMimeTypeData::toGlobPatterns(const QStringList &patterns, int weight)
+{
+    QList<QMimeGlobPattern> globPatterns;
+
+    foreach (const QString &pattern, patterns) {
+        const QRegExp wildcard(pattern, Qt::CaseSensitive, QRegExp::WildcardUnix);
+        globPatterns.append(QMimeGlobPattern(wildcard, weight));
+    }
+
+    return globPatterns;
+}
+
+QStringList QMimeTypeData::fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
+{
+    QStringList patterns;
+
+    foreach (const QMimeGlobPattern &globPattern, globPatterns)
+        patterns.append(globPattern.regExp().pattern());
+
+    return patterns;
 }
 
 static inline bool isTextFile(const QByteArray &data)
@@ -241,7 +262,7 @@ QList<QMimeGlobPattern> QMimeType::weightedGlobPatterns() const
 
 QStringList QMimeType::globPatterns() const
 {
-    return QMimeDatabasePrivate::fromGlobPatterns(d->globPatterns);
+    return QMimeTypeData::fromGlobPatterns(d->globPatterns);
 }
 
 QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
@@ -345,7 +366,7 @@ void QMimeTypeData::setWeightedGlobPatterns(const QList<QMimeGlobPattern> &globP
     QString oldPrefferedSuffix = d->preferredSuffix;
     d->suffixes.clear();
     d->preferredSuffix.clear();
-    d->assignSuffixes(QMimeDatabasePrivate::fromGlobPatterns(globPatterns));
+    d->assignSuffixes(QMimeTypeData::fromGlobPatterns(globPatterns));
     if (d->preferredSuffix != oldPrefferedSuffix && d->suffixes.contains(oldPrefferedSuffix))
         d->preferredSuffix = oldPrefferedSuffix;
 }
