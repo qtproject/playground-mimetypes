@@ -71,10 +71,6 @@ public:
     static void writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes);
     void clearUserModifiedMimeTypes();
 
-    static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
-                                                  int weight = QMimeGlobPattern::DefaultWeight);
-    static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
-
 private:
     typedef QHash<QString, QString> AliasMap;
     typedef QMultiHash<QString, QString> ParentChildrenMap;

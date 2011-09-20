@@ -73,6 +73,10 @@ public:
 
     const QRegExp suffixPattern;
 
+    static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
+                                                  int weight = QMimeGlobPattern::DefaultWeight);
+    static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
+
     QString type;
     QString comment;
     LocaleHash localeComments;
