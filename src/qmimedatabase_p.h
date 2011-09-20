@@ -66,17 +66,9 @@ public:
 
     QList<QMimeType> mimeTypes() const;
 
-    void syncUserModifiedMimeTypes();
-    static QList<QMimeType> readUserModifiedMimeTypes();
-    static void writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes);
-    void clearUserModifiedMimeTypes();
-
 private:
     typedef QHash<QString, QString> AliasMap;
     typedef QMultiHash<QString, QString> ParentChildrenMap;
-
-    static const QString kModifiedMimeTypesFile;
-    static QString kModifiedMimeTypesPath;
 
     bool addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage);
     inline QString resolveAlias(const QString &name) const
