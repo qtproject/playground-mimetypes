@@ -62,13 +62,6 @@ public:
     QStringList filterStrings() const;
     QString allFiltersString(QString *allFilesFilter = 0) const;
 
-    // The MIME types from the functions bellow are considered only in regard to
-    // their glob patterns and rule-based magic matchers.
-    void syncUserModifiedMimeTypes();
-    void clearUserModifiedMimeTypes();
-    static QList<QMimeType> readUserModifiedMimeTypes();
-    static void writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes);
-
 private:
     QMimeDatabasePrivate *const d;
 };

@@ -36,9 +36,6 @@ QT_BEGIN_NAMESPACE
 
 Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticMimeDataBase)
 
-const QString QMimeDatabasePrivate::kModifiedMimeTypesFile(QLatin1String("modifiedmimetypes.xml"));
-QString QMimeDatabasePrivate::kModifiedMimeTypesPath;
-
 QMimeDatabasePrivate::QMimeDatabasePrivate() :
     maxLevel(-1)
 {
@@ -307,31 +304,6 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
     return mimeTypes;
 }
 
-void QMimeDatabasePrivate::syncUserModifiedMimeTypes()
-{
-    QHash<QString, QMimeType> userModified;
-
-    foreach (const QMimeType &userMimeType, QMimeDatabasePrivate::readUserModifiedMimeTypes())
-        userModified.insert(userMimeType.type(), userMimeType);
-
-    foreach (MimeMapEntry *entry, typeMimeTypeMap) {
-        QHash<QString, QMimeType>::const_iterator userMimeIt = userModified.constFind(entry->type.type());
-        if (userMimeIt != userModified.constEnd()) {
-            QMimeTypeData mt = *entry->type.d;
-            mt.setWeightedGlobPatterns(userMimeIt.value().weightedGlobPatterns());
-            mt.setMagicMatchers(userMimeIt.value().magicMatchers());
-            entry->type = QMimeType(mt);
-        }
-    }
-}
-
-void QMimeDatabasePrivate::clearUserModifiedMimeTypes()
-{
-    // This removes the user's file. However, the operation will actually take place the next time
-    // Creator starts, since we currently don't support removing stuff from the MIME database.
-    QFile::remove(kModifiedMimeTypesPath + kModifiedMimeTypesFile);
-}
-
 
 /*!
     \class QMimeDatabase
@@ -537,30 +509,6 @@ QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
     filters.prepend(allFiles);
 
     return filters.join(QLatin1String(";;"));
-}
-
-void QMimeDatabase::syncUserModifiedMimeTypes()
-{
-    QMutexLocker locker(&d->mutex);
-
-    d->syncUserModifiedMimeTypes();
-}
-
-void QMimeDatabase::clearUserModifiedMimeTypes()
-{
-    QMutexLocker locker(&d->mutex);
-
-    d->clearUserModifiedMimeTypes();
-}
-
-QList<QMimeType> QMimeDatabase::readUserModifiedMimeTypes()
-{
-    return QMimeDatabasePrivate::readUserModifiedMimeTypes();
-}
-
-void QMimeDatabase::writeUserModifiedMimeTypes(const QList<QMimeType> &mimeTypes)
-{
-    QMimeDatabasePrivate::writeUserModifiedMimeTypes(mimeTypes);
 }
 
 QT_END_NAMESPACE
