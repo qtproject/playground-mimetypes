@@ -38,7 +38,6 @@ public:
     bool parse(QIODevice *dev, const QString &fileName, QString *errorMessage);
 
 protected:
-    // Overwrite to process the sequence of parsed data
     virtual bool process(const QMimeType &t, QString *errorMessage) = 0;
 
 private:
@@ -61,7 +60,6 @@ private:
 };
 
 
-// Parser that builds MimeDB hierarchy by adding to QMimeDatabasePrivate
 class MimeTypeParser : public BaseMimeTypeParser
 {
 public:
