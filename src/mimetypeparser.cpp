@@ -58,7 +58,7 @@ const char *const matchMaskAttributeC = "mask";
 
 /*!
     \class MimeTypeParser
-    \brief MIME type parser
+    \brief MIME type parser that builds MimeDB hierarchy by adding to QMimeDatabasePrivate
 
     Populates MimeDataBase
 
@@ -77,6 +77,11 @@ const char *const matchMaskAttributeC = "mask";
     \sa QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa MimeTypeParser
+*/
+
+/*!
+    \fn virtual bool BaseMimeTypeParser::process(const QMimeType &t, QString *errorMessage) = 0;
+    \brief Overwrite to process the sequence of parsed data
 */
 
 static inline void addGlobPattern(const QRegExp &wildCard, unsigned weight, QMimeTypeData *d)

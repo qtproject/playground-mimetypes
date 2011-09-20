@@ -453,7 +453,7 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 
 /*!
     Returns a MIME type for \a name or Null one if none found.
-    This function does not tries to open file to determine MIME type by it's content, use
+    This function does not try to open the file. To determine the MIME type by it's content, use
     QMimeDatabase::findByFile instead.
 */
 QMimeType QMimeDatabase::findByName(const QString &name) const
