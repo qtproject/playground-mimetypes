@@ -349,32 +349,4 @@ QString QMimeType::filterString() const
     return filter;
 }
 
-void QMimeTypeData::setType(const QString &type)
-{
-    QMimeTypeData *d = this;
-
-    d->type = type;
-}
-
-void QMimeTypeData::setWeightedGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
-{
-    QMimeTypeData *d = this;
-
-    d->globPatterns = globPatterns;
-
-    QString oldPrefferedSuffix = d->preferredSuffix;
-    d->suffixes.clear();
-    d->preferredSuffix.clear();
-    d->assignSuffixes(QMimeTypeData::fromGlobPatterns(globPatterns));
-    if (d->preferredSuffix != oldPrefferedSuffix && d->suffixes.contains(oldPrefferedSuffix))
-        d->preferredSuffix = oldPrefferedSuffix;
-}
-
-void QMimeTypeData::setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers)
-{
-    QMimeTypeData *d = this;
-
-    d->magicMatchers = matchers;
-}
-
 QT_END_NAMESPACE

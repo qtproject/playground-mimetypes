@@ -65,12 +65,6 @@ public:
     unsigned matchesFileBySuffix(const QString &name) const;
     unsigned matchesData(const QByteArray &data) const;
 
-    void setType(const QString &type);
-
-    void setWeightedGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
-
-    void setMagicMatchers(const QList<QMimeMagicRuleMatcher> &matchers);
-
     const QRegExp suffixPattern;
 
     static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,

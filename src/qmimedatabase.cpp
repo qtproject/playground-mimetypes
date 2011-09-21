@@ -274,16 +274,6 @@ QStringList QMimeDatabasePrivate::filterStrings() const
     return rc;
 }
 
-#if 0
-void QMimeDatabasePrivate::setWeightedGlobPatterns(const QString &typeOrAlias,
-                                                   const QList<QMimeGlobPattern> &globPatterns)
-{
-    MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
-    if (entry)
-        entry->type.setWeightedGlobPatterns(globPatterns);
-}
-#endif
-
 QList<QMimeMagicRuleMatcher > QMimeDatabasePrivate::magicMatchers() const
 {
     QList<QMimeMagicRuleMatcher> magicMatchers;
