@@ -66,7 +66,13 @@ void MimeTypeViewer::setMimeType(const QMimeType &mime)
     ui->mimeTypeLabel->setText(mime.type());
     ui->aliasesLabel->setText(mime.aliases().join(", "));
     ui->commentLabel->setText(mime.comment());
+    ui->localeCommentLabel->setText(mime.localeComment());
+    ui->genericIconNameLabel->setText(mime.genericIconName());
 
     ui->globPatternsLabel->setText(mime.globPatterns().join(", "));
     ui->subClassesOfLabel->setText(mime.subClassOf().join(", "));
+
+    ui->suffixesLabel->setText(mime.suffixes().join(", "));
+    ui->preferredSuffixLabel->setText(mime.preferredSuffix());
+    ui->filterStringLabel->setText(mime.filterString());
 }
