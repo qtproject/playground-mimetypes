@@ -33,7 +33,7 @@ QT_BEGIN_NAMESPACE
 class QFileInfo;
 
 class QMimeTypeData;
-class QMimeGlobPattern;
+
 class QMIME_EXPORT QMimeType
 {
 public:
@@ -61,7 +61,6 @@ public:
     QString genericIconName() const;
 
     QStringList globPatterns() const;
-    QList<QMimeGlobPattern> weightedGlobPatterns() const;
 
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
 

@@ -52,8 +52,6 @@ public:
 
     QList<QMimeType> mimeTypes() const;
 
-    void setGlobPatterns(const QString &typeOrAlias, const QList<QMimeGlobPattern> &globPatterns);
-
     QList<QMimeMagicRuleMatcher> magicMatchers() const;
 
     QString preferredSuffixByType(const QString &type) const;
