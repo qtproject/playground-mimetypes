@@ -52,9 +52,6 @@ public:
 
     QList<QMimeType> mimeTypes() const;
 
-    QString preferredSuffixByType(const QString &type) const;
-    QString preferredSuffixByFile(const QFileInfo &f) const;
-
     QStringList filterStrings() const;
     QString allFiltersString(QString *allFilesFilter = 0) const;
 
