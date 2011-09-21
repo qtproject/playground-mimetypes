@@ -4,6 +4,8 @@
 
 #include <QMimeDatabase>
 
+#include "../../src/qmimedatabase_p.h"
+
 class tst_QMimeType : public QObject
 {
     Q_OBJECT
@@ -26,9 +28,12 @@ private Q_SLOTS:
 
 private:
     QMimeDatabase database;
+    QMimeDatabaseBuilder databaseBuilder;
 };
 
-tst_QMimeType::tst_QMimeType()
+tst_QMimeType::tst_QMimeType() :
+        database(),
+        databaseBuilder()
 {
 }
 
@@ -39,7 +44,7 @@ tst_QMimeType::~tst_QMimeType()
 void tst_QMimeType::initTestCase()
 {
     QString errorMessage;
-    QVERIFY(database.addMimeTypes(SRCDIR "../../freedesktop.org.xml", &errorMessage));
+    QVERIFY(databaseBuilder.addMimeTypes(SRCDIR "../../freedesktop.org.xml", &errorMessage));
     QVERIFY(errorMessage.isEmpty());
 }
 

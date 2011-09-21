@@ -339,14 +339,23 @@ QMimeDatabase::~QMimeDatabase()
 {
 }
 
-bool QMimeDatabase::addMimeTypes(const QString &fileName, QString *errorMessage)
+QMimeDatabaseBuilder::QMimeDatabaseBuilder() :
+    d(staticMimeDataBase())
+{
+}
+
+QMimeDatabaseBuilder::~QMimeDatabaseBuilder()
+{
+}
+
+bool QMimeDatabaseBuilder::addMimeTypes(const QString &fileName, QString *errorMessage)
 {
     QMutexLocker locker(&d->mutex);
 
     return d->addMimeTypes(fileName, errorMessage);
 }
 
-bool QMimeDatabase::addMimeTypes(QIODevice *device, QString *errorMessage)
+bool QMimeDatabaseBuilder::addMimeTypes(QIODevice *device, QString *errorMessage)
 {
     QMutexLocker locker(&d->mutex);
 

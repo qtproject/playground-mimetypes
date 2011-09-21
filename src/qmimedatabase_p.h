@@ -49,6 +49,7 @@ class QMimeDatabasePrivate
 {
     Q_DISABLE_COPY(QMimeDatabasePrivate)
     friend class QMimeDatabase;
+    friend class QMimeDatabaseBuilder;
 
 public:
     QMimeDatabasePrivate();
@@ -85,6 +86,21 @@ private:
     ParentChildrenMap parentChildrenMap;
     int maxLevel;
     QMutex mutex;
+};
+
+
+class QMimeDatabaseBuilder
+{
+    Q_DISABLE_COPY(QMimeDatabaseBuilder)
+public:
+    QMimeDatabaseBuilder();
+    ~QMimeDatabaseBuilder();
+
+    bool addMimeTypes(const QString &fileName, QString *errorMessage);
+    bool addMimeTypes(QIODevice *device, QString *errorMessage);
+
+private:
+    QMimeDatabasePrivate *const d;
 };
 
 QT_END_NAMESPACE
