@@ -84,23 +84,6 @@ const char *const matchMaskAttributeC = "mask";
     \brief Overwrite to process the sequence of parsed data
 */
 
-static inline void addGlobPattern(const QRegExp &wildCard, unsigned weight, QMimeTypeData *d)
-{
-    // Collect patterns as a QRegExp list and filter out the plain
-    // suffix ones for our suffix list. Use first one as preferred
-    if (!wildCard.isValid()) {
-        qWarning("%s: Invalid wildcard '%s'.", Q_FUNC_INFO, wildCard.pattern().toLocal8Bit().constData());
-        return;
-    }
-
-    if (weight == 0)
-        weight = QMimeGlobPattern::DefaultWeight;
-
-    d->globPatterns.append(QMimeGlobPattern(wildCard, weight));
-
-    d->assignSuffix(wildCard.pattern());
-}
-
 BaseMimeTypeParser::ParseState BaseMimeTypeParser::nextState(ParseState currentState, const QStringRef &startElement)
 {
     switch (currentState) {
@@ -225,7 +208,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 const bool caseSensitive = atts.value(QLatin1String(caseSensitiveAttributeC)).toString() == QLatin1String("true");
 
                 const QRegExp wildCard(pattern, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive, QRegExp::WildcardUnix);
-                addGlobPattern(wildCard, weight, &data);
+                data.addGlobPattern(wildCard, weight);
             }
                 break;
             case ParseSubClass: {

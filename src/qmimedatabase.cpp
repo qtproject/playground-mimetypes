@@ -172,7 +172,7 @@ QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
 
 unsigned QMimeDatabasePrivate::matchesBySuffix(const QMimeType &type, const QString &name, unsigned *length) const
 {
-    foreach (const QMimeGlobPattern &gp, type.weightedGlobPatterns()) {
+    foreach (const QMimeGlobPattern &gp, type.d->globPatterns) {
         if (gp.regExp().exactMatch(name)) {
             *length = gp.regExp().pattern().length();
             return gp.weight();
@@ -422,15 +422,6 @@ QList<QMimeType> QMimeDatabase::mimeTypes() const
 
     return d->mimeTypes();
 }
-
-#if 0
-QList<QMimeGlobPattern> QMimeDatabase::weightedGlobPatterns() const
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->globPatterns();
-}
-#endif
 
 QList<QMimeMagicRuleMatcher> QMimeDatabase::magicMatchers() const
 {

@@ -65,6 +65,8 @@ public:
     unsigned matchesFileBySuffix(const QString &name) const;
     unsigned matchesData(const QByteArray &data) const;
 
+    void addGlobPattern(const QRegExp &wildCard, unsigned weight);
+
     const QRegExp suffixPattern;
 
     static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
