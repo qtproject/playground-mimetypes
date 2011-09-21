@@ -326,8 +326,7 @@ QString QMimeType::filterString() const
     QString filter;
 
     if (!d->globPatterns.empty()) { // !Binary files
-        // ### todo: Use localeComment() once creator is shipped with translations
-        filter += d->comment + QLatin1String(" (");
+        filter += localeComment() + QLatin1String(" (");
         for (int i = 0; i < d->globPatterns.size(); ++i) {
             if (i != 0)
                 filter += QLatin1Char(' ');
