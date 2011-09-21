@@ -1,6 +1,8 @@
 #include "mimetypeviewer.h"
 #include "ui_mimetypeviewer.h"
 
+#include "../../src/qmimedatabase_p.h"
+
 #include <QFileDialog>
 #include <QMimeDatabase>
 #include <QDebug>
@@ -8,7 +10,8 @@
 MimeTypeViewer::MimeTypeViewer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MimeTypeViewer),
-    dataBase(new QMimeDatabase)
+    dataBase(new QMimeDatabase),
+    databaseBuilder(new QMimeDatabaseBuilder)
 {
     ui->setupUi(this);
     connect(ui->addTypesButton, SIGNAL(clicked()), SLOT(onAddTypesButtonClicked()));
@@ -23,7 +26,7 @@ MimeTypeViewer::~MimeTypeViewer()
 void MimeTypeViewer::addDatabase(const QString &file)
 {
     QString errorString;
-    if (!dataBase->addMimeTypes(file, &errorString))
+    if (!databaseBuilder->addMimeTypes(file, &errorString))
         qWarning() << "Can't add types from" << file << ":" << errorString;
 
     updateTypes();

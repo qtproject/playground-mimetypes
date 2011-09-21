@@ -41,9 +41,6 @@ public:
     QMimeDatabase();
     ~QMimeDatabase();
 
-    bool addMimeTypes(const QString &fileName, QString *errorMessage);
-    bool addMimeTypes(QIODevice *device, QString *errorMessage);
-
     QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &fileInfo) const;
     QMimeType findByName(const QString &name) const;
