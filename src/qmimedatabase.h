@@ -52,8 +52,6 @@ public:
 
     QList<QMimeType> mimeTypes() const;
 
-    QList<QMimeMagicRuleMatcher> magicMatchers() const;
-
     QString preferredSuffixByType(const QString &type) const;
     QString preferredSuffixByFile(const QFileInfo &f) const;
 

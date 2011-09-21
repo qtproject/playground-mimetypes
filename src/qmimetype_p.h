@@ -29,6 +29,8 @@ QT_BEGIN_NAMESPACE
 
 class QTextStream;
 
+class QMimeMagicRuleMatcher;
+
 class QMimeGlobPattern
 {
 public:

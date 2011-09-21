@@ -23,10 +23,8 @@
 
 #include "qmime_global.h"
 
-#include <QtCore/QRegExp>
+#include <QtCore/QExplicitlySharedDataPointer>
 #include <QtCore/QStringList>
-
-#include "magicmatcher.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -61,8 +59,6 @@ public:
     QString genericIconName() const;
 
     QStringList globPatterns() const;
-
-    QList<QMimeMagicRuleMatcher> magicMatchers() const;
 
     QStringList subClassOf() const;
 

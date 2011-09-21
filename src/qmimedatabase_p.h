@@ -60,8 +60,6 @@ public:
 
     QStringList filterStrings() const;
 
-    QList<QMimeMagicRuleMatcher> magicMatchers() const;
-
     QList<QMimeType> mimeTypes() const;
 
 private:
