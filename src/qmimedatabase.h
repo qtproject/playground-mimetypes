@@ -41,7 +41,6 @@ public:
     QMimeDatabase();
     ~QMimeDatabase();
 
-    bool addMimeType(const QMimeType &mt);
     bool addMimeTypes(const QString &fileName, QString *errorMessage);
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
 
