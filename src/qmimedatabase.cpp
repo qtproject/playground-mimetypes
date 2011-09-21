@@ -81,7 +81,7 @@ bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, QString *errorMessage
     return addMimeTypes(device, QLatin1String("<stream>"), errorMessage);
 }
 
-bool QMimeDatabasePrivate::addMimeType(QMimeType mt)
+bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
 {
     if (!mt.isValid())
         return false;
@@ -337,13 +337,6 @@ QMimeDatabase::QMimeDatabase() :
 
 QMimeDatabase::~QMimeDatabase()
 {
-}
-
-bool QMimeDatabase::addMimeType(const QMimeType &mt)
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->addMimeType(mt);
 }
 
 bool QMimeDatabase::addMimeTypes(const QString &fileName, QString *errorMessage)

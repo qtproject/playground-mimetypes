@@ -56,7 +56,7 @@ public:
 
     bool addMimeTypes(const QString &fileName, QString *errorMessage);
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
-    bool addMimeType(QMimeType mt);
+    bool addMimeType(const QMimeType &mt);
 
     QStringList filterStrings() const;
 
