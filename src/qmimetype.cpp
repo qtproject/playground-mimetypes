@@ -259,11 +259,6 @@ QStringList QMimeType::globPatterns() const
     return QMimeTypeData::fromGlobPatterns(d->globPatterns);
 }
 
-QList<QMimeMagicRuleMatcher> QMimeType::magicMatchers() const
-{
-    return d->magicMatchers;
-}
-
 QStringList QMimeType::subClassOf() const
 {
     return d->subClassOf;

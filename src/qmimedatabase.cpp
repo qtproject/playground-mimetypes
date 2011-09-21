@@ -274,16 +274,6 @@ QStringList QMimeDatabasePrivate::filterStrings() const
     return rc;
 }
 
-QList<QMimeMagicRuleMatcher > QMimeDatabasePrivate::magicMatchers() const
-{
-    QList<QMimeMagicRuleMatcher> magicMatchers;
-
-    foreach (const MimeMapEntry *entry, typeMimeTypeMap)
-        magicMatchers.append(entry->type.magicMatchers());
-
-    return magicMatchers;
-}
-
 QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 {
     QList<QMimeType> mimeTypes;
@@ -422,23 +412,6 @@ QList<QMimeType> QMimeDatabase::mimeTypes() const
 
     return d->mimeTypes();
 }
-
-QList<QMimeMagicRuleMatcher> QMimeDatabase::magicMatchers() const
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->magicMatchers();
-}
-
-/*!
-    Returns all known suffixes
-*/
-//QStringList QMimeDatabase::suffixes() const
-//{
-    //QMutexLocker locker(&d->mutex);
-//
-    //return d->suffixes();
-//}
 
 QString QMimeDatabase::preferredSuffixByType(const QString &type) const
 {
