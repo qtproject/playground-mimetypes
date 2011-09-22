@@ -1,6 +1,8 @@
 INCLUDEPATH *= $$PWD/../include
 DEPENDPATH  *= $$PWD
 
+QT       -= gui
+
 DEFINES += QT_NO_CAST_FROM_ASCII
 
 SOURCES += qmimedatabase.cpp \
