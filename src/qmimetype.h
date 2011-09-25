@@ -67,8 +67,8 @@ public:
 
     bool matchesType(const QString &type) const;
     unsigned matchesData(const QByteArray &data) const;
-    unsigned matchesFile(const QFileInfo &file) const;
-    unsigned matchesName(const QString &name) const;
+    //unsigned matchesFile(const QFileInfo &file) const;
+    //unsigned matchesName(const QString &name) const;
 
     QString filterString() const;
 
@@ -79,6 +79,7 @@ protected:
     friend class BaseMimeTypeParser;
     friend class MimeMapEntry;
     friend class QMimeDatabasePrivate;
+    friend class QMimeDatabase;
 
     QExplicitlySharedDataPointer<QMimeTypeData> d;
 };
