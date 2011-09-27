@@ -177,6 +177,7 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
 
 bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString *errorMessage)
 {
+    QMimeDatabaseBuilder builder;
     QMimeTypeData data;
     QMimeMagicRuleMatcher *ruleMatcher = 0;
     int priority = 50;
@@ -204,11 +205,16 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 break;
             case ParseGlobPattern: {
                 const QString pattern = atts.value(QLatin1String(patternAttributeC)).toString();
-                const unsigned weight = atts.value(QLatin1String(weightAttributeC)).toString().toInt();
+                unsigned weight = atts.value(QLatin1String(weightAttributeC)).toString().toInt();
                 const bool caseSensitive = atts.value(QLatin1String(caseSensitiveAttributeC)).toString() == QLatin1String("true");
 
-                const QRegExp wildCard(pattern, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive, QRegExp::WildcardUnix);
-                data.addGlobPattern(wildCard, weight);
+                if (weight == 0)
+                    weight = QMimeGlobPattern::DefaultWeight;
+
+                Q_ASSERT(!data.type.isEmpty());
+                const QMimeGlobPattern glob(pattern, data.type, weight, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
+                builder.addGlobPattern(glob); // for actual glob matching
+                data.addGlobPattern(pattern); // just for QMimeType::globPatterns()
             }
                 break;
             case ParseSubClass: {

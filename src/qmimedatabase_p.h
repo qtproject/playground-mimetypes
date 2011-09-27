@@ -74,12 +74,15 @@ private:
     QMimeType findByType(const QString &type) const;
     QMimeType findByFile(const QFileInfo &f, unsigned *priorityPtr) const;
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr) const;
-    QMimeType findByName(const QString &name, unsigned *priorityPtr) const;
-
-    unsigned matchesBySuffix(const QMimeType &type, const QString &name, unsigned *length) const;
-
+    QStringList findByName(const QString &fileName) const;
+    void findFromOtherPatternList(QStringList &matchingMimeTypes,
+                                  const QString &fileName,
+                                  QString &foundExt,
+                                  bool highWeight) const;
     void determineLevels();
     void raiseLevelRecursion(MimeMapEntry &e, int level);
+
+    QMimeAllGlobPatterns m_mimeTypeGlobs;
 
     QHash<QString, MimeMapEntry*> typeMimeTypeMap;
     AliasMap aliasMap;
@@ -98,6 +101,8 @@ public:
 
     bool addMimeTypes(const QString &fileName, QString *errorMessage);
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
+
+    void addGlobPattern(const QMimeGlobPattern& glob);
 
 private:
     QMimeDatabasePrivate *const d;

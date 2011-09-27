@@ -4,3 +4,5 @@ SUBDIRS += \
     lib \
     examples \
     tests
+
+CONFIG += ordered

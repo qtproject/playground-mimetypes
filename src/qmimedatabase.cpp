@@ -24,6 +24,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSet>
+#include <QtCore/QDebug>
 
 #include <algorithm>
 #include <functional>
@@ -170,44 +171,83 @@ QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
     return QMimeType();
 }
 
-unsigned QMimeDatabasePrivate::matchesBySuffix(const QMimeType &type, const QString &name, unsigned *length) const
+// Helper for findByName
+void QMimeDatabasePrivate::findFromOtherPatternList(QStringList &matchingMimeTypes,
+                                                   const QString &fileName,
+                                                   QString &foundExt,
+                                                   bool highWeight) const
 {
-    foreach (const QMimeGlobPattern &gp, type.d->globPatterns) {
-        if (gp.regExp().exactMatch(name)) {
-            *length = gp.regExp().pattern().length();
-            return gp.weight();
+    const QMimeGlobPatternList &patternList = highWeight ? m_mimeTypeGlobs.m_highWeightGlobs : m_mimeTypeGlobs.m_lowWeightGlobs;
+
+    int matchingPatternLength = 0;
+    qint32 lastMatchedWeight = 0;
+    if (!highWeight && !matchingMimeTypes.isEmpty()) {
+        // We found matches in the fast pattern dict already:
+        matchingPatternLength = foundExt.length() + 2; // *.foo -> length=5
+        lastMatchedWeight = 50;
+    }
+
+    QMimeGlobPatternList::const_iterator it = patternList.constBegin();
+    const QMimeGlobPatternList::const_iterator end = patternList.constEnd();
+    for ( ; it != end; ++it ) {
+        const QMimeGlobPattern &glob = *it;
+        if (glob.matchFileName(fileName)) {
+            const int weight = glob.weight();
+            const QString pattern = glob.pattern();
+            // Is this a lower-weight pattern than the last match? Stop here then.
+            if (weight < lastMatchedWeight)
+                break;
+            if (lastMatchedWeight > 0 && weight > lastMatchedWeight) // can't happen
+                qWarning() << "Assumption failed; globs2 weights not sorted correctly"
+                           << weight << ">" << lastMatchedWeight;
+            // Is this a shorter or a longer match than an existing one, or same length?
+            if (pattern.length() < matchingPatternLength) {
+                continue; // too short, ignore
+            } else if (pattern.length() > matchingPatternLength) {
+                // longer: clear any previous match (like *.bz2, when pattern is *.tar.bz2)
+                matchingMimeTypes.clear();
+                // remember the new "longer" length
+                matchingPatternLength = pattern.length();
+            }
+            matchingMimeTypes.push_back(glob.mimeType());
+            if (pattern.startsWith(QLatin1String("*.")))
+                foundExt = pattern.mid(2);
         }
     }
-    return 0;
 }
 
-QMimeType QMimeDatabasePrivate::findByName(const QString &name, unsigned *priorityPtr) const
+QStringList QMimeDatabasePrivate::findByName(const QString &fileName) const
 {
-    // Is the hierarchy set up in case we find several matches?
-    if (maxLevel < 0) {
-        QMimeDatabasePrivate *db = const_cast<QMimeDatabasePrivate *>(this);
-        db->determineLevels();
-    }
+    // TODO parse globs file on demand here
 
-    QMimeType candidate;
-    unsigned length = 0;
+    // First try the high weight matches (>50), if any.
+    QStringList matchingMimeTypes;
+    QString foundExt;
+    findFromOtherPatternList(matchingMimeTypes, fileName, foundExt, true);
+    if (matchingMimeTypes.isEmpty()) {
 
-    for (int level = maxLevel; level >= 0 /*&& !candidate.isValid()*/; --level) {
-        foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
-            if (entry->level == level) {
-                unsigned currentLength;
-                const unsigned suffixPriority = matchesBySuffix(entry->type, name, &currentLength);
-                if (suffixPriority && (suffixPriority > *priorityPtr
-                                       || (suffixPriority == *priorityPtr && currentLength > length))) {
-                    length = currentLength;
-                    *priorityPtr = suffixPriority;
-                    candidate = entry->type;
-                }
+        // Now use the "fast patterns" dict, for simple *.foo patterns with weight 50
+        // (which is most of them, so this optimization is definitely worth it)
+        const int lastDot = fileName.lastIndexOf(QLatin1Char('.'));
+        if (lastDot != -1) { // if no '.', skip the extension lookup
+            const int ext_len = fileName.length() - lastDot - 1;
+            const QString simpleExtension = fileName.right( ext_len ).toLower();
+            // (toLower because fast matterns are always case-insensitive and saved as lowercase)
+
+            matchingMimeTypes = m_mimeTypeGlobs.m_fastPatterns.value(simpleExtension);
+            if (!matchingMimeTypes.isEmpty()) {
+                foundExt = simpleExtension;
+                // Can't return yet; *.tar.bz2 has to win over *.bz2, so we need the low-weight mimetypes anyway,
+                // at least those with weight 50.
             }
         }
-    }
 
-    return candidate;
+        // Finally, try the low weight matches (<=50)
+        findFromOtherPatternList(matchingMimeTypes, fileName, foundExt, false);
+    }
+    //if (pMatchingExtension)
+    //    *pMatchingExtension = foundExt;
+    return matchingMimeTypes;
 }
 
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
@@ -246,7 +286,15 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     FileMatchContext context(f);
 
     // Pass 1) Try to match on suffix#type
-    QMimeType candidateByName = findByName(f.fileName(), priorityPtr);
+    QStringList candidatesByName = findByName(f.fileName());
+
+    // TODO REWRITE THIS METHOD, FOR PROPER GLOB-CONFLICT HANDLING
+
+    QMimeType candidateByName;
+    if (!candidatesByName.isEmpty()) {
+        *priorityPtr = 50;
+        candidateByName = findByType(candidatesByName.last());
+    }
 
     // Pass 2) Match on content
     if (!f.isReadable())
@@ -258,6 +306,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     unsigned priorityByName = *priorityPtr;
     QMimeType candidateByData(findByData(context.data(), priorityPtr));
 
+    // ## BROKEN, PRIORITIES HAVE A DIFFERENT SCALE
     return priorityByName < *priorityPtr ? candidateByData : candidateByName;
 }
 
@@ -362,6 +411,13 @@ bool QMimeDatabaseBuilder::addMimeTypes(QIODevice *device, QString *errorMessage
     return d->addMimeTypes(device, errorMessage);
 }
 
+void QMimeDatabaseBuilder::addGlobPattern(const QMimeGlobPattern& glob)
+{
+    d->m_mimeTypeGlobs.addGlob(glob);
+}
+
+
+
 /*!
     Returns a MIME type for \a typeOrAlias or Null one if none found.
 */
@@ -384,16 +440,25 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 }
 
 /*!
-    Returns a MIME type for \a name or Null one if none found.
-    This function does not try to open the file. To determine the MIME type by it's content, use
+    Returns a MIME type for the file \a name or Null one if none found.
+    This function does not try to open the file. To determine the MIME type by its content, use
     QMimeDatabase::findByFile instead.
 */
 QMimeType QMimeDatabase::findByName(const QString &name) const
 {
     QMutexLocker locker(&d->mutex);
 
-    unsigned priority = 0;
-    return d->findByName(QFileInfo(name).fileName(), &priority);
+    QStringList matches = d->findByName(QFileInfo(name).fileName());
+    const int matchCount = matches.count();
+    if (matchCount == 0)
+        return QMimeType();
+    else if (matchCount == 1)
+        return d->findByType(matches.first());
+    else {
+        // We have to pick one.
+        matches.sort(); // Make it deterministic
+        return d->findByType(matches.first());
+    }
 }
 
 /*!
