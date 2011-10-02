@@ -26,6 +26,7 @@
 
 #include "qmimetype.h"
 #include "qmimetype_p.h"
+#include "qmimeglobpattern_p.h"
 
 QT_BEGIN_NAMESPACE
 

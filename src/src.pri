@@ -12,7 +12,8 @@ SOURCES += qmimedatabase.cpp \
     qmimetype.cpp \
     magicmatcher.cpp \
     mimetypeparser.cpp \
-    qmimemagicrule.cpp
+    qmimemagicrule.cpp \
+    ../src/qmimeglobpattern.cpp
 
 HEADERS += qmime_global.h \
     qmimedatabase.h \
@@ -22,7 +23,8 @@ HEADERS += qmime_global.h \
     magicmatcher_p.h \
     mimetypeparser_p.h \
     qmimedatabase_p.h \
-    qmimemagicrule.h
+    qmimemagicrule.h \
+    ../src/qmimeglobpattern_p.h
 
 SOURCES += inqt5/qstandardpaths.cpp
 win32: SOURCES += inqt5/qstandardpaths_win.cpp
@@ -33,4 +35,3 @@ unix: {
             SOURCES += inqt5/qstandardpaths_unix.cpp
         }
 }
-
