@@ -32,17 +32,14 @@ QT_BEGIN_NAMESPACE
 
 #define MIN_MATCH_WEIGHT 50
 
-// MimeMapEntry: Entry of a type map, consisting of type and level.
+// MimeMapEntry: Entry of a type map, consisting of type.
 struct MimeMapEntry
 {
-    static const int Dangling = 32767;
-
-    inline MimeMapEntry(const QMimeType &aType = QMimeType(), int aLevel = Dangling) :
-        type(aType), level(aLevel)
+    inline MimeMapEntry(const QMimeType &aType = QMimeType()) :
+        type(aType)
     {}
 
     QMimeType type;
-    int level; // hierachy level
 };
 
 
@@ -80,15 +77,12 @@ private:
                                   const QString &fileName,
                                   QString &foundExt,
                                   bool highWeight) const;
-    void determineLevels();
-    void raiseLevelRecursion(MimeMapEntry &e, int level);
 
     QMimeAllGlobPatterns m_mimeTypeGlobs;
 
     QHash<QString, MimeMapEntry*> typeMimeTypeMap;
     AliasMap aliasMap;
     ParentChildrenMap parentChildrenMap;
-    int maxLevel;
     QMutex mutex;
 };
 

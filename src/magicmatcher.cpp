@@ -27,9 +27,9 @@
 
 QT_BEGIN_NAMESPACE
 
-// UTF16 byte order marks
-static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
-static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
+// TODO (add to spec) UTF16 byte order marks
+//static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
+//static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
 
 /*!
     \class FileMatchContext

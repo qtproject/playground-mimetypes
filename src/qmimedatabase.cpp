@@ -37,8 +37,7 @@ QT_BEGIN_NAMESPACE
 
 Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticMimeDataBase)
 
-QMimeDatabasePrivate::QMimeDatabasePrivate() :
-    maxLevel(-1)
+QMimeDatabasePrivate::QMimeDatabasePrivate()
 {
     // Assign here to avoid non-local static data initialization issues.
 //    kModifiedMimeTypesPath = ICore::instance()->userResourcePath() + QLatin1String("/mimetypes/");
@@ -102,65 +101,7 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     foreach (const QString &alias, mt.aliases())
         aliasMap.insert(alias, type);
 
-    maxLevel = -1; // Mark as dirty
-
     return true;
-}
-
-void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
-{
-    if (e.level == MimeMapEntry::Dangling || e.level < level)
-        e.level = level;
-
-    if (maxLevel < level)
-        maxLevel = level;
-
-    // At all events recurse over children since nodes might have been added;
-    // look them up in the type->MIME type map
-    foreach (const QString &alias, parentChildrenMap.values(e.type.type())) {
-        MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(alias));
-        if (!entry) {
-            qWarning("%s: Inconsistent MIME hierarchy detected, child %s of %s cannot be found.",
-                     Q_FUNC_INFO, alias.toLocal8Bit().constData(), e.type.type().toLocal8Bit().constData());
-        } else {
-            raiseLevelRecursion(*entry, level + 1);
-        }
-    }
-}
-
-void QMimeDatabasePrivate::determineLevels()
-{
-    // Loop over toplevels and recurse down their hierarchies.
-    // Determine top levels by subtracting the children from the parent
-    // set. Note that a toplevel at this point might have 'subclassesOf'
-    // set to some class that is not in the DB, so, checking for an empty
-    // 'subclassesOf' set is not sufficient to find the toplevels.
-    // First, take the parent->child entries  whose parent exists and build
-    // sets of parents/children
-    QSet<QString> parentSet, childrenSet;
-    ParentChildrenMap::const_iterator pit = parentChildrenMap.constBegin();
-    for ( ; pit != parentChildrenMap.constEnd(); ++pit) {
-        if (typeMimeTypeMap.contains(pit.key())) {
-            parentSet.insert(pit.key());
-            childrenSet.insert(pit.value());
-        }
-    }
-
-    foreach (const QString &topLevel, parentSet.subtract(childrenSet)) {
-        MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(topLevel));
-        if (!entry) {
-            qWarning("%s: Inconsistent MIME hierarchy detected, top level element %s cannot be found.",
-                     Q_FUNC_INFO, topLevel.toLocal8Bit().constData());
-        } else {
-            raiseLevelRecursion(*entry, 0);
-        }
-    }
-
-    // move all danglings to top level
-    foreach (MimeMapEntry *entry, typeMimeTypeMap) {
-        if (entry->level == MimeMapEntry::Dangling)
-            entry->level = 0;
-    }
 }
 
 QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
@@ -252,27 +193,17 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName) const
 
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
 {
-    // Is the hierarchy set up in case we find several matches?
-    if (maxLevel < 0) {
-        QMimeDatabasePrivate *db = const_cast<QMimeDatabasePrivate *>(this);
-        db->determineLevels();
-    }
-
     QMimeType candidate;
 
-    for (int level = maxLevel; level >= 0; --level) {
-        foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
-            if (entry->level == level) {
-                const unsigned contentPriority = entry->type.d->matchesData(data);
-                if (contentPriority && contentPriority > *priorityPtr) {
-                    *priorityPtr = contentPriority;
-                    candidate = entry->type;
-                }
-            }
+    foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
+        const unsigned contentPriority = entry->type.d->matchesData(data);
+        if (contentPriority && contentPriority > *priorityPtr) {
+            *priorityPtr = contentPriority;
+            candidate = entry->type;
         }
     }
 
-        return candidate;
+    return candidate;
 }
 
 QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
@@ -334,6 +265,7 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 }
 
 
+// TODO rewrite docu, it explains implementation details
 /*!
     \class QMimeDatabase
     \brief MIME database to which the plugins can add the MIME types they handle.
@@ -359,20 +291,10 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
     This basically rules out some pointer-based tree, so the structure chosen is:
     \list
     \o An alias map QString->QString for mapping aliases to types
-    \o A Map QString->MimeMapEntry for the types (MimeMapEntry being a pair of
-       QMimeType and (hierarchy) level.
     \o A map  QString->QString representing parent->child relations (enabling
        recursing over children)
     \o Using strings avoids dangling pointers.
     \endlist
-
-    The hierarchy level is used for mapping by file types. When findByFile()
-    is first called after addMimeType() it recurses over the hierarchy and sets
-    the hierarchy level of the entries accordingly (0 toplevel, 1 first
-    order...). It then does several passes over the type map, checking the
-    globs for maxLevel, maxLevel-1....until it finds a match (idea being to
-    to check the most specific types first). Starting a recursion from the
-    leaves is not suitable since it will hit parent nodes several times.
 
     \sa QMimeType, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa BinaryMatcher, HeuristicTextMagicMatcher
