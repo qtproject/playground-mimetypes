@@ -57,6 +57,9 @@ public:
                 it.remove();
         }
     }
+    void match(QStringList &matchingMimeTypes,
+               const QString &fileName,
+               QString *foundExt) const;
 };
 
 /**
@@ -71,8 +74,9 @@ class QMimeAllGlobPatterns
 public:
     typedef QHash<QString, QStringList> PatternsMap; // mimetype -> patterns
 
-    void addGlob(const QMimeGlobPattern& glob);
-    void removeMime(const QString& mime);
+    void addGlob(const QMimeGlobPattern &glob);
+    void removeMime(const QString &mime);
+    QStringList matchingGlobs(const QString &fileName, QString *foundExt) const;
 
     PatternsMap m_fastPatterns; // example: "doc" -> "application/msword", "text/plain"
     QMimeGlobPatternList m_highWeightGlobs;
