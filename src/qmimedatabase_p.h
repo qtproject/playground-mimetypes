@@ -30,7 +30,7 @@
 
 QT_BEGIN_NAMESPACE
 
-#define MIN_MATCH_WEIGHT 50
+class QMimeProviderBase;
 
 // MimeMapEntry: Entry of a type map, consisting of type.
 struct MimeMapEntry
@@ -47,15 +47,15 @@ class QMimeDatabasePrivate
 {
     Q_DISABLE_COPY(QMimeDatabasePrivate)
     friend class QMimeDatabase;
-    friend class QMimeDatabaseBuilder;
 
 public:
     QMimeDatabasePrivate();
     ~QMimeDatabasePrivate();
 
-    bool addMimeTypes(const QString &fileName, QString *errorMessage);
-    bool addMimeTypes(QIODevice *device, QString *errorMessage);
+    QMimeProviderBase* provider();
+
     bool addMimeType(const QMimeType &mt);
+    void addGlobPattern(const QMimeGlobPattern& glob);
 
     QStringList filterStrings() const;
 
@@ -69,38 +69,22 @@ private:
     inline QString resolveAlias(const QString &name) const
     { return aliasMap.value(name, name); }
 
-    QMimeType findByType(const QString &type) const;
-    QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr) const;
-    QMimeType findByData(const QByteArray &data, unsigned *priorityPtr) const;
-    QStringList findByName(const QString &fileName) const;
+    QMimeType findByType(const QString &type);
+    QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr);
+    QMimeType findByData(const QByteArray &data, unsigned *priorityPtr);
+    QStringList findByName(const QString &fileName);
     void findFromOtherPatternList(QStringList &matchingMimeTypes,
                                   const QString &fileName,
                                   QString &foundExt,
                                   bool highWeight) const;
 
+    mutable QMimeProviderBase* m_provider;
     QMimeAllGlobPatterns m_mimeTypeGlobs;
 
     QHash<QString, MimeMapEntry*> typeMimeTypeMap;
     AliasMap aliasMap;
     ParentChildrenMap parentChildrenMap;
     QMutex mutex;
-};
-
-
-class QMimeDatabaseBuilder
-{
-    Q_DISABLE_COPY(QMimeDatabaseBuilder)
-public:
-    QMimeDatabaseBuilder();
-    ~QMimeDatabaseBuilder();
-
-    bool addMimeTypes(const QString &fileName, QString *errorMessage);
-    bool addMimeTypes(QIODevice *device, QString *errorMessage);
-
-    void addGlobPattern(const QMimeGlobPattern& glob);
-
-private:
-    QMimeDatabasePrivate *const d;
 };
 
 QT_END_NAMESPACE

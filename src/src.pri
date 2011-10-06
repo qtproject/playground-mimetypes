@@ -1,8 +1,8 @@
 INCLUDEPATH *= $$PWD/../include
 DEPENDPATH  *= $$PWD
 
-INCLUDEPATH *= inqt5
-DEPENDPATH  *= inqt5
+INCLUDEPATH += $$PWD/inqt5
+DEPENDPATH  += $$PWD/inqt5
 
 QT       -= gui
 
@@ -13,7 +13,8 @@ SOURCES += qmimedatabase.cpp \
     magicmatcher.cpp \
     mimetypeparser.cpp \
     qmimemagicrule.cpp \
-    ../src/qmimeglobpattern.cpp
+    ../src/qmimeglobpattern.cpp \
+    ../src/qmimeprovider.cpp
 
 HEADERS += qmime_global.h \
     qmimedatabase.h \
@@ -24,7 +25,8 @@ HEADERS += qmime_global.h \
     mimetypeparser_p.h \
     qmimedatabase_p.h \
     qmimemagicrule.h \
-    ../src/qmimeglobpattern_p.h
+    ../src/qmimeglobpattern_p.h \
+    ../src/qmimeprovider_p.h
 
 SOURCES += inqt5/qstandardpaths.cpp
 win32: SOURCES += inqt5/qstandardpaths_win.cpp
@@ -35,3 +37,6 @@ unix: {
             SOURCES += inqt5/qstandardpaths_unix.cpp
         }
 }
+
+RESOURCES += \
+    ../src/qmime.qrc
