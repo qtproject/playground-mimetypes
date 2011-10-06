@@ -32,6 +32,7 @@ QT_BEGIN_NAMESPACE
 class QByteArray;
 class QFileInfo;
 class QIODevice;
+class QUrl;
 
 class QMimeDatabasePrivate;
 class QMIME_EXPORT QMimeDatabase
@@ -47,6 +48,7 @@ public:
 
     QMimeType findByFile(const QString &file) const;
     QMimeType findByFile(const QFileInfo &fileInfo) const;
+    QMimeType findByUrl(const QUrl& url) const;
     QMimeType findByNameAndData(const QString &name, QIODevice *device) const;
     QMimeType findByNameAndData(const QString &name, const QByteArray &data) const;
 

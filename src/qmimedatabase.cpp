@@ -25,6 +25,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QSet>
 #include <QtCore/QBuffer>
+#include <QtCore/QUrl>
 #include <QtCore/QDebug>
 
 #include <algorithm>
@@ -333,8 +334,7 @@ QMimeType QMimeDatabase::findByName(const QString &name) const
 }
 
 /*!
-    Returns a MIME type for \a data or Null one if none found. This function reads content of a file
-    and tries to determine it's type using magic sequencies.
+    Returns a MIME type for \a data or Null one if none found.
 */
 QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 {
@@ -342,6 +342,19 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 
     unsigned int accuracy = 0;
     return d->findByData(data, &accuracy);
+}
+
+/*!
+    Returns a MIME type for \a url or Null one if none found.
+    If the url is a local file, this calls findByFile.
+    Otherwise the matching is done based on the name only
+    (except over schemes where filenames don't mean much, like HTTP)
+*/
+QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
+{
+    if (url.isLocalFile())
+        return findByFile(url.toLocalFile());
+    return findByName(url.path());
 }
 
 QMimeType QMimeDatabase::findByNameAndData(const QString &name, QIODevice *device) const
