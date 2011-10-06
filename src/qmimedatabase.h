@@ -42,9 +42,13 @@ public:
     ~QMimeDatabase();
 
     QMimeType findByType(const QString &type) const;
-    QMimeType findByFile(const QFileInfo &fileInfo) const;
     QMimeType findByName(const QString &name) const;
     QMimeType findByData(const QByteArray &data) const;
+
+    QMimeType findByFile(const QString &file) const;
+    QMimeType findByFile(const QFileInfo &fileInfo) const;
+    QMimeType findByNameAndData(const QString &name, QIODevice *device) const;
+    QMimeType findByNameAndData(const QString &name, const QByteArray &data) const;
 
     QList<QMimeType> mimeTypes() const;
 

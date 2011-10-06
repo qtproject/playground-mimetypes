@@ -24,6 +24,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSet>
+#include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 
 #include <algorithm>
@@ -139,7 +140,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
     return candidate;
 }
 
-QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
+QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr) const
 {
     // First, glob patterns are evaluated. If there is a match with max weight,
     // this one is selected and we are done. Otherwise, the file contents are
@@ -147,10 +148,10 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     // a glob pattern weight) is selected. Matching starts from max level (most
     // specific) in both cases, even when there is already a suffix matching candidate.
     *priorityPtr = 0;
-    FileMatchContext context(f);
+    FileMatchContext context(device, fileName);
 
     // Pass 1) Try to match on suffix#type
-    QStringList candidatesByName = findByName(f.fileName());
+    QStringList candidatesByName = findByName(fileName);
 
     // TODO REWRITE THIS METHOD, FOR PROPER GLOB-CONFLICT HANDLING
 
@@ -161,7 +162,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     }
 
     // Pass 2) Match on content
-    if (!f.isReadable())
+    if (!context.isReadable())
         return candidateByName;
 
     if (candidateByName.matchesData(context.data()) > MIN_MATCH_WEIGHT)
@@ -290,14 +291,29 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
     QMutexLocker locker(&d->mutex);
 
+    QFile file(fileInfo.absoluteFilePath());
     unsigned priority = 0;
-    return d->findByFile(fileInfo, &priority);
+    return d->findByNameAndData(fileInfo.fileName(), &file, &priority);
+}
+
+/*!
+    Returns a MIME type for \a file or Null one if none found.
+    The \a file can also include an absolute or relative path.
+*/
+QMimeType QMimeDatabase::findByFile(const QString &fileName) const
+{
+    QMutexLocker locker(&d->mutex);
+
+    QFile file(fileName);
+    unsigned priority = 0;
+    return d->findByNameAndData(fileName, &file, &priority);
 }
 
 /*!
     Returns a MIME type for the file \a name or Null one if none found.
-    This function does not try to open the file. To determine the MIME type by its content, use
-    QMimeDatabase::findByFile instead.
+    This function does not try to open the file. To also use the content
+    when determining the MIME type, use QMimeDatabase::findByFile or
+    QMimeDatabase::findByNameAndData instead.
 */
 QMimeType QMimeDatabase::findByName(const QString &name) const
 {
@@ -324,8 +340,21 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 {
     QMutexLocker locker(&d->mutex);
 
-    unsigned priority = 0;
-    return d->findByData(data, &priority);
+    unsigned int accuracy = 0;
+    return d->findByData(data, &accuracy);
+}
+
+QMimeType QMimeDatabase::findByNameAndData(const QString &name, QIODevice *device) const
+{
+    unsigned int accuracy = 0;
+    return d->findByNameAndData(name, device, &accuracy);
+}
+
+QMimeType QMimeDatabase::findByNameAndData(const QString &name, const QByteArray &data) const
+{
+    QBuffer buffer(const_cast<QByteArray *>(&data));
+    unsigned int accuracy = 0;
+    return d->findByNameAndData(name, &buffer, &accuracy);
 }
 
 QList<QMimeType> QMimeDatabase::mimeTypes() const

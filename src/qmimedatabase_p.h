@@ -70,7 +70,7 @@ private:
     { return aliasMap.value(name, name); }
 
     QMimeType findByType(const QString &type) const;
-    QMimeType findByFile(const QFileInfo &f, unsigned *priorityPtr) const;
+    QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr) const;
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr) const;
     QStringList findByName(const QString &fileName) const;
     void findFromOtherPatternList(QStringList &matchingMimeTypes,
