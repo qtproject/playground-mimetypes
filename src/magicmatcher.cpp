@@ -41,7 +41,6 @@ static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
     (as opposed to each MIME type trying to open and read while checking).
 
     \sa QMimeType, QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
@@ -78,7 +77,6 @@ QByteArray FileMatchContext::data()
     It is used for rules parsed from XML files.
 
     \sa QMimeType, QMimeDatabase, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
@@ -102,6 +100,7 @@ QList<QMimeMagicRule> QMimeMagicRuleMatcher::magicRules() const
     return m_list;
 }
 
+// Check for a match on contents of a file
 bool QMimeMagicRuleMatcher::matches(const QByteArray &data) const
 {
     if (m_list.isEmpty())
@@ -115,6 +114,7 @@ bool QMimeMagicRuleMatcher::matches(const QByteArray &data) const
     return true;
 }
 
+// Return a priority value from 1..100
 unsigned QMimeMagicRuleMatcher::priority() const
 {
     return m_priority;
