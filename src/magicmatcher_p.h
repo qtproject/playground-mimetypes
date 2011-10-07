@@ -26,8 +26,6 @@ public:
     QByteArray data();
 
 private:
-    const QFileInfo m_fileInfo;
-    const QString m_fileName;
     enum State {
         // File cannot be read/does not exist
         NoDataAvailable,
@@ -35,7 +33,11 @@ private:
         DataNotRead,
         // Available
         DataRead
-    } m_state;
+    };
+
+    const QFileInfo m_fileInfo;
+    const QString m_fileName;
+    State m_state;
     QByteArray m_data;
 };
 
