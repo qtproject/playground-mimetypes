@@ -35,10 +35,11 @@ class QMimeTypeData;
 class QMIME_EXPORT QMimeType
 {
 public:
+    QMimeType();
     QMimeType(const QMimeType &other);
-    ~QMimeType();
-
+    explicit QMimeType(const QMimeTypeData &dd);
     QMimeType &operator=(const QMimeType &other);
+    ~QMimeType();
 
     bool operator==(const QMimeType &other) const;
     inline bool operator!=(const QMimeType &other) const
@@ -67,19 +68,17 @@ public:
 
     bool matchesType(const QString &type) const;
     unsigned matchesData(const QByteArray &data) const;
-    //unsigned matchesFile(const QFileInfo &file) const;
-    //unsigned matchesName(const QString &name) const;
+    unsigned matchesFile(const QFileInfo &file) const;
+    unsigned matchesName(const QString &name) const;
 
     QString filterString() const;
 
 protected:
-    QMimeType();
-    explicit QMimeType(const QMimeTypeData &dd);
-
     friend class BaseMimeTypeParser;
     friend class MimeMapEntry;
     friend class QMimeDatabasePrivate;
     friend class QMimeDatabase;
+    friend class QMimeTypeData;
 
     QExplicitlySharedDataPointer<QMimeTypeData> d;
 };

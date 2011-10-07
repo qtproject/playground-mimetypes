@@ -29,12 +29,14 @@
 
 QT_BEGIN_NAMESPACE
 
+class QMimeDatabase;
+
 #define MIN_MATCH_WEIGHT 50
 
 // MimeMapEntry: Entry of a type map, consisting of type and level.
 struct MimeMapEntry
 {
-    static const int Dangling = 32767;
+    enum { Dangling = 32767 };
 
     inline MimeMapEntry(const QMimeType &aType = QMimeType(), int aLevel = Dangling) :
         type(aType), level(aLevel)
@@ -45,13 +47,10 @@ struct MimeMapEntry
 };
 
 
-class QMimeDatabasePrivate
+struct QMimeDatabasePrivate
 {
     Q_DISABLE_COPY(QMimeDatabasePrivate)
-    friend class QMimeDatabase;
-    friend class QMimeDatabaseBuilder;
 
-public:
     QMimeDatabasePrivate();
     ~QMimeDatabasePrivate();
 
@@ -61,10 +60,24 @@ public:
 
     QStringList filterStrings() const;
 
+    QList<QMimeGlobPattern> globPatterns() const;
+    void setGlobPatterns(const QString &typeOrAlias, const QStringList &globPatterns);
+
+    QStringList suffixes() const;
+    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
+
+    void setMagicMatchers(const QString &typeOrAlias,
+                          const QList<QMimeMagicRuleMatcher> &matchers);
+
     QList<QMimeType> mimeTypes() const;
 
-private:
-    typedef QHash<QString, QString> AliasMap;
+    void addGlobPattern(const QMimeGlobPattern& glob);
+
+    static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns, const QString &mimeType,
+                                                  int weight = QMimeGlobPattern::MaxWeight);
+    static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
+
+    typedef QHash<QString, MimeMapEntry *> TypeMimeTypeMap;
     typedef QMultiHash<QString, QString> ParentChildrenMap;
 
     bool addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage);
@@ -79,30 +92,49 @@ private:
                                   const QString &fileName,
                                   QString &foundExt,
                                   bool highWeight) const;
+
     void determineLevels();
     void raiseLevelRecursion(MimeMapEntry &e, int level);
 
     QMimeAllGlobPatterns m_mimeTypeGlobs;
 
-    QHash<QString, MimeMapEntry*> typeMimeTypeMap;
-    AliasMap aliasMap;
+    TypeMimeTypeMap typeMimeTypeMap;
+    QHash<QString, QString> aliasMap;
     ParentChildrenMap parentChildrenMap;
     int maxLevel;
     QMutex mutex;
 };
 
 
-class QMimeDatabaseBuilder
+class QMIME_EXPORT QMimeDatabaseBuilder
 {
     Q_DISABLE_COPY(QMimeDatabaseBuilder)
+
 public:
-    QMimeDatabaseBuilder();
+    QMimeDatabaseBuilder(QMimeDatabase *mimeDatabase);
     ~QMimeDatabaseBuilder();
 
     bool addMimeTypes(const QString &fileName, QString *errorMessage);
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
+    bool addMimeType(const QMimeType &mt);
 
-    void addGlobPattern(const QMimeGlobPattern& glob);
+    void addGlobPattern(const QMimeGlobPattern &glob);
+
+    QStringList suffixes() const;
+    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
+    QString preferredSuffixByType(const QString &type) const;
+    QString preferredSuffixByFile(const QFileInfo &fileInfo) const;
+
+    QStringList globPatterns() const;
+    void setGlobPatterns(const QString &typeOrAlias, const QStringList &globPatterns);
+
+    void setMagicMatchers(const QString &typeOrAlias,
+                          const QList<QMimeMagicRuleMatcher> &matchers);
+
+    static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
+                                                  const QString &mimeType,
+                                                  int weight = QMimeGlobPattern::MaxWeight);
+    static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 
 private:
     QMimeDatabasePrivate *const d;

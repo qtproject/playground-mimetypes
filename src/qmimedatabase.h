@@ -37,8 +37,10 @@ class QMimeDatabasePrivate;
 class QMIME_EXPORT QMimeDatabase
 {
     Q_DISABLE_COPY(QMimeDatabase)
+
 public:
     QMimeDatabase();
+    explicit QMimeDatabase(QMimeDatabasePrivate *theD);
     ~QMimeDatabase();
 
     QMimeType findByType(const QString &type) const;
@@ -52,7 +54,10 @@ public:
     QString allFiltersString(QString *allFilesFilter = 0) const;
 
 private:
-    QMimeDatabasePrivate *const d;
+    QMimeDatabasePrivate *d;
+
+public:
+    QMimeDatabasePrivate *data_ptr() { return d; }
 };
 
 QT_END_NAMESPACE

@@ -33,7 +33,7 @@ private:
 
 tst_QMimeType::tst_QMimeType() :
         database(),
-        databaseBuilder()
+        databaseBuilder(&database)
 {
 }
 

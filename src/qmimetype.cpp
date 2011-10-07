@@ -32,7 +32,6 @@ QT_BEGIN_NAMESPACE
     \brief Glob pattern for file names for MIME type matching.
 
     \sa QMimeType, QMimeDatabase, QMimeMagicRuleMatcher, QMimeMagicRule
-    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
@@ -98,6 +97,23 @@ QMimeTypeData::QMimeTypeData()
         qWarning("MimeTypeData(): invalid suffixPattern");
 }
 
+QMimeTypeData::QMimeTypeData(const QMimeType &other)
+    : suffixPattern(other.d->suffixPattern)
+    , type(other.d->type)
+    , comment(other.d->comment)
+    , localeComments(other.d->localeComments)
+    , aliases(other.d->aliases)
+    , genericIconName(other.d->genericIconName)
+    , globPatterns(other.d->globPatterns)
+    , subClassOf(other.d->subClassOf)
+    , preferredSuffix(other.d->preferredSuffix)
+    , suffixes(other.d->suffixes)
+    , magicMatchers(other.d->magicMatchers)
+{
+    if (!suffixPattern.isValid())
+        qWarning("MimeTypeData(): invalid suffixPattern");
+}
+
 void QMimeTypeData::clear()
 {
     type.clear();
@@ -121,17 +137,16 @@ void QMimeTypeData::addGlobPattern(const QString &pattern)
     }
 }
 
-#if 0
 unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 {
-    foreach (const QMimeGlobPattern &glob, globPatterns) {
+    foreach (const QString &pattern, globPatterns) {
+        QMimeGlobPattern glob(pattern, type);
         if (glob.matchFileName(name))
             return glob.weight();
     }
 
     return 0;
 }
-#endif
 
 static inline bool isTextFile(const QByteArray &data)
 {
@@ -322,7 +337,6 @@ unsigned QMimeType::matchesData(const QByteArray &data) const
     return d->matchesData(data);
 }
 
-#if 0
 /*!
     Checks the glob pattern weights and magic priorities so the highest
     value is returned. A 0 (zero) indicates no match.
@@ -343,7 +357,6 @@ unsigned QMimeType::matchesName(const QString &name) const
 {
     return d->matchesFileBySuffix(name);
 }
-#endif
 
 /*!
     Returns a filter string usable for a file dialog.

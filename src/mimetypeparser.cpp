@@ -58,12 +58,11 @@ const char *const matchMaskAttributeC = "mask";
 
 /*!
     \class MimeTypeParser
-    \brief MIME type parser that builds MimeDB hierarchy by adding to QMimeDatabasePrivate
+    \brief MIME type parser that builds a MIME database hierarchy by adding to QMimeDatabasePrivate
 
     Populates MimeDataBase
 
     \sa QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa MimeTypeParser
 */
 
@@ -75,7 +74,6 @@ const char *const matchMaskAttributeC = "mask";
     Calls abstract handler function process for QMimeType it finds.
 
     \sa QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa BinaryMatcher, HeuristicTextMagicMatcher
     \sa MimeTypeParser
 */
 
@@ -177,7 +175,6 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
 
 bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString *errorMessage)
 {
-    QMimeDatabaseBuilder builder;
     QMimeTypeData data;
     QMimeMagicRuleMatcher *ruleMatcher = 0;
     int priority = 50;
@@ -213,7 +210,8 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
 
                 Q_ASSERT(!data.type.isEmpty());
                 const QMimeGlobPattern glob(pattern, data.type, weight, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
-                builder.addGlobPattern(glob); // for actual glob matching
+                if (!process(glob, errorMessage))   // for actual glob matching
+                    return false;
                 data.addGlobPattern(pattern); // just for QMimeType::globPatterns()
             }
                 break;

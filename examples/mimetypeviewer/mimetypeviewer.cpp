@@ -11,7 +11,7 @@ MimeTypeViewer::MimeTypeViewer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MimeTypeViewer),
     dataBase(new QMimeDatabase),
-    databaseBuilder(new QMimeDatabaseBuilder)
+    databaseBuilder(new QMimeDatabaseBuilder(dataBase))
 {
     ui->setupUi(this);
     connect(ui->addTypesButton, SIGNAL(clicked()), SLOT(onAddTypesButtonClicked()));

@@ -27,6 +27,30 @@ QT_BEGIN_NAMESPACE
 
 class QIODevice;
 
+// XML tags in MIME files
+extern const char *const mimeInfoTagC;
+extern const char *const mimeTypeTagC;
+extern const char *const mimeTypeAttributeC;
+extern const char *const subClassTagC;
+extern const char *const commentTagC;
+extern const char *const genericIconTagC;
+extern const char *const nameAttributeC;
+extern const char *const globTagC;
+extern const char *const aliasTagC;
+extern const char *const patternAttributeC;
+extern const char *const weightAttributeC;
+extern const char *const caseSensitiveAttributeC;
+extern const char *const localeAttributeC;
+
+extern const char *const magicTagC;
+extern const char *const priorityAttributeC;
+
+extern const char *const matchTagC;
+extern const char *const matchValueAttributeC;
+extern const char *const matchTypeAttributeC;
+extern const char *const matchOffsetAttributeC;
+extern const char *const matchMaskAttributeC;
+
 class BaseMimeTypeParser
 {
     Q_DISABLE_COPY(BaseMimeTypeParser)
@@ -39,6 +63,7 @@ public:
 
 protected:
     virtual bool process(const QMimeType &t, QString *errorMessage) = 0;
+    virtual bool process(const QMimeGlobPattern &t, QString *errorMessage) = 0;
 
 private:
     enum ParseState {
@@ -68,6 +93,9 @@ public:
 protected:
     inline bool process(const QMimeType &t, QString *)
     { m_db.addMimeType(t); return true; }
+
+    inline bool process(const QMimeGlobPattern &glob, QString *)
+    { m_db.addGlobPattern(glob); return true; }
 
 private:
     QMimeDatabasePrivate &m_db;
