@@ -27,9 +27,9 @@
 
 QT_BEGIN_NAMESPACE
 
-// UTF16 byte order marks
-static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
-static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
+// TODO (add to spec) UTF16 byte order marks
+//static const char bigEndianByteOrderMarkC[] = "\xFE\xFF";
+//static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
 
 /*!
     \class FileMatchContext
@@ -44,25 +44,37 @@ static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-FileMatchContext::FileMatchContext(const QFileInfo &fi) :
-    m_fileInfo(fi),
-    m_fileName(fi.fileName()),
-    m_state(fi.isFile() && fi.isReadable() && fi.size() > 0 ? DataNotRead : NoDataAvailable)
+FileMatchContext::FileMatchContext(QIODevice *device, const QString &fileName) :
+    m_device(device),
+    m_fileName(fileName),
+    m_state(DataNotRead)
 {
+}
+
+bool FileMatchContext::isReadable()
+{
+    if (m_state == DataNotRead) {
+        if (m_device->open(QIODevice::ReadOnly)) {
+            // TODO use an intermediate state "device open but data not read yet?"
+            // Better - read data on demand?
+            m_data = m_device->read(MaxData);
+            m_state = DataRead;
+        }
+    }
+    return m_state == DataRead;
 }
 
 QByteArray FileMatchContext::data()
 {
     // Do we need to read?
     if (m_state == DataNotRead) {
-        QFile file(m_fileInfo.absoluteFilePath());
-        if (file.open(QIODevice::ReadOnly)) {
-            m_data = file.read(MaxData);
+        if (m_device->open(QIODevice::ReadOnly)) {
+            m_data = m_device->read(MaxData);
             m_state = DataRead;
         } else {
             qWarning("%s failed to open %s: %s", Q_FUNC_INFO,
-                     m_fileInfo.absoluteFilePath().toLocal8Bit().constData(),
-                     file.errorString().toLocal8Bit().constData());
+                     qPrintable(m_fileName),
+                     qPrintable(m_device->errorString()));
             m_state = NoDataAvailable;
         }
     }

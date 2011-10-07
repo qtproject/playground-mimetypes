@@ -26,6 +26,7 @@
 
 #include "qmimetype.h"
 #include "qmimetype_p.h"
+#include "qmimeglobpattern_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -33,17 +34,14 @@ class QMimeDatabase;
 
 #define MIN_MATCH_WEIGHT 50
 
-// MimeMapEntry: Entry of a type map, consisting of type and level.
+// MimeMapEntry: Entry of a type map, consisting of type.
 struct MimeMapEntry
 {
-    enum { Dangling = 32767 };
-
-    inline MimeMapEntry(const QMimeType &aType = QMimeType(), int aLevel = Dangling) :
-        type(aType), level(aLevel)
+    inline MimeMapEntry(const QMimeType &aType = QMimeType()) :
+        type(aType)
     {}
 
     QMimeType type;
-    int level; // hierachy level
 };
 
 
@@ -85,23 +83,15 @@ struct QMimeDatabasePrivate
     { return aliasMap.value(name, name); }
 
     QMimeType findByType(const QString &type) const;
-    QMimeType findByFile(const QFileInfo &f, unsigned *priorityPtr) const;
+    QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr) const;
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr) const;
     QStringList findByName(const QString &fileName) const;
-    void findFromOtherPatternList(QStringList &matchingMimeTypes,
-                                  const QString &fileName,
-                                  QString &foundExt,
-                                  bool highWeight) const;
-
-    void determineLevels();
-    void raiseLevelRecursion(MimeMapEntry &e, int level);
 
     QMimeAllGlobPatterns m_mimeTypeGlobs;
 
     TypeMimeTypeMap typeMimeTypeMap;
     QHash<QString, QString> aliasMap;
     ParentChildrenMap parentChildrenMap;
-    int maxLevel;
     QMutex mutex;
 };
 
@@ -123,7 +113,7 @@ public:
     QStringList suffixes() const;
     bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
     QString preferredSuffixByType(const QString &type) const;
-    QString preferredSuffixByFile(const QFileInfo &fileInfo) const;
+    QString preferredSuffixByNameAndData(const QString &fileName, QIODevice *device) const;
 
     QStringList globPatterns() const;
     void setGlobPatterns(const QString &typeOrAlias, const QStringList &globPatterns);

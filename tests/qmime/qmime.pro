@@ -24,3 +24,5 @@ INCLUDEPATH *= $$PWD/../../include
 
 SOURCES += tst_qmimetype.cpp
 DEFINES += SRCDIR='"\\"$$PWD/\\""'
+
+OTHER_FILES = testfiles/list

@@ -24,6 +24,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSet>
+#include <QtCore/QBuffer>
+#include <QtCore/QUrl>
 #include <QtCore/QDebug>
 
 #include <algorithm>
@@ -37,8 +39,7 @@ QT_BEGIN_NAMESPACE
 
 Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticMimeDataBase)
 
-QMimeDatabasePrivate::QMimeDatabasePrivate() :
-    maxLevel(-1)
+QMimeDatabasePrivate::QMimeDatabasePrivate()
 {
     // Assign here to avoid non-local static data initialization issues.
 //    kModifiedMimeTypesPath = ICore::instance()->userResourcePath() + QLatin1String("/mimetypes/");
@@ -102,65 +103,7 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     foreach (const QString &alias, mt.aliases())
         aliasMap.insert(alias, type);
 
-    maxLevel = -1; // Mark as dirty
-
     return true;
-}
-
-void QMimeDatabasePrivate::raiseLevelRecursion(MimeMapEntry &e, int level)
-{
-    if (e.level == MimeMapEntry::Dangling || e.level < level)
-        e.level = level;
-
-    if (maxLevel < level)
-        maxLevel = level;
-
-    // At all events recurse over children since nodes might have been added;
-    // look them up in the type->MIME type map
-    foreach (const QString &alias, parentChildrenMap.values(e.type.type())) {
-        MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(alias));
-        if (!entry) {
-            qWarning("%s: Inconsistent MIME hierarchy detected, child %s of %s cannot be found.",
-                     Q_FUNC_INFO, alias.toLocal8Bit().constData(), e.type.type().toLocal8Bit().constData());
-        } else {
-            raiseLevelRecursion(*entry, level + 1);
-        }
-    }
-}
-
-void QMimeDatabasePrivate::determineLevels()
-{
-    // Loop over toplevels and recurse down their hierarchies.
-    // Determine top levels by subtracting the children from the parent
-    // set. Note that a toplevel at this point might have 'subclassesOf'
-    // set to some class that is not in the DB, so, checking for an empty
-    // 'subclassesOf' set is not sufficient to find the toplevels.
-    // First, take the parent->child entries  whose parent exists and build
-    // sets of parents/children
-    QSet<QString> parentSet, childrenSet;
-    ParentChildrenMap::const_iterator pit = parentChildrenMap.constBegin();
-    for ( ; pit != parentChildrenMap.constEnd(); ++pit) {
-        if (typeMimeTypeMap.contains(pit.key())) {
-            parentSet.insert(pit.key());
-            childrenSet.insert(pit.value());
-        }
-    }
-
-    foreach (const QString &topLevel, parentSet.subtract(childrenSet)) {
-        MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(topLevel));
-        if (!entry) {
-            qWarning("%s: Inconsistent MIME hierarchy detected, top level element %s cannot be found.",
-                     Q_FUNC_INFO, topLevel.toLocal8Bit().constData());
-        } else {
-            raiseLevelRecursion(*entry, 0);
-        }
-    }
-
-    // move all danglings to top level
-    foreach (MimeMapEntry *entry, typeMimeTypeMap) {
-        if (entry->level == MimeMapEntry::Dangling)
-            entry->level = 0;
-    }
 }
 
 bool QMimeDatabasePrivate::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
@@ -184,80 +127,13 @@ QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
     return QMimeType();
 }
 
-// Helper for findByName
-void QMimeDatabasePrivate::findFromOtherPatternList(QStringList &matchingMimeTypes,
-                                                    const QString &fileName,
-                                                    QString &foundExt,
-                                                    bool highWeight) const
-{
-    const QMimeGlobPatternList &patternList = highWeight ? m_mimeTypeGlobs.m_highWeightGlobs : m_mimeTypeGlobs.m_lowWeightGlobs;
-
-    int matchingPatternLength = 0;
-    qint32 lastMatchedWeight = 0;
-    if (!highWeight && !matchingMimeTypes.isEmpty()) {
-        // We found matches in the fast pattern dict already:
-        matchingPatternLength = foundExt.length() + 2; // *.foo -> length=5
-        lastMatchedWeight = 50;
-    }
-
-    QMimeGlobPatternList::const_iterator it = patternList.constBegin();
-    const QMimeGlobPatternList::const_iterator end = patternList.constEnd();
-    for ( ; it != end; ++it ) {
-        const QMimeGlobPattern &glob = *it;
-        if (glob.matchFileName(fileName)) {
-            const int weight = glob.weight();
-            const QString pattern = glob.pattern();
-            // Is this a lower-weight pattern than the last match? Stop here then.
-            if (weight < lastMatchedWeight)
-                break;
-            if (lastMatchedWeight > 0 && weight > lastMatchedWeight) // can't happen
-                qWarning() << "Assumption failed; globs2 weights not sorted correctly"
-                           << weight << ">" << lastMatchedWeight;
-            // Is this a shorter or a longer match than an existing one, or same length?
-            if (pattern.length() < matchingPatternLength) {
-                continue; // too short, ignore
-            } else if (pattern.length() > matchingPatternLength) {
-                // longer: clear any previous match (like *.bz2, when pattern is *.tar.bz2)
-                matchingMimeTypes.clear();
-                // remember the new "longer" length
-                matchingPatternLength = pattern.length();
-            }
-            matchingMimeTypes.push_back(glob.mimeType());
-            if (pattern.startsWith(QLatin1String("*.")))
-                foundExt = pattern.mid(2);
-        }
-    }
-}
-
 QStringList QMimeDatabasePrivate::findByName(const QString &fileName) const
 {
     // TODO parse globs file on demand here
 
-    // First try the high weight matches (>50), if any.
-    QStringList matchingMimeTypes;
     QString foundExt;
-    findFromOtherPatternList(matchingMimeTypes, fileName, foundExt, true);
-    if (matchingMimeTypes.isEmpty()) {
+    const QStringList matchingMimeTypes = m_mimeTypeGlobs.matchingGlobs(fileName, &foundExt);
 
-        // Now use the "fast patterns" dict, for simple *.foo patterns with weight 50
-        // (which is most of them, so this optimization is definitely worth it)
-        const int lastDot = fileName.lastIndexOf(QLatin1Char('.'));
-        if (lastDot != -1) { // if no '.', skip the extension lookup
-            const int ext_len = fileName.length() - lastDot - 1;
-            const QString simpleExtension = fileName.right( ext_len ).toLower();
-            // (toLower because fast matterns are always case-insensitive and saved as lowercase)
-
-            matchingMimeTypes = m_mimeTypeGlobs.m_fastPatterns.value(simpleExtension);
-            if (!matchingMimeTypes.isEmpty()) {
-                foundExt = simpleExtension;
-                // Can't return yet; *.tar.bz2 has to win over *.bz2, so we need the low-weight mimetypes anyway,
-                // at least those with weight 50.
-            }
-        }
-
-        // Finally, try the low weight matches (<=50)
-        findFromOtherPatternList(matchingMimeTypes, fileName, foundExt, false);
-    }
     //if (pMatchingExtension)
     //    *pMatchingExtension = foundExt;
     return matchingMimeTypes;
@@ -266,23 +142,13 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName) const
 // Returns a MIME type or Null one if none found
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
 {
-    // Is the hierarchy set up in case we find several matches?
-    if (maxLevel < 0) {
-        QMimeDatabasePrivate *db = const_cast<QMimeDatabasePrivate *>(this);
-        db->determineLevels();
-    }
-
     QMimeType candidate;
 
-    for (int level = maxLevel; level >= 0; --level) {
-        foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
-            if (entry->level == level) {
-                const unsigned contentPriority = entry->type.d->matchesData(data);
-                if (contentPriority && contentPriority > *priorityPtr) {
-                    *priorityPtr = contentPriority;
-                    candidate = entry->type;
-                }
-            }
+    foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
+        const unsigned contentPriority = entry->type.d->matchesData(data);
+        if (contentPriority && contentPriority > *priorityPtr) {
+            *priorityPtr = contentPriority;
+            candidate = entry->type;
         }
     }
 
@@ -331,7 +197,7 @@ void QMimeDatabasePrivate::setMagicMatchers(const QString &typeOrAlias,
 }
 
 // Returns a MIME type or Null one if none found
-QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorityPtr) const
+QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr) const
 {
     // First, glob patterns are evaluated. If there is a match with max weight,
     // this one is selected and we are done. Otherwise, the file contents are
@@ -339,10 +205,10 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     // a glob pattern weight) is selected. Matching starts from max level (most
     // specific) in both cases, even when there is already a suffix matching candidate.
     *priorityPtr = 0;
-    FileMatchContext context(f);
+    FileMatchContext context(device, fileName);
 
     // Pass 1) Try to match on suffix#type
-    QStringList candidatesByName = findByName(f.fileName());
+    QStringList candidatesByName = findByName(fileName);
 
     // TODO REWRITE THIS METHOD, FOR PROPER GLOB-CONFLICT HANDLING
 
@@ -353,7 +219,7 @@ QMimeType QMimeDatabasePrivate::findByFile(const QFileInfo &f, unsigned *priorit
     }
 
     // Pass 2) Match on content
-    if (!f.isReadable())
+    if (!context.isReadable())
         return candidateByName;
 
     if (candidateByName.matchesData(context.data()) > MIN_MATCH_WEIGHT)
@@ -407,6 +273,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
 }
 
 
+// TODO rewrite docu, it explains implementation details
 /*!
     \class QMimeDatabase
     \brief MIME database to which the plugins can add the MIME types they handle.
@@ -432,20 +299,10 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
     This basically rules out some pointer-based tree, so the structure chosen is:
     \list
     \o An alias map QString->QString for mapping aliases to types
-    \o A Map QString->MimeMapEntry for the types (MimeMapEntry being a pair of
-       QMimeType and (hierarchy) level.
     \o A map  QString->QString representing parent->child relations (enabling
        recursing over children)
     \o Using strings avoids dangling pointers.
     \endlist
-
-    The hierarchy level is used for mapping by file types. When findByFile()
-    is first called after addMimeType() it recurses over the hierarchy and sets
-    the hierarchy level of the entries accordingly (0 toplevel, 1 first
-    order...). It then does several passes over the type map, checking the
-    globs for maxLevel, maxLevel-1....until it finds a match (idea being to
-    to check the most specific types first). Starting a recursion from the
-    leaves is not suitable since it will hit parent nodes several times.
 
     \sa QMimeType, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
     \sa BaseMimeTypeParser, MimeTypeParser
@@ -529,14 +386,29 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
     QMutexLocker locker(&d->mutex);
 
+    QFile file(fileInfo.absoluteFilePath());
     unsigned priority = 0;
-    return d->findByFile(fileInfo, &priority);
+    return d->findByNameAndData(fileInfo.fileName(), &file, &priority);
+}
+
+/*!
+    Returns a MIME type for \a file or Null one if none found.
+    The \a file can also include an absolute or relative path.
+*/
+QMimeType QMimeDatabase::findByFile(const QString &fileName) const
+{
+    QMutexLocker locker(&d->mutex);
+
+    QFile file(fileName);
+    unsigned priority = 0;
+    return d->findByNameAndData(fileName, &file, &priority);
 }
 
 /*!
     Returns a MIME type for the file \a name or Null one if none found.
-    This function does not try to open the file. To determine the MIME type by its content, use
-    QMimeDatabase::findByFile instead.
+    This function does not try to open the file. To also use the content
+    when determining the MIME type, use QMimeDatabase::findByFile or
+    QMimeDatabase::findByNameAndData instead.
 */
 QMimeType QMimeDatabase::findByName(const QString &name) const
 {
@@ -556,15 +428,40 @@ QMimeType QMimeDatabase::findByName(const QString &name) const
 }
 
 /*!
-    Returns a MIME type for \a data or Null one if none found. This function reads content of a file
-    and tries to determine it's type using magic sequencies.
+    Returns a MIME type for \a data or Null one if none found.
 */
 QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 {
     QMutexLocker locker(&d->mutex);
 
-    unsigned priority = 0;
-    return d->findByData(data, &priority);
+    unsigned int accuracy = 0;
+    return d->findByData(data, &accuracy);
+}
+
+/*!
+    Returns a MIME type for \a url or Null one if none found.
+    If the url is a local file, this calls findByFile.
+    Otherwise the matching is done based on the name only
+    (except over schemes where filenames don't mean much, like HTTP)
+*/
+QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
+{
+    if (url.isLocalFile())
+        return findByFile(url.toLocalFile());
+    return findByName(url.path());
+}
+
+QMimeType QMimeDatabase::findByNameAndData(const QString &name, QIODevice *device) const
+{
+    unsigned int accuracy = 0;
+    return d->findByNameAndData(name, device, &accuracy);
+}
+
+QMimeType QMimeDatabase::findByNameAndData(const QString &name, const QByteArray &data) const
+{
+    QBuffer buffer(const_cast<QByteArray *>(&data));
+    unsigned int accuracy = 0;
+    return d->findByNameAndData(name, &buffer, &accuracy);
 }
 
 void QMimeDatabaseBuilder::setMagicMatchers(const QString &typeOrAlias,
@@ -602,11 +499,11 @@ QString QMimeDatabaseBuilder::preferredSuffixByType(const QString &type) const
     return QString();
 }
 
-QString QMimeDatabaseBuilder::preferredSuffixByFile(const QFileInfo &fileInfo) const
+QString QMimeDatabaseBuilder::preferredSuffixByNameAndData(const QString &fileName, QIODevice *device) const
 {
     d->mutex.lock();
     unsigned priority = 0;
-    const QMimeType mt = d->findByFile(fileInfo, &priority);
+    const QMimeType mt = d->findByNameAndData(fileName, device, &priority);
     d->mutex.unlock();
     if (mt.isValid())
         return mt.preferredSuffix(); // already does Mutex locking

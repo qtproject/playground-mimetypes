@@ -256,6 +256,8 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                     ruleMatcher->setPriority(priority);
                 }
 
+                // TODO this does not handle nesting!
+
                 QMimeMagicRule *rule = 0;
                 if (!addMagicMatchRule(atts, /*ruleMatcher, */errorMessage, rule))
                     return false;

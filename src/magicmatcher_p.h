@@ -19,7 +19,8 @@ public:
     // in order to respect the spec. Use QIODevice-based code from KMimeMagicRule.
     enum { MaxData = 2500 };
 
-    explicit FileMatchContext(const QFileInfo &fi);
+    FileMatchContext(QIODevice *device, const QString &fileName);
+    bool isReadable();
 
     inline QString fileName() const { return m_fileName; }
     // Return (cached) first MaxData bytes of file
@@ -35,7 +36,7 @@ private:
         DataRead
     };
 
-    const QFileInfo m_fileInfo;
+    QIODevice *m_device;
     const QString m_fileName;
     State m_state;
     QByteArray m_data;
