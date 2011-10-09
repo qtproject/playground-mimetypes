@@ -39,6 +39,7 @@ public:
 
 protected:
     virtual bool process(const QMimeType &t, QString *errorMessage) = 0;
+    virtual bool process(const QMimeGlobPattern &t, QString *errorMessage) = 0;
 
 private:
     enum ParseState {
@@ -68,6 +69,9 @@ public:
 protected:
     inline bool process(const QMimeType &t, QString *)
     { m_db.addMimeType(t); return true; }
+
+    inline bool process(const QMimeGlobPattern &glob, QString *)
+    { m_db.addGlobPattern(glob); return true; }
 
 private:
     QMimeDatabasePrivate &m_db;
