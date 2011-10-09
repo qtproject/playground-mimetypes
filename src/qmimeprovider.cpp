@@ -2,6 +2,7 @@
 #include "mimetypeparser_p.h"
 #include <qstandardpaths.h>
 #include <QFile>
+#include <QDir>
 #include <QDebug>
 
 QMimeProviderBase::QMimeProviderBase(QMimeDatabasePrivate *db)
@@ -16,13 +17,19 @@ QMimeBinaryProvider::QMimeBinaryProvider(QMimeDatabasePrivate *db)
 
 bool QMimeBinaryProvider::isValid()
 {
-    const QString globalCacheFile = QStandardPaths::locate(QStandardPaths::GenericDataLocation, QLatin1String("mime/mime.cache"));
-    if (!globalCacheFile.isEmpty()) {
-        const QString localCacheFile = QStandardPaths::storageLocation(QStandardPaths::GenericDataLocation) + QLatin1String("/mime/mime.cache");
-        qDebug() << globalCacheFile << localCacheFile;
-        return globalCacheFile != localCacheFile;
-    }
-    return false;
+    m_cacheFiles = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/mime.cache"));
+    return false; // HACK FOR NOW
+
+    if (m_cacheFiles.count() > 1)
+        return true;
+    if (m_cacheFiles.isEmpty())
+        return false;
+
+    // We found exactly one file; is it the user-modified mimes, or a system file?
+    const QString foundFile = m_cacheFiles.first();
+    const QString localCacheFile = QStandardPaths::storageLocation(QStandardPaths::GenericDataLocation) + QLatin1String("/mime/mime.cache");
+
+    return foundFile != localCacheFile;
 }
 
 void QMimeBinaryProvider::ensureTypesLoaded()
@@ -67,15 +74,29 @@ void QMimeXMLProvider::ensureLoaded()
     if (!m_loaded) {
         m_loaded = true;
 
-        // TODO  look for freedesktop.org.xml file in the system
-        //       if not found, use Qt's own copy
+        bool fdoXmlFound = false;
+        QStringList allFiles;
 
-        // TODO: putting the xml file in the resource is a hack for now
-        // We should instead install the file as part of installing Qt
+        const QStringList packageDirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/packages"), QStandardPaths::LocateDirectory);
+        foreach (const QString &packageDir, packageDirs) {
+            QDir dir(packageDir);
+            const QStringList files = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+            qDebug() << packageDir << files;
+            if (!fdoXmlFound)
+                fdoXmlFound = files.contains(QLatin1String("freedesktop.org.xml"));
+            foreach (const QString& file, files) {
+                allFiles.append(packageDir + QLatin1Char('/') + file);
+            }
+        }
 
-        // TODO and then we also need to locate user-modified mimetypes, using QStandardPaths::storageLocation() + QDir::entryList
-        const QString fileName = QLatin1String(":/qmime/freedesktop.org.xml");
-        load(fileName);
+        if (!fdoXmlFound) {
+            // TODO: putting the xml file in the resource is a hack for now
+            // We should instead install the file as part of installing Qt
+            load(QLatin1String(":/qmime/freedesktop.org.xml"));
+        }
+
+        foreach (const QString& file, allFiles)
+            load(file);
     }
 }
 

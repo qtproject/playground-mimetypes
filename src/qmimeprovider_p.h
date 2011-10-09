@@ -30,7 +30,7 @@ public:
     virtual void ensureMagicLoaded();
 
 private:
-    const QStringList m_cacheFiles;
+    QStringList m_cacheFiles;
 };
 
 /*

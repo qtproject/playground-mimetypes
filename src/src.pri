@@ -4,7 +4,7 @@ DEPENDPATH  *= $$PWD
 INCLUDEPATH += $$PWD/inqt5
 DEPENDPATH  += $$PWD/inqt5
 
-QT       -= gui
+QT     = core
 
 DEFINES += QT_NO_CAST_FROM_ASCII
 
