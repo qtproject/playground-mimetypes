@@ -362,11 +362,6 @@ void QMimeDatabasePrivate::addGlobPattern(const QMimeGlobPattern& glob)
     m_mimeTypeGlobs.addGlob(glob);
 }
 
-void QMimeDatabaseBuilder::addGlobPattern(const QMimeGlobPattern& glob)
-{
-    d->addGlobPattern(glob);
-}
-
 
 
 /*!

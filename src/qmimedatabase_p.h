@@ -108,8 +108,6 @@ public:
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
     bool addMimeType(const QMimeType &mt);
 
-    void addGlobPattern(const QMimeGlobPattern &glob);
-
     QStringList suffixes() const;
     bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
     QString preferredSuffixByType(const QString &type) const;
