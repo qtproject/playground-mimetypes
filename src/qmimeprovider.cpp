@@ -116,24 +116,49 @@ void QMimeBinaryProvider::ensureTypesLoaded()
 
 QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *foundSuffix)
 {
-    GlobMatchResult results;
-    results.weight = 0;
-    results.matchingPatternLength = 0;
+    GlobMatchResult result;
+    result.m_weight = 0;
+    result.m_matchingPatternLength = 0;
     foreach (CacheFile *cacheFile, m_cacheFiles) {
-        matchGlobList(results, cacheFile, cacheFile->getUint32(PosLiteralListOffset), fileName);
-        matchGlobList(results, cacheFile, cacheFile->getUint32(PosGlobListOffset), fileName);
+        matchGlobList(result, cacheFile, cacheFile->getUint32(PosLiteralListOffset), fileName);
+        matchGlobList(result, cacheFile, cacheFile->getUint32(PosGlobListOffset), fileName);
         const int reverseSuffixTreeOffset = cacheFile->getUint32(PosReverseSuffixTreeOffset);
         const int numRoots = cacheFile->getUint32(reverseSuffixTreeOffset);
         const int firstRootOffset = cacheFile->getUint32(reverseSuffixTreeOffset + 4);
-        matchSuffixTree(results, cacheFile, numRoots, firstRootOffset, fileName);
+        matchSuffixTree(result, cacheFile, numRoots, firstRootOffset, fileName, fileName.length() - 1);
     }
-    *foundSuffix = results.foundSuffix;
-    return results.matchingMimeTypes;
+    *foundSuffix = result.m_foundSuffix;
+    return result.m_matchingMimeTypes;
 }
 
-void QMimeBinaryProvider::matchGlobList(GlobMatchResult& results, CacheFile *cacheFile, int off, const QString &fileName)
+void QMimeBinaryProvider::GlobMatchResult::addMatch(const QString &mimeType, int weight, const QString &pattern)
 {
-    const QString lowerCaseFileName = fileName;
+    // Is this a lower-weight pattern than the last match? Skip this match then.
+    if (weight < m_weight)
+        return;
+    bool replace = weight > m_weight;
+    if (!replace) {
+        // Compare the length of the match
+        if (pattern.length() < m_matchingPatternLength)
+            return; // too short, ignore
+        else if (pattern.length() > m_matchingPatternLength) {
+            // longer: clear any previous match (like *.bz2, when pattern is *.tar.bz2)
+            replace = true;
+        }
+    }
+    if (replace) {
+        m_matchingMimeTypes.clear();
+        // remember the new "longer" length
+        m_matchingPatternLength = pattern.length();
+        m_weight = weight;
+    }
+    m_matchingMimeTypes.append(mimeType);
+    if (pattern.startsWith(QLatin1String("*.")))
+        m_foundSuffix = pattern.mid(2);
+}
+
+void QMimeBinaryProvider::matchGlobList(GlobMatchResult& result, CacheFile *cacheFile, int off, const QString &fileName)
+{
     const int numGlobs = cacheFile->getUint32(off);
     //qDebug() << "Loading" << numGlobs << "globs from" << cacheFile->file->fileName() << "at offset" << cacheFile->globListOffset;
     for (int i = 0; i < numGlobs; ++i) {
@@ -150,41 +175,51 @@ void QMimeBinaryProvider::matchGlobList(GlobMatchResult& results, CacheFile *cac
         QMimeGlobPattern glob(pattern, QString() /*unused*/, weight, qtCaseSensitive);
 
         // TODO: this could be done faster for literals where a simple == would do.
-        if (glob.matchFileName(fileName)) {
-            // Is this a lower-weight pattern than the last match? Skip this match then.
-            if (weight < results.weight)
-                continue;
-            bool replace = weight > results.weight;
-            if (!replace) {
-                // Compare the length of the match
-                if (pattern.length() < results.matchingPatternLength)
-                    continue; // too short, ignore
-                else if (pattern.length() > results.matchingPatternLength) {
-                    // longer: clear any previous match (like *.bz2, when pattern is *.tar.bz2)
-                    replace = true;
-                }
-            }
-            if (replace) {
-                results.matchingMimeTypes.clear();
-                // remember the new "longer" length
-                results.matchingPatternLength = pattern.length();
-                results.weight = weight;
-            }
-            results.matchingMimeTypes.append(QLatin1String(mimeType));
-            if (pattern.startsWith(QLatin1String("*.")))
-                results.foundSuffix = pattern.mid(2);
-        }
+        if (glob.matchFileName(fileName))
+            result.addMatch(QLatin1String(mimeType), weight, pattern);
     }
 }
 
-void QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryProvider::CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName)
+bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryProvider::CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName, int charPos)
 {
-    for (int i = 0; i < numEntries; ++i) {
-        const int off = firstOffset + 12 * i;
-        const int ch = cacheFile->getUint32(off);
-        //qDebug() << QChar(ch);
-        // TODO finish
+    QChar fileChar = fileName[charPos];
+    int min = 0;
+    int max = numEntries - 1;
+    while (min <= max) {
+        const int mid = (min + max) / 2;
+        const int off = firstOffset + 12 * mid;
+        const QChar ch = cacheFile->getUint32(off);
+        if (ch < fileChar)
+            min = mid + 1;
+        else if (ch > fileChar)
+            max = mid - 1;
+        else {
+            --charPos;
+            int numChildren = cacheFile->getUint32(off + 4);
+            int childrenOffset = cacheFile->getUint32(off + 8);
+            bool success = false;
+            if (charPos > 0)
+                success = matchSuffixTree(result, cacheFile, numChildren, childrenOffset, fileName, charPos);
+            if (!success) {
+                for (int i = 0; i < numChildren; ++i) {
+                    const int childOff = childrenOffset + 12 * i;
+                    const int mch = cacheFile->getUint32(childOff);
+                    if (mch != 0)
+                        break;
+                    const int mimeTypeOffset = cacheFile->getUint32(childOff + 4);
+                    const char* mimeType = cacheFile->getCharStar(mimeTypeOffset);
+                    const int flagsAndWeight = cacheFile->getUint32(childOff + 8);
+                    const int weight = flagsAndWeight & 0xff;
+                    const bool caseSensitive = flagsAndWeight & 0x100;
+                    // TODO handle caseSensitive
+                    result.addMatch(QLatin1String(mimeType), weight, QLatin1String("*.") + fileName.mid(charPos));
+                    success = true;
+                }
+            }
+            return success;
+        }
     }
+    return false;
 }
 
 void QMimeBinaryProvider::ensureMagicLoaded()
