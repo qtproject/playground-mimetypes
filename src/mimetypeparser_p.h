@@ -22,6 +22,7 @@
 #define MIMETYPEPARSER_P_H
 
 #include "qmimedatabase_p.h"
+#include "qmimeprovider_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -64,17 +65,17 @@ private:
 class MimeTypeParser : public BaseMimeTypeParser
 {
 public:
-    explicit MimeTypeParser(QMimeDatabasePrivate &db) : m_db(db) {}
+    explicit MimeTypeParser(QMimeXMLProvider &provider) : m_provider(provider) {}
 
 protected:
     inline bool process(const QMimeType &t, QString *)
-    { m_db.addMimeType(t); return true; }
+    { m_provider.addMimeType(t); return true; }
 
     inline bool process(const QMimeGlobPattern &glob, QString *)
-    { m_db.addGlobPattern(glob); return true; }
+    { m_provider.addGlobPattern(glob); return true; }
 
 private:
-    QMimeDatabasePrivate &m_db;
+    QMimeXMLProvider &m_provider;
 };
 
 QT_END_NAMESPACE

@@ -7,7 +7,7 @@ bool QMimeGlobPattern::matchFileName(const QString& _filename) const
 {
     // "Applications MUST match globs case-insensitively, except when the case-sensitive
     // attribute is set to true."
-    // QMimeGlobPattern takes care of putting case-insensitive patterns in lowercase.
+    // The constructor takes care of putting case-insensitive patterns in lowercase.
     const QString filename = m_caseSensitivity == Qt::CaseInsensitive ? _filename.toLower() : _filename;
 
     const int pattern_len = m_pattern.length();
@@ -104,13 +104,13 @@ void QMimeAllGlobPatterns::removeMime(const QString& mime)
 
 void QMimeGlobPatternList::match(QStringList &matchingMimeTypes,
                                  const QString &fileName,
-                                 QString *foundExt) const
+                                 QString *foundSuffix) const
 {
     int matchingPatternLength = 0;
     qint32 lastMatchedWeight = 0;
     if (!matchingMimeTypes.isEmpty()) {
         // We found matches in the fast pattern dict already:
-        matchingPatternLength = foundExt->length() + 2; // *.foo -> length=5
+        matchingPatternLength = foundSuffix->length() + 2; // *.foo -> length=5
         lastMatchedWeight = 50;
     }
 
@@ -119,12 +119,14 @@ void QMimeGlobPatternList::match(QStringList &matchingMimeTypes,
     for ( ; it != end; ++it ) {
         const QMimeGlobPattern &glob = *it;
         if (glob.matchFileName(fileName)) {
+            // TODO factorize with algorithm used by QMimeBinaryProvider?
             const int weight = glob.weight();
             const QString pattern = glob.pattern();
             // Is this a lower-weight pattern than the last match? Stop here then.
             if (weight < lastMatchedWeight)
                 break;
             if (lastMatchedWeight > 0 && weight > lastMatchedWeight) // can't happen
+                // TODO FIX, we are not parsing globs2 here.
                 qWarning() << "Assumption failed; globs2 weights not sorted correctly"
                            << weight << ">" << lastMatchedWeight;
             // Is this a shorter or a longer match than an existing one, or same length?
@@ -138,16 +140,16 @@ void QMimeGlobPatternList::match(QStringList &matchingMimeTypes,
             }
             matchingMimeTypes.push_back(glob.mimeType());
             if (pattern.startsWith(QLatin1String("*.")))
-                *foundExt = pattern.mid(2);
+                *foundSuffix = pattern.mid(2);
         }
     }
 }
 
-QStringList QMimeAllGlobPatterns::matchingGlobs(const QString &fileName, QString *foundExt) const
+QStringList QMimeAllGlobPatterns::matchingGlobs(const QString &fileName, QString *foundSuffix) const
 {
     // First try the high weight matches (>50), if any.
     QStringList matchingMimeTypes;
-    m_highWeightGlobs.match(matchingMimeTypes, fileName, foundExt);
+    m_highWeightGlobs.match(matchingMimeTypes, fileName, foundSuffix);
     if (matchingMimeTypes.isEmpty()) {
 
         // Now use the "fast patterns" dict, for simple *.foo patterns with weight 50
@@ -160,14 +162,14 @@ QStringList QMimeAllGlobPatterns::matchingGlobs(const QString &fileName, QString
 
             matchingMimeTypes = m_fastPatterns.value(simpleExtension);
             if (!matchingMimeTypes.isEmpty()) {
-                *foundExt = simpleExtension;
+                *foundSuffix = simpleExtension;
                 // Can't return yet; *.tar.bz2 has to win over *.bz2, so we need the low-weight mimetypes anyway,
                 // at least those with weight 50.
             }
         }
 
         // Finally, try the low weight matches (<=50)
-        m_lowWeightGlobs.match(matchingMimeTypes, fileName, foundExt);
+        m_lowWeightGlobs.match(matchingMimeTypes, fileName, foundSuffix);
     }
     return matchingMimeTypes;
 }
