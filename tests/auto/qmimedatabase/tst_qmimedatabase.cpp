@@ -144,4 +144,4 @@ void tst_QMimeType::findByFile()
 
 QTEST_APPLESS_MAIN(tst_QMimeType)
 
-#include "tst_qmimetype.moc"
+#include "tst_qmimedatabase.moc"
