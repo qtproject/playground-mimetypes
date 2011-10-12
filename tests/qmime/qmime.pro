@@ -18,7 +18,7 @@ TEMPLATE = app
 
 LIBS += -L$$OUT_PWD/../../lib -lqmimetype
 
-INCLUDEPATH *= $$PWD/../../include
+INCLUDEPATH *= $$PWD/../../include/QtMimeTypes
 
 #DEFINES += SRC_DIR $$PWD
 

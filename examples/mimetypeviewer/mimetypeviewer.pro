@@ -15,7 +15,7 @@ message($$PWD)
 
 LIBS += -L$$OUT_PWD/../../lib -lqmimetype
 
-INCLUDEPATH *= $$PWD/../../include
+INCLUDEPATH *= $$PWD/../../include/QtMimeTypes
 
 SOURCES += main.cpp\
     mimetypeviewer.cpp

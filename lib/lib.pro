@@ -11,7 +11,7 @@ win32: DESTDIR = ./
 
 DEFINES += QMIME_LIBRARY
 
-include($$PWD/../src/src.pri)
+include($$PWD/../src/mimetypes/mimetypes.pri)
 
 symbian {
     MMP_RULES += EXPORTUNFROZEN

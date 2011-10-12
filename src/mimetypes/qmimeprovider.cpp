@@ -233,7 +233,7 @@ bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryPr
                     const char* mimeType = cacheFile->getCharStar(mimeTypeOffset);
                     const int flagsAndWeight = cacheFile->getUint32(childOff + 8);
                     const int weight = flagsAndWeight & 0xff;
-                    const bool caseSensitive = flagsAndWeight & 0x100;
+                    //const bool caseSensitive = flagsAndWeight & 0x100;
                     // TODO handle caseSensitive
                     result.addMatch(QLatin1String(mimeType), weight, QLatin1String("*.") + fileName.mid(charPos));
                     success = true;
