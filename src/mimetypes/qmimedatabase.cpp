@@ -424,8 +424,14 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 */
 QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     if (url.isLocalFile())
         return findByFile(url.toLocalFile());
+#else
+    QString localFile(url.toLocalFile());
+    if (!localFile.isEmpty())
+        return findByFile(localFile);
+#endif
     return findByName(url.path());
 }
 
