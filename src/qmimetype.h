@@ -68,8 +68,8 @@ public:
 
     bool matchesType(const QString &type) const;
     unsigned matchesData(const QByteArray &data) const;
-    unsigned matchesNameAndData(QIODevice *device, const QString &fileName) const;
-    unsigned matchesName(const QString &name) const;
+    //unsigned matchesNameAndData(QIODevice *device, const QString &fileName) const;
+    //unsigned matchesName(const QString &name) const;
 
     QString filterString() const;
 

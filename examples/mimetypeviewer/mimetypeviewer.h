@@ -4,7 +4,6 @@
 #include <QWidget>
 
 class QMimeDatabase;
-class QMimeDatabaseBuilder;
 class QMimeType;
 
 namespace Ui {
@@ -22,13 +21,11 @@ public:
     void addDatabase(const QString &file);
 
 public slots:
-    void onAddTypesButtonClicked();
     void onOpenFileButtonClicked();
 
 private:
     Ui::MimeTypeViewer *ui;
     QMimeDatabase *dataBase;
-    QMimeDatabaseBuilder *databaseBuilder;
 
     void updateTypes();
     void setMimeType(const QMimeType &mime);

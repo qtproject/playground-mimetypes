@@ -41,7 +41,7 @@ class QMIME_EXPORT QMimeDatabase
 
 public:
     QMimeDatabase();
-    explicit QMimeDatabase(QMimeDatabasePrivate *theD);
+    //explicit QMimeDatabase(QMimeDatabasePrivate *theD);
     ~QMimeDatabase();
 
     QMimeType findByType(const QString &type) const;

@@ -32,7 +32,7 @@
 #include <functional>
 
 #include "magicmatcher_p.h"
-#include "mimetypeparser_p.h"
+#include "qmimeprovider_p.h"
 #include "qmimetype_p.h"
 
 QT_BEGIN_NAMESPACE
@@ -41,9 +41,6 @@ Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticMimeDataBase)
 
 QMimeDatabasePrivate::QMimeDatabasePrivate()
 {
-    // Assign here to avoid non-local static data initialization issues.
-//    kModifiedMimeTypesPath = ICore::instance()->userResourcePath() + QLatin1String("/mimetypes/");
-#warning TODO: FIX!!!
 }
 
 QMimeDatabasePrivate::~QMimeDatabasePrivate()
@@ -51,36 +48,23 @@ QMimeDatabasePrivate::~QMimeDatabasePrivate()
     qDeleteAll(typeMimeTypeMap);
 }
 
-bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage)
+QMimeProviderBase *QMimeDatabasePrivate::provider()
 {
-    if (errorMessage)
-        errorMessage->clear();
-
-    MimeTypeParser parser(*this);
-    return parser.parse(device, fileName, errorMessage);
-}
-
-bool QMimeDatabasePrivate::addMimeTypes(const QString &fileName, QString *errorMessage)
-{
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        if (errorMessage)
-            *errorMessage = QString::fromLatin1("Cannot open %1: %2").arg(fileName, file.errorString());
-        return false;
+    if (!m_provider) {
+        QMimeProviderBase *binaryProvider = new QMimeBinaryProvider(this);
+        if (binaryProvider->isValid())
+            m_provider = binaryProvider;
+        else {
+            delete m_provider;
+            m_provider = new QMimeXMLProvider(this);
+        }
     }
-
-    if (errorMessage)
-        errorMessage->clear();
-
-    return addMimeTypes(&file, fileName, errorMessage);
+    return m_provider;
 }
 
-bool QMimeDatabasePrivate::addMimeTypes(QIODevice *device, QString *errorMessage)
+void QMimeDatabasePrivate::addGlobPattern(const QMimeGlobPattern& glob)
 {
-    if (errorMessage)
-        errorMessage->clear();
-
-    return addMimeTypes(device, QLatin1String("<stream>"), errorMessage);
+    m_mimeTypeGlobs.addGlob(glob);
 }
 
 bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
@@ -106,6 +90,7 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     return true;
 }
 
+#if 0
 bool QMimeDatabasePrivate::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
 {
     TypeMimeTypeMap::iterator tit =  typeMimeTypeMap.find(resolveAlias(typeOrAlias));
@@ -117,19 +102,22 @@ bool QMimeDatabasePrivate::setPreferredSuffix(const QString &typeOrAlias, const 
     }
     return false;
 }
+#endif
 
 // Returns a MIME type or Null one if none found
-QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias) const
+QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias)
 {
+    provider()->ensureTypesLoaded();
+
     const MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
     if (entry)
         return entry->type;
     return QMimeType();
 }
 
-QStringList QMimeDatabasePrivate::findByName(const QString &fileName) const
+QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
 {
-    // TODO parse globs file on demand here
+    provider()->ensureGlobsLoaded();
 
     QString foundExt;
     const QStringList matchingMimeTypes = m_mimeTypeGlobs.matchingGlobs(fileName, &foundExt);
@@ -140,8 +128,10 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName) const
 }
 
 // Returns a MIME type or Null one if none found
-QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr) const
+QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr)
 {
+    provider()->ensureMagicLoaded();
+
     QMimeType candidate;
 
     foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
@@ -155,6 +145,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
     return candidate;
 }
 
+#if 0
 // Return all known suffixes
 QStringList QMimeDatabasePrivate::suffixes() const
 {
@@ -195,9 +186,10 @@ void QMimeDatabasePrivate::setMagicMatchers(const QString &typeOrAlias,
         tit.value()->type = QMimeType(mimeTypeData);
     }
 }
+#endif
 
 // Returns a MIME type or Null one if none found
-QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr) const
+QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr)
 {
     // First, glob patterns are evaluated. If there is a match with max weight,
     // this one is selected and we are done. Otherwise, the file contents are
@@ -222,7 +214,7 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
     if (!context.isReadable())
         return candidateByName;
 
-    if (candidateByName.matchesData(context.data()) > MIN_MATCH_WEIGHT)
+    if (candidateByName.matchesData(context.data()) > 50 /* TODO REWRITE ALL THIS */)
         return candidateByName;
 
     unsigned priorityByName = *priorityPtr;
@@ -255,6 +247,7 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
     return mimeTypes;
 }
 
+#if 0
 QList<QMimeGlobPattern> QMimeDatabasePrivate::toGlobPatterns(const QStringList &patterns, const QString &mimeType, int weight)
 {
     QList<QMimeGlobPattern> globPatterns;
@@ -271,6 +264,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
         patterns.append(globPattern.pattern());
     return patterns;
 }
+#endif
 
 
 // TODO rewrite docu, it explains implementation details
@@ -313,20 +307,25 @@ QMimeDatabase::QMimeDatabase() :
 {
 }
 
+#if 0
 QMimeDatabase::QMimeDatabase(QMimeDatabasePrivate *const theD) :
     d(theD)
 {
 }
+#endif
 
 QMimeDatabase::~QMimeDatabase()
 {
+#if 0
     if (d != staticMimeDataBase()) {
         delete d;
     }
+#endif
 
     d = 0;
 }
 
+#if 0
 QMimeDatabaseBuilder::QMimeDatabaseBuilder(QMimeDatabase *mimeDatabase) :
     d(mimeDatabase->data_ptr())
 {
@@ -342,27 +341,7 @@ bool QMimeDatabaseBuilder::addMimeType(const QMimeType &mt)
 
     return d->addMimeType(mt);
 }
-
-bool QMimeDatabaseBuilder::addMimeTypes(const QString &fileName, QString *errorMessage)
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->addMimeTypes(fileName, errorMessage);
-}
-
-bool QMimeDatabaseBuilder::addMimeTypes(QIODevice *device, QString *errorMessage)
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->addMimeTypes(device, errorMessage);
-}
-
-void QMimeDatabasePrivate::addGlobPattern(const QMimeGlobPattern& glob)
-{
-    m_mimeTypeGlobs.addGlob(glob);
-}
-
-
+#endif
 
 /*!
     Returns a MIME type for \a typeOrAlias or Null one if none found.
@@ -459,6 +438,7 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &name, const QByteArray
     return d->findByNameAndData(name, &buffer, &accuracy);
 }
 
+#if 0
 void QMimeDatabaseBuilder::setMagicMatchers(const QString &typeOrAlias,
                                             const QList<QMimeMagicRuleMatcher> &matchers)
 {
@@ -466,6 +446,7 @@ void QMimeDatabaseBuilder::setMagicMatchers(const QString &typeOrAlias,
 
     d->setMagicMatchers(typeOrAlias, matchers);
 }
+#endif
 
 QList<QMimeType> QMimeDatabase::mimeTypes() const
 {
@@ -474,6 +455,7 @@ QList<QMimeType> QMimeDatabase::mimeTypes() const
     return d->mimeTypes();
 }
 
+#if 0
 /*!
     Returns all known suffixes
 */
@@ -536,6 +518,7 @@ void QMimeDatabaseBuilder::setGlobPatterns(const QString &typeOrAlias,
 
     d->setGlobPatterns(typeOrAlias, globPatterns);
 }
+#endif
 
 QStringList QMimeDatabase::filterStrings() const
 {

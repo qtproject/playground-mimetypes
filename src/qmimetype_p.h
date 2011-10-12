@@ -40,7 +40,7 @@ public:
     void clear();
     void addGlobPattern(const QString &pattern);
 
-    unsigned matchesFileBySuffix(const QString &name) const;
+    //unsigned matchesFileBySuffix(const QString &name) const;
     unsigned matchesData(const QByteArray &data) const;
 
     const QRegExp suffixPattern;

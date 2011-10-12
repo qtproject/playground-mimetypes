@@ -81,6 +81,7 @@ void QMimeTypeData::addGlobPattern(const QString &pattern)
     }
 }
 
+#if 0
 unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 {
     foreach (const QString &pattern, globPatterns) {
@@ -91,6 +92,7 @@ unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
 
     return 0;
 }
+#endif
 
 static inline bool isTextFile(const QByteArray &data)
 {
@@ -281,6 +283,7 @@ unsigned QMimeType::matchesData(const QByteArray &data) const
     return d->matchesData(data);
 }
 
+#if 0
 /*!
     Checks the glob pattern weights and magic priorities so the highest
     value is returned. A 0 (zero) indicates no match.
@@ -301,6 +304,7 @@ unsigned QMimeType::matchesName(const QString &name) const
 {
     return d->matchesFileBySuffix(name);
 }
+#endif
 
 /*!
     Returns a filter string usable for a file dialog.

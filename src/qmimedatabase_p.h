@@ -31,8 +31,7 @@
 QT_BEGIN_NAMESPACE
 
 class QMimeDatabase;
-
-#define MIN_MATCH_WEIGHT 50
+class QMimeProviderBase;
 
 // MimeMapEntry: Entry of a type map, consisting of type.
 struct MimeMapEntry
@@ -52,12 +51,14 @@ struct QMimeDatabasePrivate
     QMimeDatabasePrivate();
     ~QMimeDatabasePrivate();
 
-    bool addMimeTypes(const QString &fileName, QString *errorMessage);
-    bool addMimeTypes(QIODevice *device, QString *errorMessage);
+    QMimeProviderBase *provider();
+
     bool addMimeType(const QMimeType &mt);
+    void addGlobPattern(const QMimeGlobPattern& glob);
 
     QStringList filterStrings() const;
 
+#if 0
     QList<QMimeGlobPattern> globPatterns() const;
     void setGlobPatterns(const QString &typeOrAlias, const QStringList &globPatterns);
 
@@ -66,27 +67,28 @@ struct QMimeDatabasePrivate
 
     void setMagicMatchers(const QString &typeOrAlias,
                           const QList<QMimeMagicRuleMatcher> &matchers);
+#endif
 
     QList<QMimeType> mimeTypes() const;
 
-    void addGlobPattern(const QMimeGlobPattern& glob);
-
+#if 0
     static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns, const QString &mimeType,
                                                   int weight = QMimeGlobPattern::MaxWeight);
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
+#endif
 
     typedef QHash<QString, MimeMapEntry *> TypeMimeTypeMap;
     typedef QMultiHash<QString, QString> ParentChildrenMap;
 
-    bool addMimeTypes(QIODevice *device, const QString &fileName, QString *errorMessage);
     inline QString resolveAlias(const QString &name) const
     { return aliasMap.value(name, name); }
 
-    QMimeType findByType(const QString &type) const;
-    QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr) const;
-    QMimeType findByData(const QByteArray &data, unsigned *priorityPtr) const;
-    QStringList findByName(const QString &fileName) const;
+    QMimeType findByType(const QString &type);
+    QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr);
+    QMimeType findByData(const QByteArray &data, unsigned *priorityPtr);
+    QStringList findByName(const QString &fileName);
 
+    mutable QMimeProviderBase *m_provider;
     QMimeAllGlobPatterns m_mimeTypeGlobs;
 
     TypeMimeTypeMap typeMimeTypeMap;
@@ -96,6 +98,7 @@ struct QMimeDatabasePrivate
 };
 
 
+#if 0
 class QMIME_EXPORT QMimeDatabaseBuilder
 {
     Q_DISABLE_COPY(QMimeDatabaseBuilder)
@@ -104,8 +107,6 @@ public:
     QMimeDatabaseBuilder(QMimeDatabase *mimeDatabase);
     ~QMimeDatabaseBuilder();
 
-    bool addMimeTypes(const QString &fileName, QString *errorMessage);
-    bool addMimeTypes(QIODevice *device, QString *errorMessage);
     bool addMimeType(const QMimeType &mt);
 
     QStringList suffixes() const;
@@ -127,6 +128,7 @@ public:
 private:
     QMimeDatabasePrivate *const d;
 };
+#endif
 
 QT_END_NAMESPACE
 
