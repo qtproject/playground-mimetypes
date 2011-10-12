@@ -21,6 +21,7 @@
 #ifndef QMIMETYPE_P_H
 #define QMIMETYPE_P_H
 
+#include "magicmatcher.h"
 #include "qmimetype.h"
 
 #include <QtCore/QHash>
