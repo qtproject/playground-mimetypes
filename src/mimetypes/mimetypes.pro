@@ -46,7 +46,7 @@ unix: {
 }
 
 RESOURCES += \
-    qmime.qrc
+    mimetypes.qrc
 
 symbian {
     MMP_RULES += EXPORTUNFROZEN
