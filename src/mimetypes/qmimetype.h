@@ -43,7 +43,7 @@ public:
 
     bool operator==(const QMimeType &other) const;
     inline bool operator!=(const QMimeType &other) const
-    { return operator==(other); }
+    { return !operator==(other); }
 
     void clear();
 
