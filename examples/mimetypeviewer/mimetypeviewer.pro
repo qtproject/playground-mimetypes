@@ -13,7 +13,7 @@ TEMPLATE = app
 
 message($$PWD)
 
-LIBS += -L$$OUT_PWD/../../lib -lqmimetype
+LIBS += -L$$OUT_PWD/../../src/mimetypes -lQtMimeTypes
 
 INCLUDEPATH *= $$PWD/../../include/QtMimeTypes
 
