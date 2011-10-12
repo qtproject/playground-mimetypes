@@ -39,10 +39,8 @@ struct MimeMapEntry
     inline MimeMapEntry(const QMimeType &aType = QMimeType()) :
         type(aType)
     {}
-
     QMimeType type;
 };
-
 
 struct QMimeDatabasePrivate
 {
@@ -52,9 +50,10 @@ struct QMimeDatabasePrivate
     ~QMimeDatabasePrivate();
 
     QMimeProviderBase *provider();
+    void setProvider(QMimeProviderBase *theProvider);
 
     bool addMimeType(const QMimeType &mt);
-    void addGlobPattern(const QMimeGlobPattern& glob);
+    //void addGlobPattern(const QMimeGlobPattern &glob);
 
     QStringList filterStrings() const;
 
@@ -78,22 +77,24 @@ struct QMimeDatabasePrivate
 #endif
 
     typedef QHash<QString, MimeMapEntry *> TypeMimeTypeMap;
+#if 0 // This parentChildrenMap seems to be unused?
     typedef QMultiHash<QString, QString> ParentChildrenMap;
-
-    inline QString resolveAlias(const QString &name) const
-    { return aliasMap.value(name, name); }
+#endif
+    typedef QHash<QString, QString> AliasMap;
 
     QMimeType findByType(const QString &type);
     QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr);
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr);
     QStringList findByName(const QString &fileName);
-
-    mutable QMimeProviderBase *m_provider;
-    QMimeAllGlobPatterns m_mimeTypeGlobs;
+    inline QString resolveAlias(const QString &name) const
+    { return aliasMap.value(name, name); }
 
     TypeMimeTypeMap typeMimeTypeMap;
-    QHash<QString, QString> aliasMap;
+    AliasMap aliasMap;
+#if 0 // This parentChildrenMap seems to be unused?
     ParentChildrenMap parentChildrenMap;
+#endif
+    mutable QMimeProviderBase *m_provider;
     QMutex mutex;
 };
 

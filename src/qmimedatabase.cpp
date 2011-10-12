@@ -40,12 +40,15 @@ QT_BEGIN_NAMESPACE
 Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticMimeDataBase)
 
 QMimeDatabasePrivate::QMimeDatabasePrivate()
+    : m_provider(0)
 {
 }
 
 QMimeDatabasePrivate::~QMimeDatabasePrivate()
 {
     qDeleteAll(typeMimeTypeMap);
+    delete m_provider;
+    m_provider = 0;
 }
 
 QMimeProviderBase *QMimeDatabasePrivate::provider()
@@ -62,9 +65,10 @@ QMimeProviderBase *QMimeDatabasePrivate::provider()
     return m_provider;
 }
 
-void QMimeDatabasePrivate::addGlobPattern(const QMimeGlobPattern& glob)
+void QMimeDatabasePrivate::setProvider(QMimeProviderBase *theProvider)
 {
-    m_mimeTypeGlobs.addGlob(glob);
+    delete m_provider;
+    m_provider = theProvider;
 }
 
 bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
@@ -77,11 +81,13 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     // insert the type.
     typeMimeTypeMap.insert(type, new MimeMapEntry(mt));
 
+#if 0 // This parentChildrenMap seems to be unused?
     // Register the children, resolved via alias map. Note that it is still
     // possible that aliases end up in the map if the parent classes are not inserted
     // at this point (thus their aliases not known).
     foreach (const QString &subClassOf, mt.subClassOf())
         parentChildrenMap.insert(resolveAlias(subClassOf), type);
+#endif
 
     // register aliasses
     foreach (const QString &alias, mt.aliases())
@@ -117,13 +123,11 @@ QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias)
 
 QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
 {
-    provider()->ensureGlobsLoaded();
+    QString foundSuffix;
 
-    QString foundExt;
-    const QStringList matchingMimeTypes = m_mimeTypeGlobs.matchingGlobs(fileName, &foundExt);
+    const QStringList matchingMimeTypes = provider()->findByName(fileName, &foundSuffix);
+    // TODO a method that returns the found suffix
 
-    //if (pMatchingExtension)
-    //    *pMatchingExtension = foundExt;
     return matchingMimeTypes;
 }
 

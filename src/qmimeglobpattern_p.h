@@ -64,7 +64,7 @@ public:
     }
     void match(QStringList &matchingMimeTypes,
                const QString &fileName,
-               QString *foundExt) const;
+               QString *foundSuffix) const;
 };
 
 /*!
@@ -81,7 +81,7 @@ public:
 
     void addGlob(const QMimeGlobPattern &glob);
     void removeMime(const QString &mime);
-    QStringList matchingGlobs(const QString &fileName, QString *foundExt) const;
+    QStringList matchingGlobs(const QString &fileName, QString *foundSuffix) const;
 
     PatternsMap m_fastPatterns; // example: "doc" -> "application/msword", "text/plain"
     QMimeGlobPatternList m_highWeightGlobs;

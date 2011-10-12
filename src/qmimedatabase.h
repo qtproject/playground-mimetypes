@@ -59,11 +59,10 @@ public:
     QStringList filterStrings() const;
     QString allFiltersString(QString *allFilesFilter = 0) const;
 
+    QMimeDatabasePrivate *data_ptr() { return d; }
+
 private:
     QMimeDatabasePrivate *d;
-
-public:
-    QMimeDatabasePrivate *data_ptr() { return d; }
 };
 
 QT_END_NAMESPACE

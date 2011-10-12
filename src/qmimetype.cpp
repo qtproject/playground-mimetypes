@@ -288,7 +288,7 @@ unsigned QMimeType::matchesData(const QByteArray &data) const
     Checks the glob pattern weights and magic priorities so the highest
     value is returned. A 0 (zero) indicates no match.
 */
-unsigned QMimeType::matchesNameAndData(QIODevice *device, const QString &fileName) const
+unsigned QMimeType::matchesFile(QIODevice *device, const QString &fileName) const
 {
     FileMatchContext context(device, fileName);
     const unsigned suffixPriority = d->matchesFileBySuffix(context.fileName());
