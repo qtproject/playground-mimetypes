@@ -49,22 +49,22 @@ public:
 
     bool isValid() const;
 
-    QString type() const;
+    const QString &type() const;
 
-    QStringList aliases() const;
+    const QStringList &aliases() const;
 
-    QString comment() const;
+    const QString &comment() const;
 
     QString localeComment(const QString &locale = QString()) const;
 
-    QString genericIconName() const;
+    const QString &genericIconName() const;
 
-    QStringList globPatterns() const;
+    const QStringList &globPatterns() const;
 
-    QStringList subClassOf() const;
+    const QStringList &subClassOf() const;
 
-    QStringList suffixes() const;
-    QString preferredSuffix() const;
+    const QStringList &suffixes() const;
+    const QString &preferredSuffix() const;
 
     bool matchesType(const QString &type) const;
     unsigned matchesData(const QByteArray &data) const;

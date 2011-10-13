@@ -201,12 +201,12 @@ bool QMimeType::isValid() const
     return !d->type.isEmpty();
 }
 
-QString QMimeType::type() const
+const QString &QMimeType::type() const
 {
     return d->type;
 }
 
-QString QMimeType::comment() const
+const QString &QMimeType::comment() const
 {
     return d->comment;
 }
@@ -230,22 +230,22 @@ QString QMimeType::localeComment(const QString &localeArg) const
     return d->localeComments.value(locale, d->comment);
 }
 
-QStringList QMimeType::aliases() const
+const QStringList &QMimeType::aliases() const
 {
     return d->aliases;
 }
 
-QString QMimeType::genericIconName() const
+const QString &QMimeType::genericIconName() const
 {
     return d->genericIconName;
 }
 
-QStringList QMimeType::globPatterns() const
+const QStringList &QMimeType::globPatterns() const
 {
     return d->globPatterns;
 }
 
-QStringList QMimeType::subClassOf() const
+const QStringList &QMimeType::subClassOf() const
 {
     return d->subClassOf;
 }
@@ -255,7 +255,7 @@ QStringList QMimeType::subClassOf() const
 
     Extension over standard MIME data
 */
-QStringList QMimeType::suffixes() const
+const QStringList &QMimeType::suffixes() const
 {
     return d->suffixes;
 }
@@ -265,7 +265,7 @@ QStringList QMimeType::suffixes() const
 
     Extension over standard MIME data
 */
-QString QMimeType::preferredSuffix() const
+const QString &QMimeType::preferredSuffix() const
 {
     return d->preferredSuffix;
 }
