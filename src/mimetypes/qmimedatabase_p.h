@@ -59,12 +59,12 @@ struct QMimeDatabasePrivate
 
 #if 0
     QList<QMimeGlobPattern> globPatterns() const;
-    void setGlobPatterns(const QString &typeOrAlias, const QStringList &globPatterns);
+    void setGlobPatterns(const QString &nameOrAlias, const QStringList &globPatterns);
 
     QStringList suffixes() const;
-    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
+    bool setPreferredSuffix(const QString &nameOrAlias, const QString &suffix);
 
-    void setMagicMatchers(const QString &typeOrAlias,
+    void setMagicMatchers(const QString &nameOrAlias,
                           const QList<QMimeMagicRuleMatcher> &matchers);
 #endif
 
@@ -82,7 +82,7 @@ struct QMimeDatabasePrivate
 #endif
     typedef QHash<QString, QString> AliasMap;
 
-    QMimeType findByType(const QString &typeOrAlias);
+    QMimeType mimeTypeForName(const QString &nameOrAlias);
     QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr);
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr);
     QStringList findByName(const QString &fileName);
@@ -111,14 +111,14 @@ public:
     bool addMimeType(const QMimeType &mt);
 
     QStringList suffixes() const;
-    bool setPreferredSuffix(const QString &typeOrAlias, const QString &suffix);
+    bool setPreferredSuffix(const QString &nameOrAlias, const QString &suffix);
     QString preferredSuffixByType(const QString &type) const;
     QString preferredSuffixByNameAndData(const QString &fileName, QIODevice *device) const;
 
     QStringList globPatterns() const;
-    void setGlobPatterns(const QString &typeOrAlias, const QStringList &globPatterns);
+    void setGlobPatterns(const QString &nameOrAlias, const QStringList &globPatterns);
 
-    void setMagicMatchers(const QString &typeOrAlias,
+    void setMagicMatchers(const QString &nameOrAlias,
                           const QList<QMimeMagicRuleMatcher> &matchers);
 
     static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,

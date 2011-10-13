@@ -44,7 +44,7 @@ public:
     //explicit QMimeDatabase(QMimeDatabasePrivate *theD);
     ~QMimeDatabase();
 
-    QMimeType findByType(const QString &typeOrAlias) const;
+    QMimeType mimeTypeForName(const QString &nameOrAlias) const;
     QMimeType findByName(const QString &fileName) const;
     QMimeType findByData(const QByteArray &data) const;
 

@@ -97,9 +97,9 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
 }
 
 #if 0
-bool QMimeDatabasePrivate::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
+bool QMimeDatabasePrivate::setPreferredSuffix(const QString &nameOrAlias, const QString &suffix)
 {
-    TypeMimeTypeMap::iterator tit =  typeMimeTypeMap.find(resolveAlias(typeOrAlias));
+    TypeMimeTypeMap::iterator tit =  typeMimeTypeMap.find(resolveAlias(nameOrAlias));
     if (tit != typeMimeTypeMap.end()) {
         QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
         mimeTypeData.preferredSuffix = suffix;
@@ -111,11 +111,11 @@ bool QMimeDatabasePrivate::setPreferredSuffix(const QString &typeOrAlias, const 
 #endif
 
 // Returns a MIME type or Null one if none found
-QMimeType QMimeDatabasePrivate::findByType(const QString &typeOrAlias)
+QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
 {
     provider()->ensureTypesLoaded();
 
-    const MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(typeOrAlias));
+    const MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(nameOrAlias));
     if (entry)
         return entry->type;
     return QMimeType();
@@ -169,10 +169,10 @@ QList<QMimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
     return globPatterns;
 }
 
-void QMimeDatabasePrivate::setGlobPatterns(const QString &typeOrAlias,
+void QMimeDatabasePrivate::setGlobPatterns(const QString &nameOrAlias,
                                            const QStringList &globPatterns)
 {
-    TypeMimeTypeMap::iterator tit =  typeMimeTypeMap.find(resolveAlias(typeOrAlias));
+    TypeMimeTypeMap::iterator tit =  typeMimeTypeMap.find(resolveAlias(nameOrAlias));
     if (tit != typeMimeTypeMap.end()) {
         QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
         mimeTypeData.globPatterns = globPatterns;
@@ -180,10 +180,10 @@ void QMimeDatabasePrivate::setGlobPatterns(const QString &typeOrAlias,
     }
 }
 
-void QMimeDatabasePrivate::setMagicMatchers(const QString &typeOrAlias,
+void QMimeDatabasePrivate::setMagicMatchers(const QString &nameOrAlias,
                                             const QList<QMimeMagicRuleMatcher> &matchers)
 {
-    TypeMimeTypeMap::iterator tit = typeMimeTypeMap.find(resolveAlias(typeOrAlias));
+    TypeMimeTypeMap::iterator tit = typeMimeTypeMap.find(resolveAlias(nameOrAlias));
     if (tit != typeMimeTypeMap.end()) {
         QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
         mimeTypeData.magicMatchers = matchers;
@@ -211,7 +211,7 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
     QMimeType candidateByName;
     if (!candidatesByName.isEmpty()) {
         *priorityPtr = 50;
-        candidateByName = findByType(candidatesByName.last());
+        candidateByName = mimeTypeForName(candidatesByName.last());
     }
 
     // Pass 2) Match on content
@@ -348,13 +348,13 @@ bool QMimeDatabaseBuilder::addMimeType(const QMimeType &mt)
 #endif
 
 /*!
-    Returns a MIME type for \a typeOrAlias or Null one if none found.
+    Returns a MIME type for \a nameOrAlias or Null one if none found.
 */
-QMimeType QMimeDatabase::findByType(const QString &typeOrAlias) const
+QMimeType QMimeDatabase::mimeTypeForName(const QString &nameOrAlias) const
 {
     QMutexLocker locker(&d->mutex);
 
-    return d->findByType(typeOrAlias);
+    return d->mimeTypeForName(nameOrAlias);
 }
 
 /*!
@@ -397,11 +397,11 @@ QMimeType QMimeDatabase::findByName(const QString &fileName) const
     if (matchCount == 0)
         return QMimeType();
     else if (matchCount == 1)
-        return d->findByType(matches.first());
+        return d->mimeTypeForName(matches.first());
     else {
         // We have to pick one.
         matches.sort(); // Make it deterministic
-        return d->findByType(matches.first());
+        return d->mimeTypeForName(matches.first());
     }
 }
 
@@ -449,12 +449,12 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, const QByteA
 }
 
 #if 0
-void QMimeDatabaseBuilder::setMagicMatchers(const QString &typeOrAlias,
+void QMimeDatabaseBuilder::setMagicMatchers(const QString &nameOrAlias,
                                             const QList<QMimeMagicRuleMatcher> &matchers)
 {
     QMutexLocker locker(&d->mutex);
 
-    d->setMagicMatchers(typeOrAlias, matchers);
+    d->setMagicMatchers(nameOrAlias, matchers);
 }
 #endif
 
@@ -476,10 +476,10 @@ QStringList QMimeDatabaseBuilder::suffixes() const
     return d->suffixes();
 }
 
-QString QMimeDatabaseBuilder::preferredSuffixByType(const QString &typeOrAlias) const
+QString QMimeDatabaseBuilder::preferredSuffixByType(const QString &nameOrAlias) const
 {
     d->mutex.lock();
-    const QMimeType mt = d->findByType(typeOrAlias);
+    const QMimeType mt = d->mimeTypeForName(nameOrAlias);
     d->mutex.unlock();
     if (mt.isValid())
         return mt.preferredSuffix(); // already does Mutex locking
@@ -497,11 +497,11 @@ QString QMimeDatabaseBuilder::preferredSuffixByNameAndData(const QString &fileNa
     return QString();
 }
 
-bool QMimeDatabaseBuilder::setPreferredSuffix(const QString &typeOrAlias, const QString &suffix)
+bool QMimeDatabaseBuilder::setPreferredSuffix(const QString &nameOrAlias, const QString &suffix)
 {
     QMutexLocker locker(&d->mutex);
 
-    return d->setPreferredSuffix(typeOrAlias, suffix);
+    return d->setPreferredSuffix(nameOrAlias, suffix);
 }
 
 QList<QMimeGlobPattern> QMimeDatabaseBuilder::toGlobPatterns(const QStringList &patterns, const QString &mimeType, int weight)
@@ -521,12 +521,12 @@ QStringList QMimeDatabaseBuilder::globPatterns() const
     return fromGlobPatterns(d->globPatterns());
 }
 
-void QMimeDatabaseBuilder::setGlobPatterns(const QString &typeOrAlias,
+void QMimeDatabaseBuilder::setGlobPatterns(const QString &nameOrAlias,
                                            const QStringList &globPatterns)
 {
     QMutexLocker locker(&d->mutex);
 
-    d->setGlobPatterns(typeOrAlias, globPatterns);
+    d->setGlobPatterns(nameOrAlias, globPatterns);
 }
 #endif
 
