@@ -27,7 +27,7 @@ private:
     Ui::MimeTypeViewer *ui;
     QMimeDatabase *dataBase;
 
-    void updateTypes();
+    void updateNameList();
     void setMimeType(const QMimeType &mime);
 };
 

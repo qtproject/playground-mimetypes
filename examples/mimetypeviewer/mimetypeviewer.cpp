@@ -27,32 +27,32 @@ void MimeTypeViewer::onOpenFileButtonClicked()
         return;
 
     ui->fileLineEdit->setText(file);
-    QMimeType mime = dataBase->findByFile(QFileInfo(file));
-    if (mime.isValid())
-        setMimeType(mime);
+    QMimeType mimeType = dataBase->findByFile(QFileInfo(file));
+    if (mimeType.isValid())
+        setMimeType(mimeType);
 }
 
-void MimeTypeViewer::updateTypes()
+void MimeTypeViewer::updateNameList()
 {
-    ui->listWidget->clear();
+    ui->nameList->clear();
     foreach (const QMimeType &mime, dataBase->mimeTypes()) {
-        ui->listWidget->addItem(mime.type());
+        ui->nameList->addItem(mime.name());
     }
-    ui->listWidget->sortItems();
+    ui->nameList->sortItems();
 }
 
-void MimeTypeViewer::setMimeType(const QMimeType &mime)
+void MimeTypeViewer::setMimeType(const QMimeType &mimeType)
 {
-    ui->mimeTypeLabel->setText(mime.type());
-    ui->aliasesLabel->setText(mime.aliases().join(", "));
-    ui->commentLabel->setText(mime.comment());
-    ui->localeCommentLabel->setText(mime.localeComment());
-    ui->genericIconNameLabel->setText(mime.genericIconName());
+    ui->mimeTypeLabel->setText(mimeType.name());
+    ui->aliasesLabel->setText(mimeType.aliases().join(", "));
+    ui->commentLabel->setText(mimeType.comment());
+    ui->localeCommentLabel->setText(mimeType.localeComment());
+    ui->genericIconNameLabel->setText(mimeType.genericIconName());
 
-    ui->globPatternsLabel->setText(mime.globPatterns().join(", "));
-    ui->subClassesOfLabel->setText(mime.subClassOf().join(", "));
+    ui->globPatternsLabel->setText(mimeType.globPatterns().join(", "));
+    ui->subClassesOfLabel->setText(mimeType.subClassOf().join(", "));
 
-    ui->suffixesLabel->setText(mime.suffixes().join(", "));
-    ui->preferredSuffixLabel->setText(mime.preferredSuffix());
-    ui->filterStringLabel->setText(mime.filterString());
+    ui->suffixesLabel->setText(mimeType.suffixes().join(", "));
+    ui->preferredSuffixLabel->setText(mimeType.preferredSuffix());
+    ui->filterStringLabel->setText(mimeType.filterString());
 }

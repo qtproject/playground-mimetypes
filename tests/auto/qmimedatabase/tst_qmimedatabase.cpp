@@ -80,10 +80,10 @@ void tst_QMimeType::findByName()
     QFETCH(QString, mimeType);
     QFETCH(QString, xFail);
 
-    const QString resultMimeTypeName = database.findByName(filePath).type();
+    const QString resultMimeTypeName = database.findByName(filePath).name();
 
-    // Results are ambiguous when multiple mimetypes have the same glob
-    // -> accept the current result if the found mimetype actually
+    // Results are ambiguous when multiple MIME types have the same glob
+    // -> accept the current result if the found MIME type actually
     // matches the file's extension.
     const QMimeType foundMimeType = database.mimeTypeForName(resultMimeTypeName);
     const QString extension = QFileInfo(filePath).suffix();
@@ -115,7 +115,7 @@ void tst_QMimeType::findByData()
     QVERIFY(f.open(QIODevice::ReadOnly));
     QByteArray data = f.readAll();
 
-    const QString resultMimeTypeName = database.findByData(data).type();
+    const QString resultMimeTypeName = database.findByData(data).name();
     if (xFail.length() >= 2 && xFail.at(1) == QLatin1Char('x'))
         // Expected to fail
         QVERIFY2(resultMimeTypeName != mimeType, qPrintable(resultMimeTypeName));
@@ -134,7 +134,7 @@ void tst_QMimeType::findByFile()
     QFETCH(QString, mimeType);
     QFETCH(QString, xFail);
 
-    const QString resultMimeTypeName = database.findByFile(QFileInfo(filePath)).type();
+    const QString resultMimeTypeName = database.findByFile(QFileInfo(filePath)).name();
     if (xFail.length() >= 3 && xFail.at(2) == QLatin1Char('x'))
         // Expected to fail
         QVERIFY2(resultMimeTypeName != mimeType, qPrintable(resultMimeTypeName));
