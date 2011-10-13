@@ -48,9 +48,9 @@ public:
     QMimeType findByName(const QString &fileName) const;
     QMimeType findByData(const QByteArray &data) const;
 
-    QMimeType findByFile(const QString &file) const;
+    QMimeType findByFile(const QString &fileName) const;
     QMimeType findByFile(const QFileInfo &fileInfo) const;
-    QMimeType findByUrl(const QUrl& url) const;
+    QMimeType findByUrl(const QUrl &url) const;
     QMimeType findByNameAndData(const QString &fileName, QIODevice *device) const;
     QMimeType findByNameAndData(const QString &fileName, const QByteArray &data) const;
 
