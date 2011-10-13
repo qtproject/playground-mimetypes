@@ -77,7 +77,7 @@ public:
 
 protected:
     friend class BaseMimeTypeParser;
-    friend class MimeMapEntry;
+    friend class MimeTypeMapEntry;
     friend class QMimeDatabasePrivate;
     friend class QMimeDatabase;
     friend class QMimeTypeData;

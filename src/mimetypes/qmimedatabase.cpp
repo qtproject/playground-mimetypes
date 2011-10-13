@@ -46,7 +46,7 @@ QMimeDatabasePrivate::QMimeDatabasePrivate()
 
 QMimeDatabasePrivate::~QMimeDatabasePrivate()
 {
-    qDeleteAll(typeMimeTypeMap);
+    qDeleteAll(nameMimeTypeMap);
     delete m_provider;
     m_provider = 0;
 }
@@ -79,7 +79,7 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     const QString &name = mt.name();
 
     // insert the MIME type.
-    typeMimeTypeMap.insert(name, new MimeMapEntry(mt));
+    nameMimeTypeMap.insert(name, new MimeTypeMapEntry(mt));
 
 #if 0 // This parentChildrenMap seems to be unused?
     // Register the children, resolved via alias map. Note that it is still
@@ -99,8 +99,8 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
 #if 0
 bool QMimeDatabasePrivate::setPreferredSuffix(const QString &nameOrAlias, const QString &suffix)
 {
-    TypeMimeTypeMap::iterator tit =  typeMimeTypeMap.find(resolveAlias(nameOrAlias));
-    if (tit != typeMimeTypeMap.end()) {
+    NameMimeTypeMap::iterator tit =  nameMimeTypeMap.find(resolveAlias(nameOrAlias));
+    if (tit != nameMimeTypeMap.end()) {
         QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
         mimeTypeData.preferredSuffix = suffix;
         tit.value()->type = QMimeType(mimeTypeData);
@@ -115,7 +115,7 @@ QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
 {
     provider()->ensureTypesLoaded();
 
-    const MimeMapEntry *entry = typeMimeTypeMap.value(resolveAlias(nameOrAlias));
+    const MimeTypeMapEntry *entry = nameMimeTypeMap.value(resolveAlias(nameOrAlias));
     if (entry)
         return entry->type;
     return QMimeType();
@@ -138,7 +138,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
 
     QMimeType candidate;
 
-    foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
+    foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap) {
         const unsigned contentPriority = entry->type.d->matchesData(data);
         if (contentPriority && contentPriority > *priorityPtr) {
             *priorityPtr = contentPriority;
@@ -154,8 +154,8 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
 QStringList QMimeDatabasePrivate::suffixes() const
 {
     QStringList rc;
-    const TypeMimeTypeMap::const_iterator cend = typeMimeTypeMap.constEnd();
-    for (TypeMimeTypeMap::const_iterator it = typeMimeTypeMap.constBegin(); it != cend; ++it)
+    const NameMimeTypeMap::const_iterator cend = nameMimeTypeMap.constEnd();
+    for (NameMimeTypeMap::const_iterator it = nameMimeTypeMap.constBegin(); it != cend; ++it)
         rc += it.value()->type.suffixes();
     return rc;
 }
@@ -163,8 +163,8 @@ QStringList QMimeDatabasePrivate::suffixes() const
 QList<QMimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
 {
     QList<QMimeGlobPattern> globPatterns;
-    const TypeMimeTypeMap::const_iterator cend = typeMimeTypeMap.constEnd();
-    for (TypeMimeTypeMap::const_iterator it = typeMimeTypeMap.constBegin(); it != cend; ++it)
+    const NameMimeTypeMap::const_iterator cend = nameMimeTypeMap.constEnd();
+    for (NameMimeTypeMap::const_iterator it = nameMimeTypeMap.constBegin(); it != cend; ++it)
         globPatterns.append(toGlobPatterns(it.value()->type.globPatterns(), it.value()->type.type()));
     return globPatterns;
 }
@@ -172,8 +172,8 @@ QList<QMimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
 void QMimeDatabasePrivate::setGlobPatterns(const QString &nameOrAlias,
                                            const QStringList &globPatterns)
 {
-    TypeMimeTypeMap::iterator tit =  typeMimeTypeMap.find(resolveAlias(nameOrAlias));
-    if (tit != typeMimeTypeMap.end()) {
+    NameMimeTypeMap::iterator tit =  nameMimeTypeMap.find(resolveAlias(nameOrAlias));
+    if (tit != nameMimeTypeMap.end()) {
         QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
         mimeTypeData.globPatterns = globPatterns;
         tit.value()->type = QMimeType(mimeTypeData);
@@ -183,8 +183,8 @@ void QMimeDatabasePrivate::setGlobPatterns(const QString &nameOrAlias,
 void QMimeDatabasePrivate::setMagicMatchers(const QString &nameOrAlias,
                                             const QList<QMimeMagicRuleMatcher> &matchers)
 {
-    TypeMimeTypeMap::iterator tit = typeMimeTypeMap.find(resolveAlias(nameOrAlias));
-    if (tit != typeMimeTypeMap.end()) {
+    NameMimeTypeMap::iterator tit = nameMimeTypeMap.find(resolveAlias(nameOrAlias));
+    if (tit != nameMimeTypeMap.end()) {
         QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
         mimeTypeData.magicMatchers = matchers;
         tit.value()->type = QMimeType(mimeTypeData);
@@ -232,7 +232,7 @@ QStringList QMimeDatabasePrivate::filterStrings() const
 {
     QStringList rc;
 
-    foreach (const MimeMapEntry *entry, typeMimeTypeMap) {
+    foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap) {
         const QString filterString = entry->type.filterString();
         if (!filterString.isEmpty())
             rc += filterString;
@@ -245,7 +245,7 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 {
     QList<QMimeType> mimeTypes;
 
-    foreach (const MimeMapEntry *entry, typeMimeTypeMap)
+    foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap)
         mimeTypes.append(entry->type);
 
     return mimeTypes;

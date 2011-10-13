@@ -33,10 +33,10 @@ QT_BEGIN_NAMESPACE
 class QMimeDatabase;
 class QMimeProviderBase;
 
-// MimeMapEntry: Entry of a type map, consisting of type.
-struct MimeMapEntry
+// MimeTypeMapEntry: Entry of a MIME type map, consisting of a MIME type.
+struct MimeTypeMapEntry
 {
-    inline MimeMapEntry(const QMimeType &aType = QMimeType()) :
+    inline MimeTypeMapEntry(const QMimeType &aType = QMimeType()) :
         type(aType)
     {}
     QMimeType type;
@@ -76,7 +76,7 @@ struct QMimeDatabasePrivate
     static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
 #endif
 
-    typedef QHash<QString, MimeMapEntry *> TypeMimeTypeMap;
+    typedef QHash<QString, MimeTypeMapEntry *> NameMimeTypeMap;
 #if 0 // This parentChildrenMap seems to be unused?
     typedef QMultiHash<QString, QString> ParentChildrenMap;
 #endif
@@ -89,7 +89,7 @@ struct QMimeDatabasePrivate
     inline QString resolveAlias(const QString &name) const
     { return aliasMap.value(name, name); }
 
-    TypeMimeTypeMap typeMimeTypeMap;
+    NameMimeTypeMap nameMimeTypeMap;
     AliasMap aliasMap;
 #if 0 // This parentChildrenMap seems to be unused?
     ParentChildrenMap parentChildrenMap;
