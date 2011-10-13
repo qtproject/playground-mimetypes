@@ -82,7 +82,7 @@ struct QMimeDatabasePrivate
 #endif
     typedef QHash<QString, QString> AliasMap;
 
-    QMimeType findByType(const QString &type);
+    QMimeType findByType(const QString &typeOrAlias);
     QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr);
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr);
     QStringList findByName(const QString &fileName);

@@ -388,11 +388,11 @@ QMimeType QMimeDatabase::findByFile(const QString &fileName) const
     when determining the MIME type, use QMimeDatabase::findByFile or
     QMimeDatabase::findByNameAndData instead.
 */
-QMimeType QMimeDatabase::findByName(const QString &name) const
+QMimeType QMimeDatabase::findByName(const QString &fileName) const
 {
     QMutexLocker locker(&d->mutex);
 
-    QStringList matches = d->findByName(QFileInfo(name).fileName());
+    QStringList matches = d->findByName(QFileInfo(fileName).fileName());
     const int matchCount = matches.count();
     if (matchCount == 0)
         return QMimeType();
@@ -435,17 +435,17 @@ QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
     return findByName(url.path());
 }
 
-QMimeType QMimeDatabase::findByNameAndData(const QString &name, QIODevice *device) const
+QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *device) const
 {
     unsigned int accuracy = 0;
-    return d->findByNameAndData(name, device, &accuracy);
+    return d->findByNameAndData(fileName, device, &accuracy);
 }
 
-QMimeType QMimeDatabase::findByNameAndData(const QString &name, const QByteArray &data) const
+QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, const QByteArray &data) const
 {
     QBuffer buffer(const_cast<QByteArray *>(&data));
     unsigned int accuracy = 0;
-    return d->findByNameAndData(name, &buffer, &accuracy);
+    return d->findByNameAndData(fileName, &buffer, &accuracy);
 }
 
 #if 0
@@ -476,10 +476,10 @@ QStringList QMimeDatabaseBuilder::suffixes() const
     return d->suffixes();
 }
 
-QString QMimeDatabaseBuilder::preferredSuffixByType(const QString &type) const
+QString QMimeDatabaseBuilder::preferredSuffixByType(const QString &typeOrAlias) const
 {
     d->mutex.lock();
-    const QMimeType mt = d->findByType(type);
+    const QMimeType mt = d->findByType(typeOrAlias);
     d->mutex.unlock();
     if (mt.isValid())
         return mt.preferredSuffix(); // already does Mutex locking
