@@ -49,7 +49,7 @@ public:
 
     bool isValid() const;
 
-    const QString &type() const;
+    const QString &name() const;
 
     const QStringList &aliases() const;
 

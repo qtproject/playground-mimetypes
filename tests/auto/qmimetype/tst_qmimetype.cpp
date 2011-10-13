@@ -144,7 +144,7 @@ void tst_qmimetype::test_name()
               );
 
     // Verify that the Id is part of the equality test:
-    QCOMPARE(instantiatedPngMimeType.type(), pngMimeTypeName());
+    QCOMPARE(instantiatedPngMimeType.name(), pngMimeTypeName());
 
     QVERIFY(instantiatedPngMimeType != otherPngMimeType);
     QVERIFY(!(instantiatedPngMimeType == otherPngMimeType));

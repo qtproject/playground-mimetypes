@@ -76,22 +76,22 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     if (!mt.isValid())
         return false;
 
-    const QString &type = mt.type();
+    const QString &name = mt.name();
 
-    // insert the type.
-    typeMimeTypeMap.insert(type, new MimeMapEntry(mt));
+    // insert the MIME type.
+    typeMimeTypeMap.insert(name, new MimeMapEntry(mt));
 
 #if 0 // This parentChildrenMap seems to be unused?
     // Register the children, resolved via alias map. Note that it is still
     // possible that aliases end up in the map if the parent classes are not inserted
     // at this point (thus their aliases not known).
     foreach (const QString &subClassOf, mt.subClassOf())
-        parentChildrenMap.insert(resolveAlias(subClassOf), type);
+        parentChildrenMap.insert(resolveAlias(subClassOf), name);
 #endif
 
     // register aliasses
     foreach (const QString &alias, mt.aliases())
-        aliasMap.insert(alias, type);
+        aliasMap.insert(alias, name);
 
     return true;
 }

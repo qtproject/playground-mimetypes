@@ -201,7 +201,7 @@ bool QMimeType::isValid() const
     return !d->name.isEmpty();
 }
 
-const QString &QMimeType::type() const
+const QString &QMimeType::name() const
 {
     return d->name;
 }
