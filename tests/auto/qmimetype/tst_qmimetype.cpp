@@ -97,14 +97,14 @@ static const QStringList &pngMimeTypeFilenameExtensions()
 // ------------------------------------------------------------------------------------------------
 
 static QMimeTypeData buildMimeTypeData (
-                         const QString &type,
+                         const QString &name,
                          const QString &comment,
                          const QString &genericIconName,
                          const QStringList &suffixes
                      )
 {
     QMimeTypeData instantiatedPngMimeTypeData;
-    instantiatedPngMimeTypeData.type = type;
+    instantiatedPngMimeTypeData.name = name;
     instantiatedPngMimeTypeData.comment = comment;
     instantiatedPngMimeTypeData.genericIconName = genericIconName;
     instantiatedPngMimeTypeData.suffixes = suffixes;

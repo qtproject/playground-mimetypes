@@ -188,12 +188,12 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             ps = nextState(ps, reader.name());
             atts = reader.attributes();
             switch (ps) {
-            case ParseMimeType: { // start parsing a type
-                const QString type = atts.value(QLatin1String(mimeTypeAttributeC)).toString();
-                if (type.isEmpty()) {
-                    reader.raiseError(QString::fromLatin1("Missing 'type'-attribute"));
+            case ParseMimeType: { // start parsing a MIME type name
+                const QString name = atts.value(QLatin1String(mimeTypeAttributeC)).toString();
+                if (name.isEmpty()) {
+                    reader.raiseError(QString::fromLatin1("Missing '%1'-attribute").arg(QString::fromLatin1(mimeTypeAttributeC)));
                 } else {
-                    data.type = type;
+                    data.name = name;
                 }
             }
                 break;
@@ -208,8 +208,8 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 if (weight == 0)
                     weight = QMimeGlobPattern::DefaultWeight;
 
-                Q_ASSERT(!data.type.isEmpty());
-                const QMimeGlobPattern glob(pattern, data.type, weight, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
+                Q_ASSERT(!data.name.isEmpty());
+                const QMimeGlobPattern glob(pattern, data.name, weight, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
                 if (!process(glob, errorMessage))   // for actual glob matching
                     return false;
                 data.addGlobPattern(pattern); // just for QMimeType::globPatterns()

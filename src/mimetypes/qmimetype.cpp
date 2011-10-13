@@ -43,7 +43,7 @@ QMimeTypeData::QMimeTypeData()
 
 QMimeTypeData::QMimeTypeData(const QMimeType &other)
     : suffixPattern(other.d->suffixPattern)
-    , type(other.d->type)
+    , name(other.d->name)
     , comment(other.d->comment)
     , localeComments(other.d->localeComments)
     , aliases(other.d->aliases)
@@ -60,7 +60,7 @@ QMimeTypeData::QMimeTypeData(const QMimeType &other)
 
 void QMimeTypeData::clear()
 {
-    type.clear();
+    name.clear();
     comment.clear();
     aliases.clear();
     globPatterns.clear();
@@ -82,11 +82,11 @@ void QMimeTypeData::addGlobPattern(const QString &pattern)
 }
 
 #if 0
-unsigned QMimeTypeData::matchesFileBySuffix(const QString &name) const
+unsigned QMimeTypeData::matchesFileBySuffix(const QString &fileName) const
 {
     foreach (const QString &pattern, globPatterns) {
-        QMimeGlobPattern glob(pattern, type);
-        if (glob.matchFileName(name))
+        QMimeGlobPattern glob(pattern, name);
+        if (glob.matchFileName(fileName))
             return glob.weight();
     }
 
@@ -120,9 +120,9 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
         // TODO: discuss - this code is slow :(
         // Hack for text/plain and application/octet-stream
         if (magicMatchers.isEmpty()) {
-            if (type == QLatin1String("text/plain") && isTextFile(data))
+            if (name == QLatin1String("text/plain") && isTextFile(data))
                 priority = 2;
-            else if (type == QLatin1String("application/octet-stream"))
+            else if (name == QLatin1String("application/octet-stream"))
                 priority = 1;
         } else {
             foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
@@ -198,12 +198,12 @@ void QMimeType::clear()
 
 bool QMimeType::isValid() const
 {
-    return !d->type.isEmpty();
+    return !d->name.isEmpty();
 }
 
 const QString &QMimeType::type() const
 {
-    return d->type;
+    return d->name;
 }
 
 const QString &QMimeType::comment() const
@@ -270,13 +270,15 @@ const QString &QMimeType::preferredSuffix() const
     return d->preferredSuffix;
 }
 
+#if 0   // Seems unused
 /*!
-    Checks for \a type or one of the aliases.
+    Checks for \a name or one of the aliases.
 */
-bool QMimeType::matchesType(const QString &type) const
+bool QMimeType::matchesName(const QString &name) const
 {
-    return d->type == type || d->aliases.contains(type) /* TODO: BROKEN! MUST COMPARE WITH d->type */;
+    return d->name == name || d->aliases.contains(name) /* TODO: BROKEN! MUST COMPARE WITH d->name */;
 }
+#endif
 
 unsigned QMimeType::matchesData(const QByteArray &data) const
 {
@@ -300,9 +302,9 @@ unsigned QMimeType::matchesFile(QIODevice *device, const QString &fileName) cons
 /*!
     Performs search by glob patterns.
 */
-unsigned QMimeType::matchesName(const QString &name) const
+unsigned QMimeType::matchesFileBySuffix(const QString &fileName) const
 {
-    return d->matchesFileBySuffix(name);
+    return d->matchesFileBySuffix(fileName);
 }
 #endif
 

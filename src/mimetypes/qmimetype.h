@@ -66,10 +66,12 @@ public:
     const QStringList &suffixes() const;
     const QString &preferredSuffix() const;
 
-    bool matchesType(const QString &type) const;
+#if 0   // Seems unused
+    bool matchesName(const QString &name) const;
+#endif
     unsigned matchesData(const QByteArray &data) const;
     //unsigned matchesFile(QIODevice *device, const QString &fileName) const;
-    //unsigned matchesName(const QString &name) const;
+    //unsigned matchesFileBySuffix(const QString &fileName) const;
 
     QString filterString() const;
 

@@ -41,12 +41,12 @@ public:
     void clear();
     void addGlobPattern(const QString &pattern);
 
-    //unsigned matchesFileBySuffix(const QString &name) const;
+    //unsigned matchesFileBySuffix(const QString &fileName) const;
     unsigned matchesData(const QByteArray &data) const;
 
     const QRegExp suffixPattern;
 
-    QString type;
+    QString name;
     QString comment;
     LocaleHash localeComments;
     QStringList aliases;
