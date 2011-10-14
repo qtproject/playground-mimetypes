@@ -152,7 +152,7 @@ void tst_qmimetype::test_name()
 
 // ------------------------------------------------------------------------------------------------
 
-void tst_qmimetype::test_displayName()
+void tst_qmimetype::test_comment()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
@@ -171,7 +171,7 @@ void tst_qmimetype::test_displayName()
 
 // ------------------------------------------------------------------------------------------------
 
-void tst_qmimetype::test_iconUrl()
+void tst_qmimetype::test_genericIconName()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
@@ -190,7 +190,7 @@ void tst_qmimetype::test_iconUrl()
 
 // ------------------------------------------------------------------------------------------------
 
-void tst_qmimetype::test_filenameExtensions()
+void tst_qmimetype::test_suffixes()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())

@@ -53,9 +53,9 @@ private slots:
 
     void test_isValid();
     void test_name();
-    void test_displayName();
-    void test_iconUrl();
-    void test_filenameExtensions();
+    void test_comment();
+    void test_genericIconName();
+    void test_suffixes();
 };
 
 #endif // TST_QMIMETYPE_H_INCLUDED
