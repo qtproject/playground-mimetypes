@@ -266,6 +266,13 @@ const QString &QMimeType::genericIconName() const
 
 const QString &QMimeType::iconName() const
 {
+    if (d->iconName.isEmpty()) {
+        // Make default icon name from the mimetype name
+        d->iconName = name();
+        const int slashindex = d->iconName.indexOf(QLatin1Char('/'));
+        if (slashindex != -1)
+            d->iconName[slashindex] = QLatin1Char('-');
+    }
     return d->iconName;
 }
 
