@@ -23,6 +23,7 @@
 
 #include "qmimeglobpattern_p.h"
 
+//#include <QtCore/QDebug>
 #include <QtCore/QLocale>
 
 #include "magicmatcher_p.h"
@@ -31,11 +32,11 @@ QT_BEGIN_NAMESPACE
 
 /*!
     \var QMimeTypeData::suffixPattern
-    \brief Regular expression to match a suffix glob pattern: "*.ext" (and not sth like "Makefile" or "*.log[1-9]"
+    \brief Regular expression to match a suffix glob pattern: "*.ext" or "*.ext1.ext2" (and not sth like "Makefile" or "*.log[1-9]"
 */
 
 QMimeTypeData::QMimeTypeData()
-    : suffixPattern(QLatin1String("^\\*\\.[\\w+]+$"))
+    : suffixPattern(QLatin1String("^\\*[\\.\\w+]+$"))
 {
     if (!suffixPattern.isValid())
         qWarning("MimeTypeData(): invalid suffixPattern");
@@ -78,6 +79,9 @@ void QMimeTypeData::addGlobPattern(const QString &pattern)
         suffixes.append(suffix);
         if (preferredSuffix.isEmpty())
             preferredSuffix = suffix;
+    }
+    else {
+        //qDebug() << Q_FUNC_INFO << "Skipping suffix" << pattern;
     }
 }
 
