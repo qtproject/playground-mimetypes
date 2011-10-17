@@ -38,6 +38,8 @@ class QMIME_EXPORT QMimeMagicRuleMatcher
 public:
     explicit QMimeMagicRuleMatcher(unsigned priority = 65535);
 
+    bool operator==(const QMimeMagicRuleMatcher &other);
+
     void addRule(const QMimeMagicRule &rule);
     void addRules(const QList<QMimeMagicRule> &rules);
     QList<QMimeMagicRule> magicRules() const;

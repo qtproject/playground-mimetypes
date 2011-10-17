@@ -58,6 +58,8 @@ QByteArray QMimeMagicRule::typeName(QMimeMagicRule::Type theType)
 
 struct QMimeMagicRulePrivate
 {
+    bool operator==(const QMimeMagicRulePrivate &other) const;
+
     QMimeMagicRule::Type type;
     QByteArray value;
     int startPos;
@@ -71,6 +73,19 @@ struct QMimeMagicRulePrivate
     typedef bool (*MatchFunction)(QMimeMagicRulePrivate *d, const QByteArray &data);
     MatchFunction matchFunction;
 };
+
+bool QMimeMagicRulePrivate::operator==(const QMimeMagicRulePrivate &other) const
+{
+    return type == other.type &&
+           value == other.value &&
+           startPos == other.startPos &&
+           endPos == other.endPos &&
+           mask == other.mask &&
+           pattern == other.pattern &&
+           number == other.number &&
+           numberMask == other.numberMask &&
+           matchFunction == other.matchFunction;
+}
 
 static bool matchString(QMimeMagicRulePrivate *d, const QByteArray &data)
 {
@@ -235,6 +250,12 @@ QMimeMagicRule& QMimeMagicRule::operator=(const QMimeMagicRule &other)
 {
     *d = *other.d;
     return *this;
+}
+
+bool QMimeMagicRule::operator==(const QMimeMagicRule &other) const
+{
+    return d == other.d ||
+           *d == *other.d;
 }
 
 QMimeMagicRule::Type QMimeMagicRule::type() const

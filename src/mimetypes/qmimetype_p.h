@@ -30,15 +30,17 @@ QT_BEGIN_NAMESPACE
 
 class QMimeMagicRuleMatcher;
 
-class QMIME_EXPORT QMimeTypeData : public QSharedData
+struct QMIME_EXPORT QMimeTypeData : public QSharedData
 {
-public:
     typedef QHash<QString, QString> LocaleHash;
 
     QMimeTypeData();
     explicit QMimeTypeData(const QMimeType &other);
 
     void clear();
+
+    bool operator==(const QMimeTypeData &other) const;
+
     void addGlobPattern(const QString &pattern);
 
     //unsigned matchesFileBySuffix(const QString &fileName) const;

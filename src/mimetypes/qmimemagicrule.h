@@ -40,6 +40,8 @@ public:
 
     QMimeMagicRule &operator=(const QMimeMagicRule &other);
 
+    bool operator==(const QMimeMagicRule &other) const;
+
     Type type() const;
     QByteArray value() const;
     int startPos() const;

@@ -63,12 +63,28 @@ void QMimeTypeData::clear()
 {
     name.clear();
     comment.clear();
+    localeComments.clear();
     aliases.clear();
+    genericIconName.clear();
     globPatterns.clear();
     subClassOf.clear();
     preferredSuffix.clear();
     suffixes.clear();
     magicMatchers.clear();
+}
+
+bool QMimeTypeData::operator==(const QMimeTypeData &other) const
+{
+    return name == other.name &&
+           comment == other.comment &&
+           localeComments == other.localeComments &&
+           aliases == other.aliases &&
+           genericIconName == other.genericIconName &&
+           globPatterns == other.globPatterns &&
+           subClassOf == other.subClassOf &&
+           preferredSuffix == other.preferredSuffix &&
+           suffixes == other.suffixes &&
+           magicMatchers == other.magicMatchers;
 }
 
 void QMimeTypeData::addGlobPattern(const QString &pattern)
@@ -192,7 +208,8 @@ QMimeType &QMimeType::operator=(const QMimeType &other)
 
 bool QMimeType::operator==(const QMimeType &other) const
 {
-    return d == other.d;
+    return d == other.d ||
+           *d == *other.d;
 }
 
 void QMimeType::clear()

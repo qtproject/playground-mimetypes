@@ -93,8 +93,15 @@ QByteArray FileMatchContext::data()
 */
 
 QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(unsigned thePriority) :
+    m_list(),
     m_priority(thePriority)
 {
+}
+
+bool QMimeMagicRuleMatcher::operator==(const QMimeMagicRuleMatcher &other)
+{
+    return m_list == other.m_list &&
+           m_priority == other.m_priority;
 }
 
 void QMimeMagicRuleMatcher::addRule(const QMimeMagicRule &rule)
