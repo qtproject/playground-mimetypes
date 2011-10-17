@@ -2,4 +2,6 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     qmimetype \
-    qmimedatabase
+    qmimedatabase \
+    qdeclarativemimetype \
+    qdeclarativemimedatabase
