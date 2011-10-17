@@ -125,7 +125,7 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
 {
     QString foundSuffix;
 
-    const QStringList matchingMimeTypes = provider()->findByName(fileName, &foundSuffix);
+    const QStringList matchingMimeTypes = provider()->findByName(QFileInfo(fileName).fileName(), &foundSuffix);
     // TODO a method that returns the found suffix
 
     return matchingMimeTypes;
@@ -215,14 +215,21 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
     }
 
     // Pass 2) Match on content
-    if (!context.isReadable())
+    if (!context.isReadable()) {
+        qWarning() << Q_FUNC_INFO << "File" << fileName << "could not be read!";
         return candidateByName;
+    }
 
-    if (candidateByName.matchesData(context.data()) > 50 /* TODO REWRITE ALL THIS */)
+    if (candidateByName.matchesData(context.data()) > 50 /* TODO REWRITE ALL THIS */) {
+        //qDebug() << Q_FUNC_INFO << "candidateByName" << candidateByName.name() << "for" << fileName << "also matches by data";
         return candidateByName;
+    }
 
     unsigned priorityByName = *priorityPtr;
+    //qDebug() << Q_FUNC_INFO << "findByName() for        " << fileName << "returned" << candidateByName.name() << "with priority" << priorityByName;
+
     QMimeType candidateByData(findByData(context.data(), priorityPtr));
+    //qDebug() << Q_FUNC_INFO << "findByData() for data of" << fileName << "returned" << candidateByData.name() << "with priority" << *priorityPtr;
 
     // ## BROKEN, PRIORITIES HAVE A DIFFERENT SCALE
     return priorityByName < *priorityPtr ? candidateByData : candidateByName;
@@ -362,11 +369,13 @@ QMimeType QMimeDatabase::mimeTypeForName(const QString &nameOrAlias) const
 */
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
+    //qDebug() << Q_FUNC_INFO << "fileInfo" << fileInfo.absoluteFilePath();
+
     QMutexLocker locker(&d->mutex);
 
     QFile file(fileInfo.absoluteFilePath());
     unsigned priority = 0;
-    return d->findByNameAndData(fileInfo.fileName(), &file, &priority);
+    return d->findByNameAndData(fileInfo.absoluteFilePath(), &file, &priority);
 }
 
 /*!
@@ -375,6 +384,8 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 */
 QMimeType QMimeDatabase::findByFile(const QString &fileName) const
 {
+    //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
+
     QMutexLocker locker(&d->mutex);
 
     QFile file(fileName);
@@ -392,7 +403,7 @@ QMimeType QMimeDatabase::findByName(const QString &fileName) const
 {
     QMutexLocker locker(&d->mutex);
 
-    QStringList matches = d->findByName(QFileInfo(fileName).fileName());
+    QStringList matches = d->findByName(fileName);
     const int matchCount = matches.count();
     if (matchCount == 0)
         return QMimeType();
@@ -437,12 +448,16 @@ QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
 
 QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *device) const
 {
+    //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
+
     unsigned int accuracy = 0;
     return d->findByNameAndData(fileName, device, &accuracy);
 }
 
 QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, const QByteArray &data) const
 {
+    //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
+
     QBuffer buffer(const_cast<QByteArray *>(&data));
     unsigned int accuracy = 0;
     return d->findByNameAndData(fileName, &buffer, &accuracy);
