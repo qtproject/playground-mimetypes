@@ -2,6 +2,12 @@
 
 #include <QtTest/QtTest>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QIcon>
+#else
+#include <QtGui/QIcon>
+#endif
+
 #include <QMimeDatabase>
 
 class tst_qmimedatabase : public QObject
@@ -82,17 +88,31 @@ void tst_qmimedatabase::findByName()
 
     //qDebug() << Q_FUNC_INFO << filePath;
 
-    const QString resultMimeTypeName = database.findByName(filePath).name();
+    const QMimeType resultMimeType(database.findByName(filePath));
+    if (resultMimeType.isValid()) {
+        //qDebug() << Q_FUNC_INFO << "MIME type" << resultMimeType.name() << "has icon name" << resultMimeType.genericIconName();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        QCOMPARE(resultMimeType.genericIconName(), QIcon::fromTheme(resultMimeType.genericIconName()).name());
+        QVERIFY2(!QIcon::fromTheme(resultMimeType.genericIconName()).isNull(), qPrintable(resultMimeType.genericIconName()));
+        QVERIFY2(QIcon::hasThemeIcon(resultMimeType.genericIconName()), qPrintable(resultMimeType.genericIconName()));
+#else
+        // Under Qt4 not all genericIconNames return an icon that is valid.
+#endif
+    }
+    const QString resultMimeTypeName = resultMimeType.name();
     //qDebug() << Q_FUNC_INFO << "findByName() returned" << resultMimeTypeName;
 
     // Results are ambiguous when multiple MIME types have the same glob
     // -> accept the current result if the found MIME type actually
     // matches the file's extension.
     const QMimeType foundMimeType = database.mimeTypeForName(resultMimeTypeName);
-    const QString extension = QFileInfo(filePath).suffix();
-    //qDebug() << Q_FUNC_INFO << "globPatterns:" << foundMimeType.globPatterns() << "- extension:" << QString() + "*." + extension;
-    if (foundMimeType.globPatterns().contains("*." + extension))
-        return;
+    QVERIFY2(resultMimeType == foundMimeType, qPrintable(resultMimeType.name() + " vs. " + foundMimeType.name()));
+    if (foundMimeType.isValid()) {
+        const QString extension = QFileInfo(filePath).suffix();
+        //qDebug() << Q_FUNC_INFO << "globPatterns:" << foundMimeType.globPatterns() << "- extension:" << QString() + "*." + extension;
+        if (foundMimeType.globPatterns().contains("*." + extension))
+            return;
+    }
 
     const bool shouldFail = (xFail.length() >= 1 && xFail.at(0) == QLatin1Char('x'));
     if (shouldFail) {
@@ -150,6 +170,12 @@ void tst_qmimedatabase::findByFile()
     }
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 QTEST_APPLESS_MAIN(tst_qmimedatabase)
+#else
+// If tests with icons were activated in Qt4 we'd use QTEST_MAIN:
+//QTEST_MAIN(tst_qmimedatabase)
+QTEST_APPLESS_MAIN(tst_qmimedatabase)
+#endif
 
 #include "tst_qmimedatabase.moc"
