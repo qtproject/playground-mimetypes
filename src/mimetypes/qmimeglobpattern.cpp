@@ -101,14 +101,14 @@ void QMimeAllGlobPatterns::addGlob(const QMimeGlobPattern& glob)
     }
 }
 
-void QMimeAllGlobPatterns::removeMime(const QString& mime)
+void QMimeAllGlobPatterns::removeMimeType(const QString& mimeType)
 {
     QMutableHashIterator<QString, QStringList> it(m_fastPatterns);
     while (it.hasNext()) {
-        it.next().value().removeAll(mime);
+        it.next().value().removeAll(mimeType);
     }
-    m_highWeightGlobs.removeMime(mime);
-    m_lowWeightGlobs.removeMime(mime);
+    m_highWeightGlobs.removeMimeType(mimeType);
+    m_lowWeightGlobs.removeMimeType(mimeType);
 }
 
 void QMimeGlobPatternList::match(QStringList &matchingMimeTypes,
@@ -124,8 +124,8 @@ void QMimeGlobPatternList::match(QStringList &matchingMimeTypes,
     }
 
     QMimeGlobPatternList::const_iterator it = this->constBegin();
-    const QMimeGlobPatternList::const_iterator end = this->constEnd();
-    for ( ; it != end; ++it ) {
+    const QMimeGlobPatternList::const_iterator endIt = this->constEnd();
+    for ( ; it != endIt; ++it ) {
         const QMimeGlobPattern &glob = *it;
         if (glob.matchFileName(fileName)) {
             // TODO factorize with algorithm used by QMimeBinaryProvider?

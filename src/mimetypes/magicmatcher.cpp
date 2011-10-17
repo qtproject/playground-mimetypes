@@ -44,9 +44,9 @@ QT_BEGIN_NAMESPACE
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-FileMatchContext::FileMatchContext(QIODevice *device, const QString &fileName) :
+FileMatchContext::FileMatchContext(QIODevice *device, const QString &theFileName) :
     m_device(device),
-    m_fileName(fileName),
+    m_fileName(theFileName),
     m_state(DataNotRead)
 {
 }
@@ -92,8 +92,8 @@ QByteArray FileMatchContext::data()
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(unsigned priority) :
-    m_priority(priority)
+QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(unsigned thePriority) :
+    m_priority(thePriority)
 {
 }
 
@@ -132,9 +132,9 @@ unsigned QMimeMagicRuleMatcher::priority() const
     return m_priority;
 }
 
-void QMimeMagicRuleMatcher::setPriority(unsigned priority)
+void QMimeMagicRuleMatcher::setPriority(unsigned thePriority)
 {
-    m_priority = priority;
+    m_priority = thePriority;
 }
 
 QT_END_NAMESPACE

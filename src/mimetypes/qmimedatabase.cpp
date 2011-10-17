@@ -250,12 +250,12 @@ QStringList QMimeDatabasePrivate::filterStrings() const
 
 QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 {
-    QList<QMimeType> mimeTypes;
+    QList<QMimeType> result;
 
     foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap)
-        mimeTypes.append(entry->type);
+        result.append(entry->type);
 
-    return mimeTypes;
+    return result;
 }
 
 #if 0

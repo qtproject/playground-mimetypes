@@ -106,8 +106,8 @@ bool QMimeBinaryProvider::isValid()
     m_cacheFiles.clear();
 
     // Verify version
-    foreach (const QString& cacheFile, cacheFilenames) {
-        QFile *file = new QFile(cacheFile);
+    foreach (const QString& cacheFilename, cacheFilenames) {
+        QFile *file = new QFile(cacheFilename);
         if (file->open(QIODevice::ReadOnly)) {
             CacheFile *cacheFile = new CacheFile(file);
             if (cacheFile->isValid())
@@ -290,8 +290,9 @@ void QMimeXMLProvider::ensureLoaded()
             qDebug() << Q_FUNC_INFO << packageDir << files;
             if (!fdoXmlFound)
                 fdoXmlFound = files.contains(QLatin1String("freedesktop.org.xml"));
-            foreach (const QString& file, files) {
-                allFiles.append(packageDir + QLatin1Char('/') + file);
+            QStringList::const_iterator endIt(files.constEnd());
+            for (QStringList::const_iterator it(files.constBegin()); it != endIt; ++it) {
+                allFiles.append(packageDir + QLatin1Char('/') + *it);
             }
         }
 

@@ -42,18 +42,18 @@ static const int magicRuleTypes_indices[] = {
     0, 8, 15, 22, 29, 35, 41, 50, 59, 65, 0
 };
 
-QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray &type)
+QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray &theTypeName)
 {
     for (int i = String; i <= Byte; ++i) {
-        if (type == magicRuleTypes_string + magicRuleTypes_indices[i])
+        if (theTypeName == magicRuleTypes_string + magicRuleTypes_indices[i])
             return static_cast<Type>(i);
     }
     return Invalid;
 }
 
-QByteArray QMimeMagicRule::typeName(QMimeMagicRule::Type type)
+QByteArray QMimeMagicRule::typeName(QMimeMagicRule::Type theType)
 {
-    return magicRuleTypes_string + magicRuleTypes_indices[type];
+    return magicRuleTypes_string + magicRuleTypes_indices[theType];
 }
 
 struct QMimeMagicRulePrivate
@@ -146,19 +146,20 @@ static inline QByteArray makePattern(const QByteArray &value)
     return pattern;
 }
 
-QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type type,
-                               const QByteArray &value,
-                               int startPos, int endPos,
-                               const QByteArray &mask) :
+QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type theType,
+                               const QByteArray &theValue,
+                               int theStartPos,
+                               int theEndPos,
+                               const QByteArray &theMask) :
     d(new QMimeMagicRulePrivate)
 {
-    Q_ASSERT(!value.isEmpty());
+    Q_ASSERT(!theValue.isEmpty());
 
-    d->type = type;
-    d->value = value;
-    d->startPos = startPos;
-    d->endPos = endPos;
-    d->mask = mask;
+    d->type = theType;
+    d->value = theValue;
+    d->startPos = theStartPos;
+    d->endPos = theEndPos;
+    d->mask = theMask;
     d->matchFunction = 0;
 
     if (d->type >= Host16 && d->type <= Byte) {
@@ -184,7 +185,7 @@ QMimeMagicRule::QMimeMagicRule(QMimeMagicRule::Type type,
             while (p < e)
                 *p++ &= *m++;
         } else {
-            d->mask.fill(0xff, d->pattern.size());
+            d->mask.fill(static_cast<char>(0xff), d->pattern.size());
         }
         d->mask.squeeze();
         d->matchFunction = matchString;
@@ -258,12 +259,12 @@ int QMimeMagicRule::endPos() const
 
 QByteArray QMimeMagicRule::mask() const
 {
-    QByteArray mask = d->mask;
+    QByteArray result = d->mask;
     if (d->type == String) {
         // restore '0x'
-        mask = "0x" + mask.toHex();
+        result = "0x" + result.toHex();
     }
-    return mask;
+    return result;
 }
 
 bool QMimeMagicRule::isValid() const

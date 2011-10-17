@@ -12,8 +12,8 @@ public:
     static const unsigned DefaultWeight = 50;
     static const unsigned MinWeight = 1;
 
-    explicit QMimeGlobPattern(const QString &pattern, const QString &mimeType, unsigned weight = DefaultWeight, Qt::CaseSensitivity s = Qt::CaseInsensitive) :
-        m_pattern(pattern), m_mimeType(mimeType), m_weight(weight), m_caseSensitivity(s)
+    explicit QMimeGlobPattern(const QString &thePattern, const QString &theMimeType, unsigned theWeight = DefaultWeight, Qt::CaseSensitivity s = Qt::CaseInsensitive) :
+        m_pattern(thePattern), m_mimeType(theMimeType), m_weight(theWeight), m_caseSensitivity(s)
     {
         if (s == Qt::CaseInsensitive) {
             m_pattern = m_pattern.toLower();
@@ -42,11 +42,12 @@ private:
 class QMimeGlobPatternList : public QList<QMimeGlobPattern>
 {
 public:
-    bool hasPattern(const QString& mime, const QString& pattern) const {
+    bool hasPattern(const QString& mimeType, const QString& pattern) const
+    {
         const_iterator it = begin();
         const const_iterator myend = end();
         for (; it != myend; ++it)
-            if ((*it).pattern() == pattern && (*it).mimeType() == mime)
+            if ((*it).pattern() == pattern && (*it).mimeType() == mimeType)
                 return true;
         return false;
     }
@@ -54,21 +55,22 @@ public:
     /*!
         "noglobs" is very rare occurrence, so it's ok if it's slow
      */
-    void removeMime(const QString& mime)
+    void removeMimeType(const QString& mimeType)
     {
         QMutableListIterator<QMimeGlobPattern> it(*this);
         while (it.hasNext()) {
-            if (it.next().mimeType() == mime)
+            if (it.next().mimeType() == mimeType)
                 it.remove();
         }
     }
+
     void match(QStringList &matchingMimeTypes,
                const QString &fileName,
                QString *foundSuffix) const;
 };
 
 /*!
-    Result of the globs parsing, as data structures ready for efficient mimetype matching.
+    Result of the globs parsing, as data structures ready for efficient MIME type matching.
     This contains:
     1) a map of fast regular patterns (e.g. *.txt is stored as "txt" in a qhash's key)
     2) a linear list of high-weight globs
@@ -77,10 +79,10 @@ public:
 class QMimeAllGlobPatterns
 {
 public:
-    typedef QHash<QString, QStringList> PatternsMap; // mimetype -> patterns
+    typedef QHash<QString, QStringList> PatternsMap; // MIME type -> patterns
 
     void addGlob(const QMimeGlobPattern &glob);
-    void removeMime(const QString &mime);
+    void removeMimeType(const QString &mimeType);
     QStringList matchingGlobs(const QString &fileName, QString *foundSuffix) const;
 
     PatternsMap m_fastPatterns; // example: "doc" -> "application/msword", "text/plain"
