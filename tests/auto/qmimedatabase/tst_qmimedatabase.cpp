@@ -80,14 +80,17 @@ void tst_QMimeType::findByName()
     QFETCH(QString, mimeType);
     QFETCH(QString, xFail);
 
+    //qDebug() << Q_FUNC_INFO << filePath;
+
     const QString resultMimeTypeName = database.findByName(filePath).name();
+    //qDebug() << Q_FUNC_INFO << "findByName() returned" << resultMimeTypeName;
 
     // Results are ambiguous when multiple MIME types have the same glob
     // -> accept the current result if the found MIME type actually
     // matches the file's extension.
     const QMimeType foundMimeType = database.mimeTypeForName(resultMimeTypeName);
     const QString extension = QFileInfo(filePath).suffix();
-    //qDebug() << foundMimeType.globPatterns() << "extension=*." << extension;
+    //qDebug() << Q_FUNC_INFO << "globPatterns:" << foundMimeType.globPatterns() << "- extension:" << QString() + "*." + extension;
     if (foundMimeType.globPatterns().contains("*." + extension))
         return;
 
@@ -116,11 +119,13 @@ void tst_QMimeType::findByData()
     QByteArray data = f.readAll();
 
     const QString resultMimeTypeName = database.findByData(data).name();
-    if (xFail.length() >= 2 && xFail.at(1) == QLatin1Char('x'))
+    if (xFail.length() >= 2 && xFail.at(1) == QLatin1Char('x')) {
         // Expected to fail
         QVERIFY2(resultMimeTypeName != mimeType, qPrintable(resultMimeTypeName));
-    else
+    }
+    else {
         QCOMPARE(resultMimeTypeName, mimeType);
+    }
 }
 
 void tst_QMimeType::findByFile_data()
@@ -135,11 +140,14 @@ void tst_QMimeType::findByFile()
     QFETCH(QString, xFail);
 
     const QString resultMimeTypeName = database.findByFile(QFileInfo(filePath)).name();
-    if (xFail.length() >= 3 && xFail.at(2) == QLatin1Char('x'))
+    //qDebug() << Q_FUNC_INFO << filePath << "->" << resultMimeTypeName;
+    if (xFail.length() >= 3 && xFail.at(2) == QLatin1Char('x')) {
         // Expected to fail
         QVERIFY2(resultMimeTypeName != mimeType, qPrintable(resultMimeTypeName));
-    else
+    }
+    else {
         QCOMPARE(resultMimeTypeName, mimeType);
+    }
 }
 
 QTEST_APPLESS_MAIN(tst_QMimeType)
