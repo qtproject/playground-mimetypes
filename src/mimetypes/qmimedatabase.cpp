@@ -27,6 +27,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QUrl>
 #include <QtCore/QDebug>
+#include <qplatformdefs.h>
 
 #include <algorithm>
 #include <functional>
@@ -366,6 +367,9 @@ QMimeType QMimeDatabase::mimeTypeForName(const QString &nameOrAlias) const
 
 /*!
     Returns a MIME type for \a fileInfo or Null one if none found.
+
+    If \a fileInfo is a unix symbolic link, the file that it refers to
+    will be used instead.
 */
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
@@ -373,7 +377,27 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 
     QMutexLocker locker(&d->mutex);
 
+    if (fileInfo.isDir())
+        return d->mimeTypeForName(QLatin1String("inode/directory"));
+
     QFile file(fileInfo.absoluteFilePath());
+
+#ifdef Q_OS_UNIX
+    // Cannot access statBuf.st_mode from the filesystem engine, so we have to stat again.
+    const QByteArray nativeFilePath = QFile::encodeName(file.fileName());
+    QT_STATBUF statBuffer;
+    if (QT_LSTAT(nativeFilePath, &statBuffer) == 0) {
+        if (S_ISCHR(statBuffer.st_mode))
+            return d->mimeTypeForName(QLatin1String("inode/chardevice"));
+        if (S_ISBLK(statBuffer.st_mode))
+            return d->mimeTypeForName(QLatin1String("inode/blockdevice"));
+        if (S_ISFIFO(statBuffer.st_mode))
+            return d->mimeTypeForName(QLatin1String("inode/fifo"));
+        if (S_ISSOCK(statBuffer.st_mode))
+            return d->mimeTypeForName(QLatin1String("inode/socket"));
+    }
+#endif
+
     unsigned priority = 0;
     return d->findByNameAndData(fileInfo.absoluteFilePath(), &file, &priority);
 }
