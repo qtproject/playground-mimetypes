@@ -4,13 +4,13 @@
 
 #include <QMimeDatabase>
 
-class tst_QMimeType : public QObject
+class tst_qmimedatabase : public QObject
 {
     Q_OBJECT
 
 public:
-    tst_QMimeType();
-    ~tst_QMimeType();
+    tst_qmimedatabase();
+    ~tst_qmimedatabase();
 
 private Q_SLOTS:
     void initTestCase();
@@ -28,20 +28,20 @@ private:
     QMimeDatabase database;
 };
 
-tst_QMimeType::tst_QMimeType() :
+tst_qmimedatabase::tst_qmimedatabase() :
         database()
 {
 }
 
-tst_QMimeType::~tst_QMimeType()
+tst_qmimedatabase::~tst_qmimedatabase()
 {
 }
 
-void tst_QMimeType::initTestCase()
+void tst_qmimedatabase::initTestCase()
 {
 }
 
-void tst_QMimeType::findByName_data()
+void tst_qmimedatabase::findByName_data()
 {
     QTest::addColumn<QString>("filePath");
     QTest::addColumn<QString>("mimeType");
@@ -74,7 +74,7 @@ void tst_QMimeType::findByName_data()
     }
 }
 
-void tst_QMimeType::findByName()
+void tst_qmimedatabase::findByName()
 {
     QFETCH(QString, filePath);
     QFETCH(QString, mimeType);
@@ -103,12 +103,12 @@ void tst_QMimeType::findByName()
     }
 }
 
-void tst_QMimeType::findByData_data()
+void tst_qmimedatabase::findByData_data()
 {
     findByName_data();
 }
 
-void tst_QMimeType::findByData()
+void tst_qmimedatabase::findByData()
 {
     QFETCH(QString, filePath);
     QFETCH(QString, mimeType);
@@ -128,12 +128,12 @@ void tst_QMimeType::findByData()
     }
 }
 
-void tst_QMimeType::findByFile_data()
+void tst_qmimedatabase::findByFile_data()
 {
     findByName_data();
 }
 
-void tst_QMimeType::findByFile()
+void tst_qmimedatabase::findByFile()
 {
     QFETCH(QString, filePath);
     QFETCH(QString, mimeType);
@@ -150,6 +150,6 @@ void tst_QMimeType::findByFile()
     }
 }
 
-QTEST_APPLESS_MAIN(tst_QMimeType)
+QTEST_APPLESS_MAIN(tst_qmimedatabase)
 
 #include "tst_qmimedatabase.moc"
