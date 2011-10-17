@@ -141,12 +141,12 @@
    <item row="7" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>Glob patterns:</string>
+      <string>Icon name:</string>
      </property>
     </widget>
    </item>
    <item row="7" column="1">
-    <widget class="QLabel" name="globPatternsLabel">
+    <widget class="QLabel" name="iconNameLabel">
      <property name="text">
       <string>&lt;&gt;</string>
      </property>
@@ -155,12 +155,12 @@
    <item row="8" column="0">
     <widget class="QLabel" name="label_8">
      <property name="text">
-      <string>SubClasses of:</string>
+      <string>Glob patterns:</string>
      </property>
     </widget>
    </item>
    <item row="8" column="1">
-    <widget class="QLabel" name="subClassesOfLabel">
+    <widget class="QLabel" name="globPatternsLabel">
      <property name="text">
       <string>&lt;&gt;</string>
      </property>
@@ -169,12 +169,12 @@
    <item row="9" column="0">
     <widget class="QLabel" name="label_9">
      <property name="text">
-      <string>Suffixes:</string>
+      <string>SubClasses of:</string>
      </property>
     </widget>
    </item>
    <item row="9" column="1">
-    <widget class="QLabel" name="suffixesLabel">
+    <widget class="QLabel" name="subClassesOfLabel">
      <property name="text">
       <string>&lt;&gt;</string>
      </property>
@@ -183,12 +183,12 @@
    <item row="10" column="0">
     <widget class="QLabel" name="label_10">
      <property name="text">
-      <string>Preferred suffix:</string>
+      <string>Suffixes:</string>
      </property>
     </widget>
    </item>
    <item row="10" column="1">
-    <widget class="QLabel" name="preferredSuffixLabel">
+    <widget class="QLabel" name="suffixesLabel">
      <property name="text">
       <string>&lt;&gt;</string>
      </property>
@@ -197,11 +197,25 @@
    <item row="11" column="0">
     <widget class="QLabel" name="label_11">
      <property name="text">
-      <string>Filter string:</string>
+      <string>Preferred suffix:</string>
      </property>
     </widget>
    </item>
    <item row="11" column="1">
+    <widget class="QLabel" name="preferredSuffixLabel">
+     <property name="text">
+      <string>&lt;&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>Filter string:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
     <widget class="QLabel" name="filterStringLabel">
      <property name="text">
       <string>&lt;&gt;</string>

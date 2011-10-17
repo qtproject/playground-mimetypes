@@ -48,6 +48,7 @@ void MimeTypeViewer::setMimeType(const QMimeType &mimeType)
     ui->commentLabel->setText(mimeType.comment());
     ui->localeCommentLabel->setText(mimeType.localeComment());
     ui->genericIconNameLabel->setText(mimeType.genericIconName());
+    ui->iconNameLabel->setText(mimeType.iconName());
 
     ui->globPatternsLabel->setText(mimeType.globPatterns().join(", "));
     ui->subClassesOfLabel->setText(mimeType.subClassOf().join(", "));

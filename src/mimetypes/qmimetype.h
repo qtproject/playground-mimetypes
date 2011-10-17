@@ -59,6 +59,8 @@ public:
 
     const QString &genericIconName() const;
 
+    const QString &iconName() const;
+
     const QStringList &globPatterns() const;
 
     const QStringList &subClassOf() const;

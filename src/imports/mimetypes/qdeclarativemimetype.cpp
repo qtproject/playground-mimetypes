@@ -117,6 +117,7 @@ static QMimeType buildMimeType (
                      const QString &name,
                      const QString &comment,
                      const QString &genericIconName,
+                     const QString &iconName,
                      const QStringList &suffixes
                  )
 {
@@ -124,6 +125,7 @@ static QMimeType buildMimeType (
     mimeTypeData.name = name;
     mimeTypeData.comment = comment;
     mimeTypeData.genericIconName = genericIconName;
+    mimeTypeData.iconName = iconName;
     mimeTypeData.suffixes = suffixes;
     return QMimeType(mimeTypeData);
 }
@@ -132,7 +134,7 @@ static QMimeType buildMimeType (
 
 void QDeclarativeMimeType::setName(const QString &newName)
 {
-    m_MimeType = buildMimeType(newName, m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.suffixes());
+    m_MimeType = buildMimeType(newName, m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.suffixes());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -146,7 +148,7 @@ const QString &QDeclarativeMimeType::comment() const
 
 void QDeclarativeMimeType::setComment(const QString &newComment)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), newComment, m_MimeType.genericIconName(), m_MimeType.suffixes());
+    m_MimeType = buildMimeType(m_MimeType.name(), newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.suffixes());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -160,7 +162,21 @@ const QString &QDeclarativeMimeType::genericIconName() const
 
 void QDeclarativeMimeType::setGenericIconName(const QString &newGenericIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), newGenericIconName, m_MimeType.suffixes());
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), newGenericIconName, m_MimeType.iconName(), m_MimeType.suffixes());
+}
+
+// ------------------------------------------------------------------------------------------------
+
+const QString &QDeclarativeMimeType::iconName() const
+{
+    return m_MimeType.iconName();
+}
+
+// ------------------------------------------------------------------------------------------------
+
+void QDeclarativeMimeType::setIconName(const QString &newIconName)
+{
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), newIconName, m_MimeType.suffixes());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -193,7 +209,7 @@ QVariantList QDeclarativeMimeType::suffixes() const
 
 void QDeclarativeMimeType::setSuffixes(const QVariantList &newSuffixes)
 {
-    QList<QString> result;
+    QList<QString> newSuffixesStringList;
 
     foreach (const QVariant &newSuffix, newSuffixes) {
         if (newSuffix.type() != QVariant::String) {
@@ -201,8 +217,8 @@ void QDeclarativeMimeType::setSuffixes(const QVariantList &newSuffixes)
             continue;
         }
 
-        result << newSuffix.toString();
+        newSuffixesStringList << newSuffix.toString();
     }
 
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), result);
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), newSuffixesStringList);
 }

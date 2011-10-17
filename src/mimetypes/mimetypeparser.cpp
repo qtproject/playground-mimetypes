@@ -39,6 +39,7 @@ const char *const mimeTypeAttributeC = "type";
 const char *const subClassTagC = "sub-class-of";
 const char *const commentTagC = "comment";
 const char *const genericIconTagC = "generic-icon";
+const char *const iconTagC = "icon";
 const char *const nameAttributeC = "name";
 const char *const globTagC = "glob";
 const char *const aliasTagC = "alias";
@@ -96,6 +97,7 @@ BaseMimeTypeParser::ParseState BaseMimeTypeParser::nextState(ParseState currentS
     case ParseMimeType:
     case ParseComment:
     case ParseGenericIcon:
+    case ParseIcon:
     case ParseGlobPattern:
     case ParseSubClass:
     case ParseAlias:
@@ -107,6 +109,8 @@ BaseMimeTypeParser::ParseState BaseMimeTypeParser::nextState(ParseState currentS
             return ParseComment;
         if (startElement == QLatin1String(genericIconTagC))
             return ParseGenericIcon;
+        if (startElement == QLatin1String(iconTagC))
+            return ParseIcon;
         if (startElement == QLatin1String(globTagC))
             return ParseGlobPattern;
         if (startElement == QLatin1String(subClassTagC))
@@ -199,6 +203,9 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 break;
             case ParseGenericIcon:
                 data.genericIconName = atts.value(QLatin1String(nameAttributeC)).toString();
+                break;
+            case ParseIcon:
+                data.iconName = atts.value(QLatin1String(nameAttributeC)).toString();
                 break;
             case ParseGlobPattern: {
                 const QString pattern = atts.value(QLatin1String(patternAttributeC)).toString();

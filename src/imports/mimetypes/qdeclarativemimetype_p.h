@@ -66,6 +66,10 @@ class QDeclarativeMimeType : public QObject
                READ genericIconName
                WRITE setGenericIconName)
 
+    Q_PROPERTY(QString iconName
+               READ iconName
+               WRITE setIconName)
+
     Q_PROPERTY(QVariantList globPatterns
                READ globPatterns
                STORED false)
@@ -105,6 +109,8 @@ public:
     void setComment(const QString &newComment);
     const QString &genericIconName() const;
     void setGenericIconName(const QString &newGenericIconName);
+    const QString &iconName() const;
+    void setIconName(const QString &newIconName);
     QVariantList globPatterns() const;
     QVariantList suffixes() const;
     void setSuffixes(const QVariantList &newSuffixes);

@@ -55,6 +55,7 @@ private slots:
     void test_name();
     void test_comment();
     void test_genericIconName();
+    void test_iconName();
     void test_suffixes();
 };
 

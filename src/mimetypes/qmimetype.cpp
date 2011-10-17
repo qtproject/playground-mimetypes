@@ -49,6 +49,7 @@ QMimeTypeData::QMimeTypeData(const QMimeType &other)
     , localeComments(other.d->localeComments)
     , aliases(other.d->aliases)
     , genericIconName(other.d->genericIconName)
+    , iconName(other.d->iconName)
     , globPatterns(other.d->globPatterns)
     , subClassOf(other.d->subClassOf)
     , preferredSuffix(other.d->preferredSuffix)
@@ -66,6 +67,7 @@ void QMimeTypeData::clear()
     localeComments.clear();
     aliases.clear();
     genericIconName.clear();
+    iconName.clear();
     globPatterns.clear();
     subClassOf.clear();
     preferredSuffix.clear();
@@ -80,6 +82,7 @@ bool QMimeTypeData::operator==(const QMimeTypeData &other) const
            localeComments == other.localeComments &&
            aliases == other.aliases &&
            genericIconName == other.genericIconName &&
+           iconName == other.iconName &&
            globPatterns == other.globPatterns &&
            subClassOf == other.subClassOf &&
            preferredSuffix == other.preferredSuffix &&
@@ -259,6 +262,11 @@ const QStringList &QMimeType::aliases() const
 const QString &QMimeType::genericIconName() const
 {
     return d->genericIconName;
+}
+
+const QString &QMimeType::iconName() const
+{
+    return d->iconName;
 }
 
 const QStringList &QMimeType::globPatterns() const

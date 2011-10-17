@@ -73,6 +73,7 @@ private:
         ParseMimeType,
         ParseComment,
         ParseGenericIcon,
+        ParseIcon,
         ParseGlobPattern,
         ParseSubClass,
         ParseAlias,

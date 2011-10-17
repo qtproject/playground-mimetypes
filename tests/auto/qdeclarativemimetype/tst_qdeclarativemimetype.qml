@@ -58,6 +58,10 @@ TestCase {
         return "/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png"
     }
 
+    function pngMimeTypeIconName() {
+        return "/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png"
+    }
+
     function firstPngMimeTypeSuffixes() {
         return ".png"
     }
@@ -67,6 +71,7 @@ TestCase {
         name: pngMimeTypeName()
         comment: pngMimeTypeComment()
         genericIconName: pngMimeTypeGenericIconName()
+        iconName: pngMimeTypeIconName()
         suffixes: [ firstPngMimeTypeSuffixes() ]
     }
 
@@ -94,7 +99,7 @@ TestCase {
         otherPngMimeType.assign(instantiatedPngMimeType)
         otherPngMimeType.name = ""
 
-        // Verify that the Id is part of the equality test:
+        // Verify that the Name is part of the equality test:
         compare(instantiatedPngMimeType.name, pngMimeTypeName())
 
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
@@ -104,7 +109,7 @@ TestCase {
         otherPngMimeType.assign(instantiatedPngMimeType)
         otherPngMimeType.comment = ""
 
-        // Verify that the Id is part of the equality test:
+        // Verify that the Comment is part of the equality test:
         compare(instantiatedPngMimeType.comment, pngMimeTypeComment())
 
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
@@ -114,8 +119,18 @@ TestCase {
         otherPngMimeType.assign(instantiatedPngMimeType)
         otherPngMimeType.genericIconName = ""
 
-        // Verify that the Id is part of the equality test:
+        // Verify that the GenericIconName is part of the equality test:
         compare(instantiatedPngMimeType.genericIconName, pngMimeTypeGenericIconName())
+
+        compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
+    }
+
+    function test_iconName() {
+        otherPngMimeType.assign(instantiatedPngMimeType)
+        otherPngMimeType.iconName = ""
+
+        // Verify that the IconName is part of the equality test:
+        compare(instantiatedPngMimeType.iconName, pngMimeTypeIconName())
 
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
     }
@@ -125,7 +140,7 @@ TestCase {
         otherPngMimeType.suffixes = []
         compare(otherPngMimeType.suffixes.length, 0)
 
-        // Verify that the Id is part of the equality test:
+        // Verify that the Suffixes is part of the equality test:
         compare(instantiatedPngMimeType.suffixes.length, 1)
         compare(instantiatedPngMimeType.suffixes[0], ".png")
 

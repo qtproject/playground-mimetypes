@@ -90,13 +90,17 @@ void tst_qmimedatabase::findByName()
 
     const QMimeType resultMimeType(database.findByName(filePath));
     if (resultMimeType.isValid()) {
-        //qDebug() << Q_FUNC_INFO << "MIME type" << resultMimeType.name() << "has icon name" << resultMimeType.genericIconName();
+        //qDebug() << Q_FUNC_INFO << "MIME type" << resultMimeType.name() << "has generic icon name" << resultMimeType.genericIconName() << "and icon name" << resultMimeType.iconName();
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         QCOMPARE(resultMimeType.genericIconName(), QIcon::fromTheme(resultMimeType.genericIconName()).name());
         QVERIFY2(!QIcon::fromTheme(resultMimeType.genericIconName()).isNull(), qPrintable(resultMimeType.genericIconName()));
         QVERIFY2(QIcon::hasThemeIcon(resultMimeType.genericIconName()), qPrintable(resultMimeType.genericIconName()));
+
+        QCOMPARE(resultMimeType.iconName(), QIcon::fromTheme(resultMimeType.iconName()).name());
+        QVERIFY2(!QIcon::fromTheme(resultMimeType.iconName()).isNull(), qPrintable(resultMimeType.iconName()));
+        QVERIFY2(QIcon::hasThemeIcon(resultMimeType.iconName()), qPrintable(resultMimeType.iconName()));
 #else
-        // Under Qt4 not all genericIconNames return an icon that is valid.
+        // Under Qt4 not all genericIconNames or iconNames return an icon that is valid.
 #endif
     }
     const QString resultMimeTypeName = resultMimeType.name();

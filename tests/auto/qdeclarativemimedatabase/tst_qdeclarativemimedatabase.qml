@@ -60,6 +60,10 @@ TestCase {
         return "/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png"
     }
 
+    function pngMimeTypeIconName() {
+        return "/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png"
+    }
+
     function firstPngMimeTypeSuffixes() {
         return ".png"
     }
@@ -69,6 +73,7 @@ TestCase {
         name: pngMimeTypeName()
         comment: pngMimeTypeComment()
         genericIconName: pngMimeTypeGenericIconName()
+        iconName: pngMimeTypeIconName()
         suffixes: [ firstPngMimeTypeSuffixes() ]
     }
 

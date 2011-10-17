@@ -53,6 +53,7 @@ struct QMIME_EXPORT QMimeTypeData : public QSharedData
     LocaleHash localeComments;
     QStringList aliases;
     QString genericIconName;
+    QString iconName;
     QStringList globPatterns;
     QStringList subClassOf;
     QString preferredSuffix;
