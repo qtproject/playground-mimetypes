@@ -357,5 +357,17 @@ QString QMimeType::filterString() const
     return filter;
 }
 
+/*!
+    Returns true if this mimetype is \name, or inherits \name,
+    or is an alias for \name.
+ */
+bool QMimeType::inherits(const QString &mimeTypeName) const
+{
+    if (d->name == mimeTypeName)
+        return true;
+    // TODO implement, in the provider
+    return false;
+}
+
 
 QT_END_NAMESPACE

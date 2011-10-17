@@ -139,6 +139,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *pri
 
     QMimeType candidate;
 
+    // TODO delegate to backend, implement properly.
     foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap) {
         const unsigned contentPriority = entry->type.d->matchesData(data);
         if (contentPriority && contentPriority > *priorityPtr) {
@@ -194,46 +195,61 @@ void QMimeDatabasePrivate::setMagicMatchers(const QString &nameOrAlias,
 #endif
 
 // Returns a MIME type or Null one if none found
-QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr)
+QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *accuracyPtr)
 {
     // First, glob patterns are evaluated. If there is a match with max weight,
     // this one is selected and we are done. Otherwise, the file contents are
     // evaluated and the match with the highest value (either a magic priority or
     // a glob pattern weight) is selected. Matching starts from max level (most
     // specific) in both cases, even when there is already a suffix matching candidate.
-    *priorityPtr = 0;
+    *accuracyPtr = 0;
     FileMatchContext context(device, fileName);
 
-    // Pass 1) Try to match on suffix#type
+    // Pass 1) Try to match on the file name
     QStringList candidatesByName = findByName(fileName);
 
-    // TODO REWRITE THIS METHOD, FOR PROPER GLOB-CONFLICT HANDLING
-
-    QMimeType candidateByName;
-    if (!candidatesByName.isEmpty()) {
-        *priorityPtr = 50;
-        candidateByName = mimeTypeForName(candidatesByName.last());
+    if (candidatesByName.count() == 1) {
+        *accuracyPtr = 100;
+        const QMimeType mime = mimeTypeForName(candidatesByName.at(0));
+        if (mime.isValid())
+            return mime;
+        candidatesByName.clear();
     }
 
-    // Pass 2) Match on content
-    if (!context.isReadable()) {
-        qWarning() << Q_FUNC_INFO << "File" << fileName << "could not be read!";
-        return candidateByName;
+    // Extension is unknown, or matches multiple mimetypes.
+    // Pass 2) Match on content, if we can read the data
+    if (context.isReadable()) {
+
+        unsigned magicAccuracy = 0;
+        QMimeType candidateByData(findByData(context.data(), &magicAccuracy));
+
+        // Disambiguate conflicting extensions (if magic found something and the magicrule was < 80)
+        if (candidateByData.isValid() && magicAccuracy > 0) {
+            // "for glob_match in glob_matches:"
+            // "if glob_match is subclass or equal to sniffed_type, use glob_match"
+            const QString sniffedMime = candidateByData.name();
+            foreach(const QString &m, candidatesByName) {
+                // TODO for speed: provider->inherits(a,b) without loading QMimeType(a).
+                QMimeType mimeFromPattern = mimeTypeForName(m);
+                if (mimeFromPattern.inherits(sniffedMime)) {
+                    // We have magic + pattern pointing to this, so it's a pretty good match
+                    *accuracyPtr = 100;
+                    return mimeFromPattern;
+                }
+            }
+        }
     }
 
-    if (candidateByName.matchesData(context.data()) > 50 /* TODO REWRITE ALL THIS */) {
-        //qDebug() << Q_FUNC_INFO << "candidateByName" << candidateByName.name() << "for" << fileName << "also matches by data";
-        return candidateByName;
+    if (candidatesByName.count() > 1) {
+        *accuracyPtr = 20;
+        candidatesByName.sort(); // to make it deterministic
+        const QMimeType mime = mimeTypeForName(candidatesByName.at(0));
+        if (mime.isValid())
+            return mime;
     }
 
-    unsigned priorityByName = *priorityPtr;
-    //qDebug() << Q_FUNC_INFO << "findByName() for        " << fileName << "returned" << candidateByName.name() << "with priority" << priorityByName;
-
-    QMimeType candidateByData(findByData(context.data(), priorityPtr));
-    //qDebug() << Q_FUNC_INFO << "findByData() for data of" << fileName << "returned" << candidateByData.name() << "with priority" << *priorityPtr;
-
-    // ## BROKEN, PRIORITIES HAVE A DIFFERENT SCALE
-    return priorityByName < *priorityPtr ? candidateByData : candidateByName;
+    // ### TODO: should be application/octet-stream, but the docu says Null
+    return QMimeType();
 }
 
 QStringList QMimeDatabasePrivate::filterStrings() const
