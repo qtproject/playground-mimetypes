@@ -83,7 +83,7 @@ void tst_qmimedatabase::findByName_data()
         QString filePath = list.at(0);
         QString mimeTypeType = list.at(1);
         QString xFail;
-        if (list.size() == 3)
+        if (list.size() >= 3)
             xFail = list.at(2);
 
         QTest::newRow(filePath.toLatin1().constData()) << prefix + filePath << mimeTypeType << xFail;
@@ -156,8 +156,7 @@ void tst_qmimedatabase::findByData()
     if (xFail.length() >= 2 && xFail.at(1) == QLatin1Char('x')) {
         // Expected to fail
         QVERIFY2(resultMimeTypeName != mimeTypeName, qPrintable(resultMimeTypeName));
-    }
-    else {
+    } else {
         QCOMPARE(resultMimeTypeName, mimeTypeName);
     }
 }
@@ -178,8 +177,7 @@ void tst_qmimedatabase::findByFile()
     if (xFail.length() >= 3 && xFail.at(2) == QLatin1Char('x')) {
         // Expected to fail
         QVERIFY2(resultMimeTypeName != mimeTypeName, qPrintable(resultMimeTypeName));
-    }
-    else {
+    } else {
         QCOMPARE(resultMimeTypeName, mimeTypeName);
     }
 }

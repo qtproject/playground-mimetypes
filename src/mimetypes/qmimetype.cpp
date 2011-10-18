@@ -113,7 +113,7 @@ static inline bool isTextFile(const QByteArray &data)
 
     // Check the first 32 bytes (see shared-mime spec)
     const char *p = data.constData();
-    const char *e = p + data.size();
+    const char *e = p + qMin(32, data.size());
     for ( ; p < e; ++p) {
         if ((unsigned char)(*p) < 32 && *p != 9 && *p !=10 && *p != 13)
             return false;

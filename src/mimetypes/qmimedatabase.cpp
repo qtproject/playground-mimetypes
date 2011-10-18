@@ -141,6 +141,8 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *acc
         return mimeTypeForName(QLatin1String("application/x-zerosize"));
     }
 
+    *accuracyPtr = 0;
+
     // TODO delegate to backend, implement properly.
     foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap) {
         const unsigned contentPriority = entry->type.d->matchesData(data);
