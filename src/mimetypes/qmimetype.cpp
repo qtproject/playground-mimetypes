@@ -218,11 +218,6 @@ bool QMimeType::operator==(const QMimeType &other) const
            *d == *other.d;
 }
 
-void QMimeType::clear()
-{
-    d->clear();
-}
-
 bool QMimeType::isValid() const
 {
     return !d->name.isEmpty();

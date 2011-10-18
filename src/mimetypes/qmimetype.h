@@ -45,8 +45,6 @@ public:
     inline bool operator!=(const QMimeType &other) const
     { return !operator==(other); }
 
-    void clear();
-
     bool isValid() const;
 
     const QString &name() const;
