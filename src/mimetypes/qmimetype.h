@@ -67,6 +67,8 @@ public:
 
     const QStringList &parentMimeTypes() const;
 
+    const QStringList &allParentMimeTypes() const;
+
     const QStringList &suffixes() const;
     const QString &preferredSuffix() const;
 

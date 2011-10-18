@@ -52,6 +52,7 @@ QMimeTypeData::QMimeTypeData(const QMimeType &other)
     , iconName(other.d->iconName)
     , globPatterns(other.d->globPatterns)
     , parentMimeTypes(other.d->parentMimeTypes)
+    , allParentMimeTypes(other.d->allParentMimeTypes)
     , preferredSuffix(other.d->preferredSuffix)
     , suffixes(other.d->suffixes)
     , magicMatchers(other.d->magicMatchers)
@@ -70,6 +71,7 @@ void QMimeTypeData::clear()
     iconName.clear();
     globPatterns.clear();
     parentMimeTypes.clear();
+    allParentMimeTypes.clear();
     preferredSuffix.clear();
     suffixes.clear();
     magicMatchers.clear();
@@ -85,6 +87,7 @@ bool QMimeTypeData::operator==(const QMimeTypeData &other) const
            iconName == other.iconName &&
            globPatterns == other.globPatterns &&
            parentMimeTypes == other.parentMimeTypes &&
+           allParentMimeTypes == other.allParentMimeTypes &&
            preferredSuffix == other.preferredSuffix &&
            suffixes == other.suffixes &&
            magicMatchers == other.magicMatchers;
@@ -284,6 +287,11 @@ const QStringList &QMimeType::globPatterns() const
 const QStringList &QMimeType::parentMimeTypes() const
 {
     return d->parentMimeTypes;
+}
+
+const QStringList &QMimeType::allParentMimeTypes() const
+{
+    return d->allParentMimeTypes;
 }
 
 /*!

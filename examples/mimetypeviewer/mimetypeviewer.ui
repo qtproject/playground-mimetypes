@@ -174,48 +174,62 @@
     </widget>
    </item>
    <item row="9" column="1">
-    <widget class="QLabel" name="subClassesOfLabel">
+    <widget class="QLabel" name="parentMimeTypesLabel">
      <property name="text">
       <string>&lt;&gt;</string>
      </property>
     </widget>
    </item>
    <item row="10" column="0">
-    <widget class="QLabel" name="label_10">
+    <widget class="QLabel" name="label_9">
      <property name="text">
-      <string>Suffixes:</string>
+      <string>SubClasses of:</string>
      </property>
     </widget>
    </item>
    <item row="10" column="1">
-    <widget class="QLabel" name="suffixesLabel">
+    <widget class="QLabel" name="allParentMimeTypesLabel">
      <property name="text">
       <string>&lt;&gt;</string>
      </property>
     </widget>
    </item>
    <item row="11" column="0">
-    <widget class="QLabel" name="label_11">
+    <widget class="QLabel" name="label_10">
      <property name="text">
-      <string>Preferred suffix:</string>
+      <string>Suffixes:</string>
      </property>
     </widget>
    </item>
    <item row="11" column="1">
-    <widget class="QLabel" name="preferredSuffixLabel">
+    <widget class="QLabel" name="suffixesLabel">
      <property name="text">
       <string>&lt;&gt;</string>
      </property>
     </widget>
    </item>
    <item row="12" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Preferred suffix:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QLabel" name="preferredSuffixLabel">
+     <property name="text">
+      <string>&lt;&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
     <widget class="QLabel" name="label_12">
      <property name="text">
       <string>Filter string:</string>
      </property>
     </widget>
    </item>
-   <item row="12" column="1">
+   <item row="13" column="1">
     <widget class="QLabel" name="filterStringLabel">
      <property name="text">
       <string>&lt;&gt;</string>
