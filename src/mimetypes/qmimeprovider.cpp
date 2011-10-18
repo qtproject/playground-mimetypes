@@ -344,7 +344,7 @@ void QMimeXMLProvider::ensureLoaded()
         foreach (const QString &packageDir, packageDirs) {
             QDir dir(packageDir);
             const QStringList files = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-            qDebug() << Q_FUNC_INFO << packageDir << files;
+            //qDebug() << Q_FUNC_INFO << packageDir << files;
             if (!fdoXmlFound)
                 fdoXmlFound = files.contains(QLatin1String("freedesktop.org.xml"));
             QStringList::const_iterator endIt(files.constEnd());
