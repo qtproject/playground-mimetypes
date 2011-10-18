@@ -78,7 +78,7 @@ protected:
     friend class BaseMimeTypeParser;
     friend class MimeTypeMapEntry;
     friend class QMimeDatabasePrivate;
-    friend class QMimeDatabase;
+    friend class QMimeXMLProvider;
     friend class QMimeTypeData;
 
     QExplicitlySharedDataPointer<QMimeTypeData> d;

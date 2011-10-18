@@ -150,8 +150,12 @@ bool QMimeBinaryProvider::isValid()
 #endif
 }
 
-void QMimeBinaryProvider::ensureTypesLoaded()
+QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 {
+    // TODO implement, including a QCache
+    QMimeType mime;
+    Q_UNUSED(name);
+    return mime;
 }
 
 QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *foundSuffix)
@@ -262,8 +266,13 @@ bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryPr
     return false;
 }
 
-void QMimeBinaryProvider::ensureMagicLoaded()
+QMimeType QMimeBinaryProvider::findByMagic(const QByteArray &data, int *accuracyPtr)
 {
+    QMimeType candidate;
+    Q_UNUSED(data);
+    *accuracyPtr = 0;
+    // TODO implement
+    return candidate;
 }
 
 QStringList QMimeBinaryProvider::parents(const QString &mime)
@@ -311,6 +320,14 @@ QString QMimeBinaryProvider::resolveAlias(const QString &name)
     return name;
 }
 
+QList<QMimeType> QMimeBinaryProvider::allMimeTypes()
+{
+    QList<QMimeType> result;
+    // TODO implement
+    return result;
+}
+
+
 ////
 
 QMimeXMLProvider::QMimeXMLProvider(QMimeDatabasePrivate *db)
@@ -323,9 +340,11 @@ bool QMimeXMLProvider::isValid()
     return true;
 }
 
-void QMimeXMLProvider::ensureTypesLoaded()
+QMimeType QMimeXMLProvider::mimeTypeForName(const QString &name)
 {
     ensureLoaded();
+
+    return m_nameMimeTypeMap.value(name);
 }
 
 QStringList QMimeXMLProvider::findByName(const QString &fileName, QString *foundSuffix)
@@ -336,9 +355,21 @@ QStringList QMimeXMLProvider::findByName(const QString &fileName, QString *found
     return matchingMimeTypes;
 }
 
-void QMimeXMLProvider::ensureMagicLoaded()
+QMimeType QMimeXMLProvider::findByMagic(const QByteArray &data, int *accuracyPtr)
 {
     ensureLoaded();
+
+    QMimeType candidate;
+
+    // TODO implement properly.
+    foreach (const QMimeType &mime, m_nameMimeTypeMap) {
+        const int contentPriority = mime.d->matchesData(data);
+        if (contentPriority && contentPriority > *accuracyPtr) {
+            *accuracyPtr = contentPriority;
+            candidate = mime;
+        }
+    }
+    return candidate;
 }
 
 void QMimeXMLProvider::ensureLoaded()
@@ -401,10 +432,9 @@ void QMimeXMLProvider::addGlobPattern(const QMimeGlobPattern& glob)
     m_mimeTypeGlobs.addGlob(glob);
 }
 
-bool QMimeXMLProvider::addMimeType(const QMimeType &mt)
+void QMimeXMLProvider::addMimeType(const QMimeType &mt)
 {
-    // HACK FOR NOW. The goal is to move all that code here.
-    return m_db->addMimeType(mt);
+    m_nameMimeTypeMap.insert(mt.name(), mt);
 }
 
 QStringList QMimeXMLProvider::parents(const QString &mime)
@@ -431,4 +461,9 @@ QString QMimeXMLProvider::resolveAlias(const QString &name)
 void QMimeXMLProvider::addAlias(const QString &alias, const QString &name)
 {
     m_aliases.insert(alias, name);
+}
+
+QList<QMimeType> QMimeXMLProvider::allMimeTypes()
+{
+    return m_nameMimeTypeMap.values();
 }

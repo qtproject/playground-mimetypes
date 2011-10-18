@@ -30,11 +30,12 @@ public:
     virtual ~QMimeProviderBase() {}
 
     virtual bool isValid() = 0;
-    virtual void ensureTypesLoaded() = 0;
+    virtual QMimeType mimeTypeForName(const QString &name) = 0;
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix) = 0;
     virtual QStringList parents(const QString &mime) = 0;
     virtual QString resolveAlias(const QString &name) = 0;
-    virtual void ensureMagicLoaded() = 0;
+    virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr) = 0;
+    virtual QList<QMimeType> allMimeTypes() = 0;
 
     QMimeDatabasePrivate* m_db;
 };
@@ -49,11 +50,12 @@ public:
     virtual ~QMimeBinaryProvider();
 
     virtual bool isValid();
-    virtual void ensureTypesLoaded();
+    virtual QMimeType mimeTypeForName(const QString &name);
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix);
     virtual QStringList parents(const QString &mime);
     virtual QString resolveAlias(const QString &name);
-    virtual void ensureMagicLoaded();
+    virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr);
+    virtual QList<QMimeType> allMimeTypes();
 
 private:
     struct CacheFile;
@@ -82,16 +84,17 @@ public:
     QMimeXMLProvider(QMimeDatabasePrivate *db);
 
     virtual bool isValid();
-    virtual void ensureTypesLoaded();
+    virtual QMimeType mimeTypeForName(const QString &name);
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix);
     virtual QStringList parents(const QString &mime);
     virtual QString resolveAlias(const QString &name);
-    virtual void ensureMagicLoaded();
+    virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr);
+    virtual QList<QMimeType> allMimeTypes();
 
     bool load(const QString &fileName, QString *errorMessage);
 
     // Called by the mimetype xml parser
-    bool addMimeType(const QMimeType &mt);
+    void addMimeType(const QMimeType &mt);
     void addGlobPattern(const QMimeGlobPattern& glob);
     void addParent(const QString &child, const QString &parent);
     void addAlias(const QString &alias, const QString &name);
@@ -101,6 +104,9 @@ private:
     void load(const QString &fileName);
 
     bool m_loaded;
+
+    typedef QHash<QString, QMimeType> NameMimeTypeMap;
+    NameMimeTypeMap m_nameMimeTypeMap;
 
     typedef QHash<QString, QString> AliasHash;
     AliasHash m_aliases;

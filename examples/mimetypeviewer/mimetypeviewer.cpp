@@ -35,7 +35,7 @@ void MimeTypeViewer::onOpenFileButtonClicked()
 void MimeTypeViewer::updateNameList()
 {
     ui->nameList->clear();
-    foreach (const QMimeType &mime, dataBase->mimeTypes()) {
+    foreach (const QMimeType &mime, dataBase->allMimeTypes()) {
         ui->nameList->addItem(mime.name());
     }
     ui->nameList->sortItems();

@@ -33,15 +33,6 @@ QT_BEGIN_NAMESPACE
 class QMimeDatabase;
 class QMimeProviderBase;
 
-// MimeTypeMapEntry: Entry of a MIME type map, consisting of a MIME type.
-struct MimeTypeMapEntry
-{
-    inline MimeTypeMapEntry(const QMimeType &aType = QMimeType()) :
-        type(aType)
-    {}
-    QMimeType type;
-};
-
 struct QMimeDatabasePrivate
 {
     Q_DISABLE_COPY(QMimeDatabasePrivate)
@@ -56,25 +47,20 @@ struct QMimeDatabasePrivate
 
     QString defaultMimeType() const { return m_defaultMimeType; }
 
-
-    bool addMimeType(const QMimeType &mt);
-
 #if 0
     QStringList filterStrings() const;
 #endif
 
     bool inherits(const QString &mime, const QString &parent);
 
-    QList<QMimeType> mimeTypes() const;
+    QList<QMimeType> allMimeTypes();
 
-    typedef QHash<QString, MimeTypeMapEntry *> NameMimeTypeMap;
 
     QMimeType mimeTypeForName(const QString &nameOrAlias);
-    QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr);
-    QMimeType findByData(const QByteArray &data, unsigned *priorityPtr);
+    QMimeType findByNameAndData(const QString &fileName, QIODevice *device, int *priorityPtr);
+    QMimeType findByData(const QByteArray &data, int *priorityPtr);
     QStringList findByName(const QString &fileName);
 
-    NameMimeTypeMap nameMimeTypeMap;
     mutable QMimeProviderBase *m_provider;
     const QString m_defaultMimeType;
     QMutex mutex;

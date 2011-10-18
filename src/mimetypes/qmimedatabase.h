@@ -54,7 +54,7 @@ public:
     QMimeType findByNameAndData(const QString &fileName, QIODevice *device) const;
     QMimeType findByNameAndData(const QString &fileName, const QByteArray &data) const;
 
-    QList<QMimeType> mimeTypes() const;
+    QList<QMimeType> allMimeTypes() const;
 
 #if 0
     // This must be a huge list, why would anyone ever want this?

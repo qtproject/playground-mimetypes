@@ -53,7 +53,6 @@ QMimeDatabasePrivate::QMimeDatabasePrivate()
 
 QMimeDatabasePrivate::~QMimeDatabasePrivate()
 {
-    qDeleteAll(nameMimeTypeMap);
     delete m_provider;
     m_provider = 0;
 }
@@ -78,16 +77,6 @@ void QMimeDatabasePrivate::setProvider(QMimeProviderBase *theProvider)
     m_provider = theProvider;
 }
 
-bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
-{
-    if (!mt.isValid())
-        return false;
-
-    // insert the MIME type.
-    nameMimeTypeMap.insert(mt.name(), new MimeTypeMapEntry(mt));
-    return true;
-}
-
 #if 0
 bool QMimeDatabasePrivate::setPreferredSuffix(const QString &nameOrAlias, const QString &suffix)
 {
@@ -105,12 +94,7 @@ bool QMimeDatabasePrivate::setPreferredSuffix(const QString &nameOrAlias, const 
 // Returns a MIME type or an invalid one if none found
 QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
 {
-    provider()->ensureTypesLoaded();
-
-    const MimeTypeMapEntry *entry = nameMimeTypeMap.value(provider()->resolveAlias(nameOrAlias));
-    if (entry)
-        return entry->type;
-    return QMimeType();
+    return provider()->mimeTypeForName(provider()->resolveAlias(nameOrAlias));
 }
 
 QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
@@ -123,27 +107,15 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
     return matchingMimeTypes;
 }
 
-QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *accuracyPtr)
+QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, int *accuracyPtr)
 {
-    provider()->ensureMagicLoaded();
-
-    QMimeType candidate;
-
     if (data.isEmpty()) {
         *accuracyPtr = 100;
         return mimeTypeForName(QLatin1String("application/x-zerosize"));
     }
 
     *accuracyPtr = 0;
-
-    // TODO delegate to backend, implement properly.
-    foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap) {
-        const unsigned contentPriority = entry->type.d->matchesData(data);
-        if (contentPriority && contentPriority > *accuracyPtr) {
-            *accuracyPtr = contentPriority;
-            candidate = entry->type;
-        }
-    }
+    QMimeType candidate = provider()->findByMagic(data, accuracyPtr);
 
     if (candidate.isValid())
         return candidate;
@@ -151,7 +123,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *acc
     return mimeTypeForName(defaultMimeType());
 }
 
-QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *accuracyPtr)
+QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, int *accuracyPtr)
 {
     // First, glob patterns are evaluated. If there is a match with max weight,
     // this one is selected and we are done. Otherwise, the file contents are
@@ -176,7 +148,7 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
     // Pass 2) Match on content, if we can read the data
     if (context.isReadable()) {
 
-        unsigned magicAccuracy = 0;
+        int magicAccuracy = 0;
         QMimeType candidateByData(findByData(context.data(), &magicAccuracy));
 
         // Disambiguate conflicting extensions (if magic found something and the magicrule was < 80)
@@ -222,14 +194,9 @@ QStringList QMimeDatabasePrivate::filterStrings() const
 }
 #endif
 
-QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
+QList<QMimeType> QMimeDatabasePrivate::allMimeTypes()
 {
-    QList<QMimeType> result;
-
-    foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap)
-        result.append(entry->type);
-
-    return result;
+    return provider()->allMimeTypes();
 }
 
 
@@ -324,7 +291,7 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
     }
 #endif
 
-    unsigned priority = 0;
+    int priority = 0;
     return d->findByNameAndData(fileInfo.absoluteFilePath(), &file, &priority);
 }
 
@@ -388,7 +355,7 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 {
     QMutexLocker locker(&d->mutex);
 
-    unsigned int accuracy = 0;
+    int accuracy = 0;
     return d->findByData(data, &accuracy);
 }
 
@@ -441,7 +408,7 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *d
 {
     //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
 
-    unsigned int accuracy = 0;
+    int accuracy = 0;
     return d->findByNameAndData(fileName, device, &accuracy);
 }
 
@@ -466,15 +433,22 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, const QByteA
     //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
 
     QBuffer buffer(const_cast<QByteArray *>(&data));
-    unsigned int accuracy = 0;
+    int accuracy = 0;
     return d->findByNameAndData(fileName, &buffer, &accuracy);
 }
 
-QList<QMimeType> QMimeDatabase::mimeTypes() const
+/*!
+    Returns the list of all available MIME types.
+
+    This can be useful for showing all MIME types to the user, for instance
+    in a MIME type editor. Do not use unless really necessary in other cases
+    though, prefer using the findBy* methods for performance reasons.
+*/
+QList<QMimeType> QMimeDatabase::allMimeTypes() const
 {
     QMutexLocker locker(&d->mutex);
 
-    return d->mimeTypes();
+    return d->allMimeTypes();
 }
 
 // TODO: needed?

@@ -72,7 +72,7 @@ QVariantList QDeclarativeMimeDatabase::mimeTypeNames() const
 {
     QVariantList result;
 
-    foreach (const QMimeType &mimeType, m_MimeDatabase.mimeTypes()) {
+    foreach (const QMimeType &mimeType, m_MimeDatabase.allMimeTypes()) {
         result << mimeType.name();
     }
 
