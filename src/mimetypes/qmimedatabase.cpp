@@ -47,7 +47,7 @@ QMimeDatabasePrivate *QMimeDatabasePrivate::instance()
 }
 
 QMimeDatabasePrivate::QMimeDatabasePrivate()
-    : m_provider(0)
+    : m_provider(0), m_defaultMimeType(QLatin1String("application/octet-stream"))
 {
 }
 
@@ -130,7 +130,6 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
     return matchingMimeTypes;
 }
 
-// Returns a MIME type or Null one if none found
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *accuracyPtr)
 {
     provider()->ensureMagicLoaded();
@@ -151,10 +150,12 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *acc
         }
     }
 
-    return candidate;
+    if (candidate.isValid())
+        return candidate;
+
+    return mimeTypeForName(defaultMimeType());
 }
 
-// Returns a MIME type or Null one if none found
 QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *accuracyPtr)
 {
     // First, glob patterns are evaluated. If there is a match with max weight,
@@ -210,8 +211,7 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
             return mime;
     }
 
-    // ### TODO: should be application/octet-stream, but the docu says Null
-    return QMimeType();
+    return mimeTypeForName(defaultMimeType());
 }
 
 QStringList QMimeDatabasePrivate::filterStrings() const
@@ -299,9 +299,9 @@ QMimeDatabase::~QMimeDatabase()
 }
 
 /*!
-    Returns a MIME type for \a nameOrAlias or Null one if none found.
+    Returns a MIME type for \a nameOrAlias or an invalid one if none found.
 */
-QMimeType QMimeDatabase::mimeTypeForName(const QString &nameOrAlias) const
+QMimeType QMimeDatabase::mimeTypeForName(const QString& nameOrAlias) const
 {
     QMutexLocker locker(&d->mutex);
 
@@ -309,10 +309,21 @@ QMimeType QMimeDatabase::mimeTypeForName(const QString &nameOrAlias) const
 }
 
 /*!
-    Returns a MIME type for \a fileInfo or Null one if none found.
+    Returns a MIME type for \a fileInfo.
+
+    This method looks at both the file name and the file contents,
+    if necessary. The file extension has priority over the contents,
+    but the contents will be used if the file extension is unknown, or
+    matches multiple MIME types.
+
+    A valid MIME type is always returned. If the file doesn't match any
+    known extension or data, the default MIME type (application/octet-stream)
+    is returned.
 
     If \a fileInfo is a unix symbolic link, the file that it refers to
     will be used instead.
+
+    \see isDefault
 */
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
@@ -346,22 +357,33 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 }
 
 /*!
-    Returns a MIME type for \a file or Null one if none found.
+    Returns a MIME type for \a file.
+
+    This method looks at both the file name and the file contents,
+    if necessary. The file extension has priority over the contents,
+    but the contents will be used if the file extension is unknown, or
+    matches multiple MIME types.
+
+    A valid MIME type is always returned. If the file doesn't match any
+    known pattern or data, the default MIME type (application/octet-stream)
+    is returned.
+
     The \a file can also include an absolute or relative path.
 */
 QMimeType QMimeDatabase::findByFile(const QString &fileName) const
 {
-    //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
-
-    QMutexLocker locker(&d->mutex);
-
-    QFile file(fileName);
-    unsigned priority = 0;
-    return d->findByNameAndData(fileName, &file, &priority);
+    // Implemented as a wrapper around findByFile(QFileInfo), so no mutex.
+    QFileInfo fileInfo(fileName);
+    return findByFile(fileInfo);
 }
 
 /*!
-    Returns a MIME type for the file \a name or Null one if none found.
+    Returns a MIME type for the file \a fileName.
+
+    A valid MIME type is always returned. If the file name doesn't match any
+    known pattern, the default MIME type (application/octet-stream)
+    is returned.
+
     This function does not try to open the file. To also use the content
     when determining the MIME type, use QMimeDatabase::findByFile or
     QMimeDatabase::findByNameAndData instead.
@@ -373,7 +395,7 @@ QMimeType QMimeDatabase::findByName(const QString &fileName) const
     QStringList matches = d->findByName(fileName);
     const int matchCount = matches.count();
     if (matchCount == 0)
-        return QMimeType();
+        return d->mimeTypeForName(d->defaultMimeType());
     else if (matchCount == 1)
         return d->mimeTypeForName(matches.first());
     else {
@@ -384,7 +406,11 @@ QMimeType QMimeDatabase::findByName(const QString &fileName) const
 }
 
 /*!
-    Returns a MIME type for \a data or Null one if none found.
+    Returns a MIME type for \a data.
+
+    A valid MIME type is always returned. If \a data doesn't match any
+    known MIME type data, the default MIME type (application/octet-stream)
+    is returned.
 */
 QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 {
@@ -395,10 +421,15 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 }
 
 /*!
-    Returns a MIME type for \a url or Null one if none found.
+    Returns a MIME type for \a url.
+
     If the url is a local file, this calls findByFile.
     Otherwise the matching is done based on the name only
     (except over schemes where filenames don't mean much, like HTTP)
+
+    A valid MIME type is always returned. If \a data doesn't match any
+    known MIME type data, the default MIME type (application/octet-stream)
+    is returned.
 */
 QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
 {
@@ -410,9 +441,30 @@ QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
     if (!localFile.isEmpty())
         return findByFile(localFile);
 #endif
+
+    const QString scheme = url.scheme();
+    if (scheme.startsWith(QLatin1String("http")))
+        return mimeTypeForName(d->defaultMimeType());
+
     return findByName(url.path());
 }
 
+/*!
+    Returns a MIME type for the given \a fileName and \a device data.
+
+    This overload can be useful when the file is remote, and we started to
+    download some of its data in a device. This allows to do full MIME type
+    matching for remote files as well.
+
+    A valid MIME type is always returned. If \a data doesn't match any
+    known MIME type data, the default MIME type (application/octet-stream)
+    is returned.
+
+    This method looks at both the file name and the file contents,
+    if necessary. The file extension has priority over the contents,
+    but the contents will be used if the file extension is unknown, or
+    matches multiple MIME types.
+*/
 QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *device) const
 {
     //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
@@ -421,6 +473,22 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *d
     return d->findByNameAndData(fileName, device, &accuracy);
 }
 
+/*!
+    Returns a MIME type for the given \a fileName and \a device data.
+
+    This overload can be useful when the file is remote, and we started to
+    download some of its data. This allows to do full MIME type matching for
+    remote files as well.
+
+    A valid MIME type is always returned. If \a data doesn't match any
+    known MIME type data, the default MIME type (application/octet-stream)
+    is returned.
+
+    This method looks at both the file name and the file contents,
+    if necessary. The file extension has priority over the contents,
+    but the contents will be used if the file extension is unknown, or
+    matches multiple MIME types.
+*/
 QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, const QByteArray &data) const
 {
     //qDebug() << Q_FUNC_INFO << "fileName" << fileName;

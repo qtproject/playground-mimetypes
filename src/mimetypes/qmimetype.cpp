@@ -201,9 +201,23 @@ bool QMimeType::operator==(const QMimeType &other) const
            *d == *other.d;
 }
 
+/*!
+    Returns true if the MIME type is valid, otherwise returns false.
+    A valid MIME type has a non-empty name().
+    The invalid MIME type is the default-constructed QMimeType.
+ */
 bool QMimeType::isValid() const
 {
     return !d->name.isEmpty();
+}
+
+/*!
+    Returns true if this MIME type is the default MIME type which
+    applies to all files: application/octet-stream.
+ */
+bool QMimeType::isDefault() const
+{
+    return d->name == QMimeDatabasePrivate::instance()->defaultMimeType();
 }
 
 QString QMimeType::name() const

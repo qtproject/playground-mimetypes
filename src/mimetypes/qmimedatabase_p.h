@@ -54,6 +54,9 @@ struct QMimeDatabasePrivate
     QMimeProviderBase *provider();
     void setProvider(QMimeProviderBase *theProvider);
 
+    QString defaultMimeType() const { return m_defaultMimeType; }
+
+
     bool addMimeType(const QMimeType &mt);
 
     QStringList filterStrings() const;
@@ -75,6 +78,7 @@ struct QMimeDatabasePrivate
     NameMimeTypeMap nameMimeTypeMap;
     AliasMap aliasMap;
     mutable QMimeProviderBase *m_provider;
+    const QString m_defaultMimeType;
     QMutex mutex;
 };
 

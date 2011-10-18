@@ -47,6 +47,8 @@ public:
 
     bool isValid() const;
 
+    bool isDefault() const;
+
     QString name() const;
 
     QStringList aliases() const;
