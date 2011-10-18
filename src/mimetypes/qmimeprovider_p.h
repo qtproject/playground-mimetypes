@@ -33,6 +33,7 @@ public:
     virtual void ensureTypesLoaded() = 0;
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix) = 0;
     virtual QStringList parents(const QString &mime) = 0;
+    virtual QString resolveAlias(const QString &name) = 0;
     virtual void ensureMagicLoaded() = 0;
 
     QMimeDatabasePrivate* m_db;
@@ -51,6 +52,7 @@ public:
     virtual void ensureTypesLoaded();
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix);
     virtual QStringList parents(const QString &mime);
+    virtual QString resolveAlias(const QString &name);
     virtual void ensureMagicLoaded();
 
 private:
@@ -83,6 +85,7 @@ public:
     virtual void ensureTypesLoaded();
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix);
     virtual QStringList parents(const QString &mime);
+    virtual QString resolveAlias(const QString &name);
     virtual void ensureMagicLoaded();
 
     bool load(const QString &fileName, QString *errorMessage);
@@ -91,12 +94,16 @@ public:
     bool addMimeType(const QMimeType &mt);
     void addGlobPattern(const QMimeGlobPattern& glob);
     void addParent(const QString &child, const QString &parent);
+    void addAlias(const QString &alias, const QString &name);
 
 private:
     void ensureLoaded();
     void load(const QString &fileName);
 
     bool m_loaded;
+
+    typedef QHash<QString, QString> AliasHash;
+    AliasHash m_aliases;
 
     typedef QHash<QString, QStringList> ParentsHash;
     ParentsHash m_parents;

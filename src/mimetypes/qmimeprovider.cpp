@@ -115,6 +115,7 @@ enum { PosAliasListOffset = 4,
 bool QMimeBinaryProvider::isValid()
 {
 #if defined(QT_USE_MMAP)
+    // TODO qgetenv, so that the unittest can choose between with or without mime.cache
     return false; // HACK FOR NOW
 
     const QStringList cacheFilenames = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/mime.cache"));
@@ -304,6 +305,12 @@ QStringList QMimeBinaryProvider::parents(const QString &mime)
     return result;
 }
 
+QString QMimeBinaryProvider::resolveAlias(const QString &name)
+{
+    // TODO implement
+    return name;
+}
+
 ////
 
 QMimeXMLProvider::QMimeXMLProvider(QMimeDatabasePrivate *db)
@@ -414,4 +421,14 @@ QStringList QMimeXMLProvider::parents(const QString &mime)
 void QMimeXMLProvider::addParent(const QString &child, const QString &parent)
 {
     m_parents[child].append(parent);
+}
+
+QString QMimeXMLProvider::resolveAlias(const QString &name)
+{
+    return m_aliases.value(name, name);
+}
+
+void QMimeXMLProvider::addAlias(const QString &alias, const QString &name)
+{
+    m_aliases.insert(alias, name);
 }

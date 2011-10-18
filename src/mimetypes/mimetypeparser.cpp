@@ -241,7 +241,7 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             case ParseAlias: {
                 const QString alias = atts.value(QLatin1String(mimeTypeAttributeC)).toString();
                 if (!alias.isEmpty())
-                    data.aliases.append(alias);
+                    processAlias(alias, data.name);
             }
                 break;
             case ParseMagic: {

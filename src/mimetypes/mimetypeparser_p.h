@@ -65,7 +65,8 @@ public:
 protected:
     virtual bool process(const QMimeType &t, QString *errorMessage) = 0;
     virtual bool process(const QMimeGlobPattern &t, QString *errorMessage) = 0;
-    virtual void processParent(const QString &child, const QString &parent) = 0;
+    virtual void processParent(const QString& child, const QString& parent) = 0;
+    virtual void processAlias(const QString& alias, const QString& name) = 0;
 
 private:
     enum ParseState {
@@ -102,6 +103,9 @@ protected:
 
     inline void processParent(const QString &child, const QString &parent)
     { m_provider.addParent(child, parent); }
+
+    inline void processAlias(const QString &alias, const QString &name)
+    { m_provider.addAlias(alias, name); }
 
 private:
     QMimeXMLProvider &m_provider;

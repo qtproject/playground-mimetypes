@@ -66,17 +66,13 @@ struct QMimeDatabasePrivate
     QList<QMimeType> mimeTypes() const;
 
     typedef QHash<QString, MimeTypeMapEntry *> NameMimeTypeMap;
-    typedef QHash<QString, QString> AliasMap;
 
     QMimeType mimeTypeForName(const QString &nameOrAlias);
     QMimeType findByNameAndData(const QString &fileName, QIODevice *device, unsigned *priorityPtr);
     QMimeType findByData(const QByteArray &data, unsigned *priorityPtr);
     QStringList findByName(const QString &fileName);
-    inline QString resolveAlias(const QString &name) const
-    { return aliasMap.value(name, name); }
 
     NameMimeTypeMap nameMimeTypeMap;
-    AliasMap aliasMap;
     mutable QMimeProviderBase *m_provider;
     const QString m_defaultMimeType;
     QMutex mutex;

@@ -103,7 +103,7 @@ static QMimeTypeData buildMimeTypeData (
                          const QString &genericIconName,
                          const QString &iconName,
                          const QStringList &suffixes
-                     )
+                    )
 {
     QMimeTypeData instantiatedPngMimeTypeData;
     instantiatedPngMimeTypeData.name = name;
@@ -120,7 +120,7 @@ void tst_qmimetype::test_isValid()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     QVERIFY(instantiatedPngMimeType.isValid());
 
@@ -140,11 +140,11 @@ void tst_qmimetype::test_name()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     QMimeType otherPngMimeType (
                   buildMimeTypeData(QString(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     // Verify that the Id is part of the equality test:
     QCOMPARE(instantiatedPngMimeType.name(), pngMimeTypeName());
@@ -159,11 +159,11 @@ void tst_qmimetype::test_comment()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     QMimeType otherPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), QString(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     // Verify that the DisplayName is part of the equality test:
     QCOMPARE(instantiatedPngMimeType.comment(), pngMimeTypeDisplayName());
@@ -178,11 +178,11 @@ void tst_qmimetype::test_genericIconName()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     QMimeType otherPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), QString(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     // Verify that the IconUrl is part of the equality test:
     QCOMPARE(instantiatedPngMimeType.genericIconName(), pngMimeTypeIconUrl());
@@ -197,11 +197,11 @@ void tst_qmimetype::test_iconName()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     QMimeType otherPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), QString(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     // Verify that the IconUrl is part of the equality test:
     QCOMPARE(instantiatedPngMimeType.iconName(), pngMimeTypeIconUrl());
@@ -216,11 +216,11 @@ void tst_qmimetype::test_suffixes()
 {
     QMimeType instantiatedPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), pngMimeTypeFilenameExtensions())
-              );
+             );
 
     QMimeType otherPngMimeType (
                   buildMimeTypeData(pngMimeTypeName(), pngMimeTypeDisplayName(), pngMimeTypeIconUrl(), pngMimeTypeIconUrl(), QStringList())
-              );
+             );
 
     // Verify that the FilenameExtensions are part of the equality test:
     QCOMPARE(instantiatedPngMimeType.suffixes(), pngMimeTypeFilenameExtensions());
@@ -285,6 +285,25 @@ void tst_qmimetype::test_inheritance()
     QVERIFY(mrml.isValid());
     QVERIFY(mrml.inherits("text/plain"));
     QVERIFY(mrml.inherits("application/octet-stream"));
+}
+
+void tst_qmimetype::test_aliases()
+{
+    QMimeDatabase db;
+
+    const QMimeType canonical = db.mimeTypeForName("application/xml");
+    QVERIFY(canonical.isValid());
+
+    QMimeType resolvedAlias = db.mimeTypeForName("text/xml");
+    QVERIFY(resolvedAlias.isValid());
+    QCOMPARE(resolvedAlias.name(), QString("application/xml"));
+
+    QVERIFY(resolvedAlias.inherits("application/xml"));
+    QVERIFY(canonical.inherits("text/xml"));
+
+    // Test for kde bug 197346: does nspluginscan see that audio/mp3 already exists?
+    bool mustWriteMimeType = !db.mimeTypeForName("audio/mp3").isValid();
+    QVERIFY(!mustWriteMimeType);
 }
 
 // ------------------------------------------------------------------------------------------------

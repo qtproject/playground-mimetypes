@@ -348,8 +348,8 @@ QString QMimeType::filterString() const
 }
 
 /*!
-    Returns true if this mimetype is \name, or inherits \name,
-    or is an alias for \name.
+    Returns true if this mimetype is \a mimeTypeName, or inherits \a mimeTypeName,
+    or \a mimeTypeName is an alias for this mimetype.
  */
 bool QMimeType::inherits(const QString &mimeTypeName) const
 {

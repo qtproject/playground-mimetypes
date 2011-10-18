@@ -83,15 +83,8 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     if (!mt.isValid())
         return false;
 
-    const QString &name = mt.name();
-
     // insert the MIME type.
-    nameMimeTypeMap.insert(name, new MimeTypeMapEntry(mt));
-
-    // register aliasses
-    foreach (const QString &alias, mt.aliases())
-        aliasMap.insert(alias, name);
-
+    nameMimeTypeMap.insert(mt.name(), new MimeTypeMapEntry(mt));
     return true;
 }
 
@@ -114,7 +107,7 @@ QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
 {
     provider()->ensureTypesLoaded();
 
-    const MimeTypeMapEntry *entry = nameMimeTypeMap.value(resolveAlias(nameOrAlias));
+    const MimeTypeMapEntry *entry = nameMimeTypeMap.value(provider()->resolveAlias(nameOrAlias));
     if (entry)
         return entry->type;
     return QMimeType();
@@ -242,11 +235,13 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 
 bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
 {
+    const QString resolvedParent = provider()->resolveAlias(parent);
+    Q_ASSERT(provider()->resolveAlias(mime) == mime);
     QStack<QString> toCheck;
     toCheck.push(mime);
     while (!toCheck.isEmpty()) {
         const QString current = toCheck.pop();
-        if (current == parent)
+        if (current == resolvedParent)
             return true;
         foreach(const QString &par, provider()->parents(current)) {
             toCheck.push(par);
