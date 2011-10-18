@@ -317,12 +317,12 @@ bool QMimeType::matchesName(const QString &name) const
 {
     return d->name == name || d->aliases.contains(name) /* TODO: BROKEN! MUST COMPARE WITH d->name */;
 }
-#endif
 
 unsigned QMimeType::matchesData(const QByteArray &data) const
 {
     return d->matchesData(data);
 }
+#endif
 
 #if 0
 /*!

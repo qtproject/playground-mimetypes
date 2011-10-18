@@ -55,8 +55,6 @@ public:
 
     QString localeComment(const QString &locale = QString()) const;
 
-    // TODO do not return const refs! This prevents any kind of non-trivial implementation
-
     QString genericIconName() const;
 
     QString iconName() const;
@@ -74,8 +72,8 @@ public:
 
 #if 0   // Seems unused
     bool matchesName(const QString &name) const;
-#endif
     unsigned matchesData(const QByteArray &data) const;
+#endif
     //unsigned matchesFile(QIODevice *device, const QString &fileName) const;
     //unsigned matchesFileBySuffix(const QString &fileName) const;
 
