@@ -10,6 +10,16 @@
 
 #include <QMimeDatabase>
 
+static int initializeDataDirs()
+{
+    // To make sure that other mime packages don't change our test results
+    qputenv("XDG_DATA_DIRS", SRCDIR "../../../src/mimetypes/mime");
+    qputenv("XDG_DATA_HOME", QByteArray());
+    return 0;
+}
+
+Q_CONSTRUCTOR_FUNCTION(initializeDataDirs)
+
 class tst_qmimedatabase : public QObject
 {
     Q_OBJECT

@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     const QString fileName = QFile::decodeName(argv[1]);
-    int accuracy;
+    //int accuracy;
     QMimeDatabase db;
     QMimeType mime;
     if (fileName == QLatin1String("-")) {
