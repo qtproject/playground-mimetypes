@@ -248,6 +248,8 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
                     return mimeFromPattern;
                 }
             }
+            *accuracyPtr = magicAccuracy;
+            return candidateByData;
         }
     }
 
