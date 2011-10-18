@@ -506,6 +506,7 @@ QList<QMimeType> QMimeDatabase::mimeTypes() const
 }
 
 // TODO: needed?
+#if 0
 QStringList QMimeDatabase::filterStrings() const
 {
     QMutexLocker locker(&d->mutex);
@@ -538,5 +539,6 @@ QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
 
     return filters.join(QLatin1String(";;"));
 }
+#endif
 
 QT_END_NAMESPACE

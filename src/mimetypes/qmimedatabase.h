@@ -56,8 +56,11 @@ public:
 
     QList<QMimeType> mimeTypes() const;
 
+#if 0
+    // This must be a huge list, why would anyone ever want this?
     QStringList filterStrings() const;
     QString allFiltersString(QString *allFilesFilter = 0) const;
+#endif
 
     QMimeDatabasePrivate *data_ptr() { return d; }
 
