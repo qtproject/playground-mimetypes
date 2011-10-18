@@ -51,7 +51,7 @@ void MimeTypeViewer::setMimeType(const QMimeType &mimeType)
     ui->iconNameLabel->setText(mimeType.iconName());
 
     ui->globPatternsLabel->setText(mimeType.globPatterns().join(", "));
-    ui->subClassesOfLabel->setText(mimeType.subClassOf().join(", "));
+    ui->subClassesOfLabel->setText(mimeType.parentMimeTypes().join(", "));
 
     ui->suffixesLabel->setText(mimeType.suffixes().join(", "));
     ui->preferredSuffixLabel->setText(mimeType.preferredSuffix());

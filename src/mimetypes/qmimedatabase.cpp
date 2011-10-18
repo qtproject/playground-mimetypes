@@ -86,8 +86,8 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     // Register the children, resolved via alias map. Note that it is still
     // possible that aliases end up in the map if the parent classes are not inserted
     // at this point (thus their aliases not known).
-    foreach (const QString &subClassOf, mt.subClassOf())
-        parentChildrenMap.insert(resolveAlias(subClassOf), name);
+    foreach (const QString &parentMimeTypes, mt.parentMimeTypes())
+        parentChildrenMap.insert(resolveAlias(parentMimeTypes), name);
 #endif
 
     // register aliasses
@@ -313,7 +313,7 @@ QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern>
     \list
     \o Must be robust in case of incomplete hierarchies, dangling entries
     \o Plugins will not load and register their MIME types in order of inheritance.
-    \o Multiple inheritance (several subClassOf) can occur
+    \o Multiple inheritance (several parentMimeTypes) can occur
     \o Provide quick lookup by name
     \o Provide quick lookup by file type.
     \endlist

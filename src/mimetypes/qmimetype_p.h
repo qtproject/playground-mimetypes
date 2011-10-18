@@ -55,7 +55,7 @@ struct QMIME_EXPORT QMimeTypeData : public QSharedData
     QString genericIconName;
     QString iconName;
     QStringList globPatterns;
-    QStringList subClassOf;
+    QStringList parentMimeTypes;
     QString preferredSuffix;
     QStringList suffixes;
     QList<QMimeMagicRuleMatcher> magicMatchers;

@@ -65,7 +65,7 @@ public:
 
     const QStringList &globPatterns() const;
 
-    const QStringList &subClassOf() const;
+    const QStringList &parentMimeTypes() const;
 
     const QStringList &suffixes() const;
     const QString &preferredSuffix() const;
