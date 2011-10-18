@@ -102,7 +102,7 @@ bool QMimeDatabasePrivate::setPreferredSuffix(const QString &nameOrAlias, const 
 }
 #endif
 
-// Returns a MIME type or Null one if none found
+// Returns a MIME type or an invalid one if none found
 QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
 {
     provider()->ensureTypesLoaded();
@@ -250,39 +250,14 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
     return false;
 }
 
-// TODO rewrite docu, it explains implementation details
+// TODO write more docu
 /*!
     \class QMimeDatabase
-    \brief MIME database to which the plugins can add the MIME types they handle.
+    \brief Database of MIME types
 
     The class is protected by a QMutex and can therefore be accessed by threads.
 
-    A good testcase is to run it over \c '/usr/share/mime/<*>/<*>.xml' on Linux.
-
-    When adding a "text/plain" to it, the mimetype will receive a magic matcher
-    that checks for text files that do not match the globs by heuristics.
-
-    \section1 Design Considerations
-
-    Storage requirements:
-    \list
-    \o Must be robust in case of incomplete hierarchies, dangling entries
-    \o Plugins will not load and register their MIME types in order of inheritance.
-    \o Multiple inheritance (several parentMimeTypes) can occur
-    \o Provide quick lookup by name
-    \o Provide quick lookup by file type.
-    \endlist
-
-    This basically rules out some pointer-based tree, so the structure chosen is:
-    \list
-    \o An alias map QString->QString for mapping aliases to types
-    \o A map  QString->QString representing parent->child relations (enabling
-       recursing over children)
-    \o Using strings avoids dangling pointers.
-    \endlist
-
-    \sa QMimeType, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa BaseMimeTypeParser, MimeTypeParser
+    \sa QMimeType
 */
 
 QMimeDatabase::QMimeDatabase() :
