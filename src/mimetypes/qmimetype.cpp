@@ -223,12 +223,12 @@ bool QMimeType::isValid() const
     return !d->name.isEmpty();
 }
 
-const QString &QMimeType::name() const
+QString QMimeType::name() const
 {
     return d->name;
 }
 
-const QString &QMimeType::comment() const
+QString QMimeType::comment() const
 {
     return d->comment;
 }
@@ -252,17 +252,17 @@ QString QMimeType::localeComment(const QString &localeArg) const
     return d->localeComments.value(locale, d->comment);
 }
 
-const QStringList &QMimeType::aliases() const
+QStringList QMimeType::aliases() const
 {
     return d->aliases;
 }
 
-const QString &QMimeType::genericIconName() const
+QString QMimeType::genericIconName() const
 {
     return d->genericIconName;
 }
 
-const QString &QMimeType::iconName() const
+QString QMimeType::iconName() const
 {
     if (d->iconName.isEmpty()) {
         // Make default icon name from the mimetype name
@@ -274,17 +274,17 @@ const QString &QMimeType::iconName() const
     return d->iconName;
 }
 
-const QStringList &QMimeType::globPatterns() const
+QStringList QMimeType::globPatterns() const
 {
     return d->globPatterns;
 }
 
-const QStringList &QMimeType::parentMimeTypes() const
+QStringList QMimeType::parentMimeTypes() const
 {
     return d->parentMimeTypes;
 }
 
-const QStringList &QMimeType::allParentMimeTypes() const
+QStringList QMimeType::allParentMimeTypes() const
 {
     return d->allParentMimeTypes;
 }
@@ -294,7 +294,7 @@ const QStringList &QMimeType::allParentMimeTypes() const
 
     Extension over standard MIME data
 */
-const QStringList &QMimeType::suffixes() const
+QStringList QMimeType::suffixes() const
 {
     return d->suffixes;
 }
@@ -304,7 +304,7 @@ const QStringList &QMimeType::suffixes() const
 
     Extension over standard MIME data
 */
-const QString &QMimeType::preferredSuffix() const
+QString QMimeType::preferredSuffix() const
 {
     return d->preferredSuffix;
 }

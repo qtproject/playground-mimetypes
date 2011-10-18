@@ -103,13 +103,13 @@ public:
 
     bool isValid() const;
 
-    const QString &name() const;
+    QString name() const;
     void setName(const QString &newName);
-    const QString &comment() const;
+    QString comment() const;
     void setComment(const QString &newComment);
-    const QString &genericIconName() const;
+    QString genericIconName() const;
     void setGenericIconName(const QString &newGenericIconName);
-    const QString &iconName() const;
+    QString iconName() const;
     void setIconName(const QString &newIconName);
     QVariantList globPatterns() const;
     QVariantList suffixes() const;

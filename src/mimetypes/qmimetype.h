@@ -47,28 +47,28 @@ public:
 
     bool isValid() const;
 
-    const QString &name() const;
+    QString name() const;
 
-    const QStringList &aliases() const;
+    QStringList aliases() const;
 
-    const QString &comment() const;
+    QString comment() const;
 
     QString localeComment(const QString &locale = QString()) const;
 
     // TODO do not return const refs! This prevents any kind of non-trivial implementation
 
-    const QString &genericIconName() const;
+    QString genericIconName() const;
 
-    const QString &iconName() const;
+    QString iconName() const;
 
-    const QStringList &globPatterns() const;
+    QStringList globPatterns() const;
 
-    const QStringList &parentMimeTypes() const;
+    QStringList parentMimeTypes() const;
 
-    const QStringList &allParentMimeTypes() const;
+    QStringList allParentMimeTypes() const;
 
-    const QStringList &suffixes() const;
-    const QString &preferredSuffix() const;
+    QStringList suffixes() const;
+    QString preferredSuffix() const;
 
     bool inherits(const QString &mimeTypeName) const;
 

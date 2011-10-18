@@ -106,7 +106,7 @@ bool QDeclarativeMimeType::isValid() const
 
 // ------------------------------------------------------------------------------------------------
 
-const QString &QDeclarativeMimeType::name() const
+QString QDeclarativeMimeType::name() const
 {
     return m_MimeType.name();
 }
@@ -139,7 +139,7 @@ void QDeclarativeMimeType::setName(const QString &newName)
 
 // ------------------------------------------------------------------------------------------------
 
-const QString &QDeclarativeMimeType::comment() const
+QString QDeclarativeMimeType::comment() const
 {
     return m_MimeType.comment();
 }
@@ -153,7 +153,7 @@ void QDeclarativeMimeType::setComment(const QString &newComment)
 
 // ------------------------------------------------------------------------------------------------
 
-const QString &QDeclarativeMimeType::genericIconName() const
+QString QDeclarativeMimeType::genericIconName() const
 {
     return m_MimeType.genericIconName();
 }
@@ -167,7 +167,7 @@ void QDeclarativeMimeType::setGenericIconName(const QString &newGenericIconName)
 
 // ------------------------------------------------------------------------------------------------
 
-const QString &QDeclarativeMimeType::iconName() const
+QString QDeclarativeMimeType::iconName() const
 {
     return m_MimeType.iconName();
 }
