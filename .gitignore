@@ -1,2 +1,10 @@
-qmime.pro.user
+qtmimetypes.pro.user
+examples/mimetypeviewer/MimeTypeViewer
 *.DS_Store
+moc*
+qrc_*
+ui_*
+*.o
+*.moc
+*~
+Makefile*

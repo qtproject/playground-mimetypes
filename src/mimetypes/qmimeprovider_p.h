@@ -32,6 +32,7 @@ public:
     virtual bool isValid() = 0;
     virtual void ensureTypesLoaded() = 0;
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix) = 0;
+    virtual QStringList parents(const QString &mime) = 0;
     virtual void ensureMagicLoaded() = 0;
 
     QMimeDatabasePrivate* m_db;
@@ -49,6 +50,7 @@ public:
     virtual bool isValid();
     virtual void ensureTypesLoaded();
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix);
+    virtual QStringList parents(const QString &mime);
     virtual void ensureMagicLoaded();
 
 private:
@@ -80,6 +82,7 @@ public:
     virtual bool isValid();
     virtual void ensureTypesLoaded();
     virtual QStringList findByName(const QString &fileName, QString *foundSuffix);
+    virtual QStringList parents(const QString &mime);
     virtual void ensureMagicLoaded();
 
     bool load(const QString &fileName, QString *errorMessage);
@@ -87,6 +90,7 @@ public:
     // Called by the mimetype xml parser
     bool addMimeType(const QMimeType &mt);
     void addGlobPattern(const QMimeGlobPattern& glob);
+    void addParent(const QString &child, const QString &parent);
 
 private:
     void ensureLoaded();
@@ -94,6 +98,8 @@ private:
 
     bool m_loaded;
 
+    typedef QHash<QString, QStringList> ParentsHash;
+    ParentsHash m_parents;
     QMimeAllGlobPatterns m_mimeTypeGlobs;
 };
 

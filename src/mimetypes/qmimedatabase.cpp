@@ -26,6 +26,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QBuffer>
 #include <QtCore/QUrl>
+#include <QtCore/QStack>
 #include <QtCore/QDebug>
 #include <qplatformdefs.h>
 
@@ -39,6 +40,11 @@
 QT_BEGIN_NAMESPACE
 
 Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticMimeDataBase)
+
+QMimeDatabasePrivate *QMimeDatabasePrivate::instance()
+{
+    return staticMimeDataBase();
+}
 
 QMimeDatabasePrivate::QMimeDatabasePrivate()
     : m_provider(0)
@@ -273,6 +279,22 @@ QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
         result.append(entry->type);
 
     return result;
+}
+
+
+bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
+{
+    QStack<QString> toCheck;
+    toCheck.push(mime);
+    while (!toCheck.isEmpty()) {
+        const QString current = toCheck.pop();
+        if (current == parent)
+            return true;
+        foreach(const QString &par, provider()->parents(current)) {
+            toCheck.push(par);
+        }
+    }
+    return false;
 }
 
 #if 0

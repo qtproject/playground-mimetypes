@@ -20,6 +20,8 @@
 
 #include "qmimetype.h"
 #include "qmimetype_p.h"
+#include "qmimedatabase_p.h"
+#include "qmimeprovider_p.h"
 
 #include "qmimeglobpattern_p.h"
 
@@ -51,8 +53,6 @@ QMimeTypeData::QMimeTypeData(const QMimeType &other)
     , genericIconName(other.d->genericIconName)
     , iconName(other.d->iconName)
     , globPatterns(other.d->globPatterns)
-    , parentMimeTypes(other.d->parentMimeTypes)
-    , allParentMimeTypes(other.d->allParentMimeTypes)
     , preferredSuffix(other.d->preferredSuffix)
     , suffixes(other.d->suffixes)
     , magicMatchers(other.d->magicMatchers)
@@ -70,8 +70,6 @@ void QMimeTypeData::clear()
     genericIconName.clear();
     iconName.clear();
     globPatterns.clear();
-    parentMimeTypes.clear();
-    allParentMimeTypes.clear();
     preferredSuffix.clear();
     suffixes.clear();
     magicMatchers.clear();
@@ -86,8 +84,6 @@ bool QMimeTypeData::operator==(const QMimeTypeData &other) const
            genericIconName == other.genericIconName &&
            iconName == other.iconName &&
            globPatterns == other.globPatterns &&
-           parentMimeTypes == other.parentMimeTypes &&
-           allParentMimeTypes == other.allParentMimeTypes &&
            preferredSuffix == other.preferredSuffix &&
            suffixes == other.suffixes &&
            magicMatchers == other.magicMatchers;
@@ -281,12 +277,33 @@ QStringList QMimeType::globPatterns() const
 
 QStringList QMimeType::parentMimeTypes() const
 {
-    return d->parentMimeTypes;
+    return QMimeDatabasePrivate::instance()->provider()->parents(d->name);
+}
+
+static void collectParentMimeTypes(const QString& mime, QStringList& allParents)
+{
+    QStringList parents = QMimeDatabasePrivate::instance()->provider()->parents(mime);
+    foreach(const QString& parent, parents) {
+        // I would use QSet, but since order matters I better not
+        if (!allParents.contains(parent))
+            allParents.append(parent);
+    }
+    // We want a breadth-first search, so that the least-specific parent (octet-stream) is last
+    // This means iterating twice, unfortunately.
+    foreach(const QString& parent, parents) {
+        collectParentMimeTypes(parent, allParents);
+    }
 }
 
 QStringList QMimeType::allParentMimeTypes() const
 {
-    return d->allParentMimeTypes;
+    QStringList allParents;
+    const QString canonical = d->name; // TODO QMimeDatabasePrivate::instance()->resolveAlias(d->name);
+    if (!canonical.isEmpty())
+        allParents.append(canonical);
+    collectParentMimeTypes(d->name, allParents);
+
+    return allParents;
 }
 
 /*!
@@ -375,8 +392,7 @@ bool QMimeType::inherits(const QString &mimeTypeName) const
 {
     if (d->name == mimeTypeName)
         return true;
-    // TODO implement, in the provider
-    return false;
+    return QMimeDatabasePrivate::instance()->inherits(d->name, mimeTypeName);
 }
 
 

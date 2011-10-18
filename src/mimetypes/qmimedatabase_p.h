@@ -49,6 +49,8 @@ struct QMimeDatabasePrivate
     QMimeDatabasePrivate();
     ~QMimeDatabasePrivate();
 
+    static QMimeDatabasePrivate* instance();
+
     QMimeProviderBase *provider();
     void setProvider(QMimeProviderBase *theProvider);
 
@@ -56,6 +58,8 @@ struct QMimeDatabasePrivate
     //void addGlobPattern(const QMimeGlobPattern &glob);
 
     QStringList filterStrings() const;
+
+    bool inherits(const QString &mime, const QString &parent);
 
 #if 0
     QList<QMimeGlobPattern> globPatterns() const;

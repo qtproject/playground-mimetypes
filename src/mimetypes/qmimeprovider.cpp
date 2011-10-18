@@ -28,6 +28,22 @@
 #include <QDebug>
 #include <qendian.h>
 
+static QString fallbackParent(const QString& mimeTypeName)
+{
+    const QString myGroup = mimeTypeName.left(mimeTypeName.indexOf(QLatin1Char('/')));
+    // All text/* types are subclasses of text/plain.
+    if (myGroup == QLatin1String("text") && mimeTypeName != QLatin1String("text/plain"))
+        return QLatin1String("text/plain");
+    // All real-file mimetypes implicitly derive from application/octet-stream
+    if (myGroup != QLatin1String("inode") &&
+        // ignore non-file extensions
+        myGroup != QLatin1String("all") && myGroup != QLatin1String("fonts") && myGroup != QLatin1String("print") && myGroup != QLatin1String("uri")
+        && mimeTypeName != QLatin1String("application/octet-stream")) {
+        return QLatin1String("application/octet-stream");
+    }
+    return QString();
+}
+
 QMimeProviderBase::QMimeProviderBase(QMimeDatabasePrivate *db)
     : m_db(db)
 {
@@ -249,6 +265,47 @@ void QMimeBinaryProvider::ensureMagicLoaded()
 {
 }
 
+QStringList QMimeBinaryProvider::parents(const QString &mime)
+{
+    const QByteArray mimeStr = mime.toLatin1();
+    QStringList result;
+    foreach (CacheFile *cacheFile, m_cacheFiles) {
+        const int parentListOffset = cacheFile->getUint32(PosParentListOffset);
+        const int numEntries = cacheFile->getUint32(parentListOffset);
+
+        int begin = 0;
+        int end = numEntries - 1;
+        while (end >= begin) {
+            const int medium = (begin + end)/2;
+            const int off = parentListOffset + 4 + 8 * medium;
+            const int mimeOffset = cacheFile->getUint32(off);
+            const char* aMime = cacheFile->getCharStar(mimeOffset);
+            const int cmp = strcmp(aMime, mimeStr.constData());
+            if (cmp < 0)
+                begin = medium + 1;
+            else if (cmp > 0)
+                end = medium - 1;
+            else {
+                const int parentsOffset = cacheFile->getUint32(off + 4);
+                const int numParents = cacheFile->getUint32(parentsOffset);
+                for (int i = 0; i < numParents; ++i) {
+                    const char* aParent = cacheFile->getCharStar(parentsOffset + 4 + 4 * i);
+                    result.append(QString::fromLatin1(aParent));
+                }
+                break;
+            }
+        }
+    }
+    if (result.isEmpty()) {
+        const QString parent = fallbackParent(mime);
+        if (!parent.isEmpty())
+            result.append(parent);
+    }
+    return result;
+}
+
+////
+
 QMimeXMLProvider::QMimeXMLProvider(QMimeDatabasePrivate *db)
     : QMimeProviderBase(db), m_loaded(false)
 {
@@ -341,4 +398,20 @@ bool QMimeXMLProvider::addMimeType(const QMimeType &mt)
 {
     // HACK FOR NOW. The goal is to move all that code here.
     return m_db->addMimeType(mt);
+}
+
+QStringList QMimeXMLProvider::parents(const QString &mime)
+{
+    QStringList result = m_parents.value(mime);
+    if (result.isEmpty()) {
+        const QString parent = fallbackParent(mime);
+        if (!parent.isEmpty())
+            result.append(parent);
+    }
+    return result;
+}
+
+void QMimeXMLProvider::addParent(const QString &child, const QString &parent)
+{
+    m_parents[child].append(parent);
 }

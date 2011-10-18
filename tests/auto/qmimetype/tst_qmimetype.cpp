@@ -44,6 +44,7 @@
 #include <qmimetype_p.h>
 
 #include <QMimeType>
+#include <QMimeDatabase>
 
 #include <QtTest/QtTest>
 
@@ -226,6 +227,64 @@ void tst_qmimetype::test_suffixes()
 
     QVERIFY(instantiatedPngMimeType != otherPngMimeType);
     QVERIFY(!(instantiatedPngMimeType == otherPngMimeType));
+}
+
+void tst_qmimetype::test_inheritance()
+{
+    QMimeDatabase db;
+
+    // All file-like mimetypes inherit from octet-stream
+    const QMimeType wordperfect = db.mimeTypeForName("application/vnd.wordperfect");
+    QVERIFY(wordperfect.isValid());
+    QCOMPARE(wordperfect.parentMimeTypes().join(","), QString("application/octet-stream"));
+    QVERIFY(wordperfect.inherits("application/octet-stream"));
+
+    QVERIFY(db.mimeTypeForName("image/svg+xml-compressed").inherits("application/x-gzip"));
+
+    // Check that msword derives from ole-storage
+    const QMimeType msword = db.mimeTypeForName("application/msword");
+    QVERIFY(msword.isValid());
+    const QMimeType olestorage = db.mimeTypeForName("application/x-ole-storage");
+    QVERIFY(olestorage.isValid());
+    QVERIFY(msword.inherits(olestorage.name()));
+    QVERIFY(msword.inherits("application/octet-stream"));
+
+    const QMimeType directory = db.mimeTypeForName("inode/directory");
+    QVERIFY(directory.isValid());
+    QCOMPARE(directory.parentMimeTypes().count(), 0);
+    QVERIFY(!directory.inherits("application/octet-stream"));
+
+    // Check that text/x-patch knows that it inherits from text/plain (it says so explicitly)
+    const QMimeType plain = db.mimeTypeForName("text/plain");
+    const QMimeType derived = db.mimeTypeForName("text/x-patch");
+    QVERIFY(derived.isValid());
+    QCOMPARE(derived.parentMimeTypes().join(","), plain.name());
+    QVERIFY(derived.inherits("text/plain"));
+    QVERIFY(derived.inherits("application/octet-stream"));
+
+    // Check that application/x-shellscript inherits from application/x-executable
+    // (Otherwise KRun cannot start shellscripts...)
+    // This is a test for multiple inheritance...
+    const QMimeType shellscript = db.mimeTypeForName("application/x-shellscript");
+    QVERIFY(shellscript.isValid());
+    QVERIFY(shellscript.inherits("text/plain"));
+    QVERIFY(shellscript.inherits("application/x-executable"));
+    const QStringList shellParents = shellscript.parentMimeTypes();
+    QVERIFY(shellParents.contains("text/plain"));
+    QVERIFY(shellParents.contains("application/x-executable"));
+    QCOMPARE(shellParents.count(), 2); // only the above two
+    const QStringList allShellParents = shellscript.allParentMimeTypes();
+    QVERIFY(allShellParents.contains("text/plain"));
+    QVERIFY(allShellParents.contains("application/x-executable"));
+    QVERIFY(allShellParents.contains("application/octet-stream"));
+    // Must be least-specific last, i.e. breadth first.
+    QCOMPARE(allShellParents.last(), QString("application/octet-stream"));
+
+    // Check that text/x-mrml knows that it inherits from text/plain (implicitly)
+    const QMimeType mrml = db.mimeTypeForName("text/x-mrml");
+    QVERIFY(mrml.isValid());
+    QVERIFY(mrml.inherits("text/plain"));
+    QVERIFY(mrml.inherits("application/octet-stream"));
 }
 
 // ------------------------------------------------------------------------------------------------
