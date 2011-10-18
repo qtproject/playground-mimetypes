@@ -70,13 +70,6 @@ public:
 
     bool inherits(const QString &mimeTypeName) const;
 
-#if 0   // Seems unused
-    bool matchesName(const QString &name) const;
-    unsigned matchesData(const QByteArray &data) const;
-#endif
-    //unsigned matchesFile(QIODevice *device, const QString &fileName) const;
-    //unsigned matchesFileBySuffix(const QString &fileName) const;
-
     QString filterString() const;
 
 protected:

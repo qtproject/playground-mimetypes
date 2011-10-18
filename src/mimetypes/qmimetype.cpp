@@ -103,19 +103,6 @@ void QMimeTypeData::addGlobPattern(const QString &pattern)
     }
 }
 
-#if 0
-unsigned QMimeTypeData::matchesFileBySuffix(const QString &fileName) const
-{
-    foreach (const QString &pattern, globPatterns) {
-        QMimeGlobPattern glob(pattern, name);
-        if (glob.matchFileName(fileName))
-            return glob.weight();
-    }
-
-    return 0;
-}
-#endif
-
 static inline bool isTextFile(const QByteArray &data)
 {
     // UTF16 byte order marks
@@ -325,44 +312,6 @@ QString QMimeType::preferredSuffix() const
 {
     return d->preferredSuffix;
 }
-
-#if 0   // Seems unused
-/*!
-    Checks for \a name or one of the aliases.
-*/
-bool QMimeType::matchesName(const QString &name) const
-{
-    return d->name == name || d->aliases.contains(name) /* TODO: BROKEN! MUST COMPARE WITH d->name */;
-}
-
-unsigned QMimeType::matchesData(const QByteArray &data) const
-{
-    return d->matchesData(data);
-}
-#endif
-
-#if 0
-/*!
-    Checks the glob pattern weights and magic priorities so the highest
-    value is returned. A 0 (zero) indicates no match.
-*/
-unsigned QMimeType::matchesFile(QIODevice *device, const QString &fileName) const
-{
-    FileMatchContext context(device, fileName);
-    const unsigned suffixPriority = d->matchesFileBySuffix(context.fileName());
-    if (suffixPriority >= QMimeGlobPattern::MaxWeight)
-        return QMimeGlobPattern::MaxWeight;
-    return qMax(suffixPriority, d->matchesData(context.data()));
-}
-
-/*!
-    Performs search by glob patterns.
-*/
-unsigned QMimeType::matchesFileBySuffix(const QString &fileName) const
-{
-    return d->matchesFileBySuffix(fileName);
-}
-#endif
 
 /*!
     Returns a filter string usable for a file dialog.

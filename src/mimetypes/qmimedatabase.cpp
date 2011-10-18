@@ -88,14 +88,6 @@ bool QMimeDatabasePrivate::addMimeType(const QMimeType &mt)
     // insert the MIME type.
     nameMimeTypeMap.insert(name, new MimeTypeMapEntry(mt));
 
-#if 0 // This parentChildrenMap seems to be unused?
-    // Register the children, resolved via alias map. Note that it is still
-    // possible that aliases end up in the map if the parent classes are not inserted
-    // at this point (thus their aliases not known).
-    foreach (const QString &parentMimeTypes, mt.parentMimeTypes())
-        parentChildrenMap.insert(resolveAlias(parentMimeTypes), name);
-#endif
-
     // register aliasses
     foreach (const QString &alias, mt.aliases())
         aliasMap.insert(alias, name);
@@ -161,49 +153,6 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *acc
 
     return candidate;
 }
-
-#if 0
-// Return all known suffixes
-QStringList QMimeDatabasePrivate::suffixes() const
-{
-    QStringList rc;
-    const NameMimeTypeMap::const_iterator cend = nameMimeTypeMap.constEnd();
-    for (NameMimeTypeMap::const_iterator it = nameMimeTypeMap.constBegin(); it != cend; ++it)
-        rc += it.value()->type.suffixes();
-    return rc;
-}
-
-QList<QMimeGlobPattern> QMimeDatabasePrivate::globPatterns() const
-{
-    QList<QMimeGlobPattern> globPatterns;
-    const NameMimeTypeMap::const_iterator cend = nameMimeTypeMap.constEnd();
-    for (NameMimeTypeMap::const_iterator it = nameMimeTypeMap.constBegin(); it != cend; ++it)
-        globPatterns.append(toGlobPatterns(it.value()->type.globPatterns(), it.value()->type.type()));
-    return globPatterns;
-}
-
-void QMimeDatabasePrivate::setGlobPatterns(const QString &nameOrAlias,
-                                           const QStringList &globPatterns)
-{
-    NameMimeTypeMap::iterator tit =  nameMimeTypeMap.find(resolveAlias(nameOrAlias));
-    if (tit != nameMimeTypeMap.end()) {
-        QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
-        mimeTypeData.globPatterns = globPatterns;
-        tit.value()->type = QMimeType(mimeTypeData);
-    }
-}
-
-void QMimeDatabasePrivate::setMagicMatchers(const QString &nameOrAlias,
-                                            const QList<QMimeMagicRuleMatcher> &matchers)
-{
-    NameMimeTypeMap::iterator tit = nameMimeTypeMap.find(resolveAlias(nameOrAlias));
-    if (tit != nameMimeTypeMap.end()) {
-        QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
-        mimeTypeData.magicMatchers = matchers;
-        tit.value()->type = QMimeType(mimeTypeData);
-    }
-}
-#endif
 
 // Returns a MIME type or Null one if none found
 QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, unsigned *accuracyPtr)
@@ -304,26 +253,6 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
     return false;
 }
 
-#if 0
-QList<QMimeGlobPattern> QMimeDatabasePrivate::toGlobPatterns(const QStringList &patterns, const QString &mimeType, int weight)
-{
-    QList<QMimeGlobPattern> globPatterns;
-    foreach (const QString &pattern, patterns) {
-        globPatterns.append(QMimeGlobPattern(pattern, mimeType, weight, Qt::CaseSensitive));
-    }
-    return globPatterns;
-}
-
-QStringList QMimeDatabasePrivate::fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
-{
-    QStringList patterns;
-    foreach (const QMimeGlobPattern &globPattern, globPatterns)
-        patterns.append(globPattern.pattern());
-    return patterns;
-}
-#endif
-
-
 // TODO rewrite docu, it explains implementation details
 /*!
     \class QMimeDatabase
@@ -364,41 +293,10 @@ QMimeDatabase::QMimeDatabase() :
 {
 }
 
-#if 0
-QMimeDatabase::QMimeDatabase(QMimeDatabasePrivate *const theD) :
-    d(theD)
-{
-}
-#endif
-
 QMimeDatabase::~QMimeDatabase()
 {
-#if 0
-    if (d != staticMimeDataBase()) {
-        delete d;
-    }
-#endif
-
     d = 0;
 }
-
-#if 0
-QMimeDatabaseBuilder::QMimeDatabaseBuilder(QMimeDatabase *mimeDatabase) :
-    d(mimeDatabase->data_ptr())
-{
-}
-
-QMimeDatabaseBuilder::~QMimeDatabaseBuilder()
-{
-}
-
-bool QMimeDatabaseBuilder::addMimeType(const QMimeType &mt)
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->addMimeType(mt);
-}
-#endif
 
 /*!
     Returns a MIME type for \a nameOrAlias or Null one if none found.
@@ -532,16 +430,6 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, const QByteA
     return d->findByNameAndData(fileName, &buffer, &accuracy);
 }
 
-#if 0
-void QMimeDatabaseBuilder::setMagicMatchers(const QString &nameOrAlias,
-                                            const QList<QMimeMagicRuleMatcher> &matchers)
-{
-    QMutexLocker locker(&d->mutex);
-
-    d->setMagicMatchers(nameOrAlias, matchers);
-}
-#endif
-
 QList<QMimeType> QMimeDatabase::mimeTypes() const
 {
     QMutexLocker locker(&d->mutex);
@@ -549,71 +437,7 @@ QList<QMimeType> QMimeDatabase::mimeTypes() const
     return d->mimeTypes();
 }
 
-#if 0
-/*!
-    Returns all known suffixes
-*/
-QStringList QMimeDatabaseBuilder::suffixes() const
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->suffixes();
-}
-
-QString QMimeDatabaseBuilder::preferredSuffixByType(const QString &nameOrAlias) const
-{
-    d->mutex.lock();
-    const QMimeType mt = d->mimeTypeForName(nameOrAlias);
-    d->mutex.unlock();
-    if (mt.isValid())
-        return mt.preferredSuffix(); // already does Mutex locking
-    return QString();
-}
-
-QString QMimeDatabaseBuilder::preferredSuffixByNameAndData(const QString &fileName, QIODevice *device) const
-{
-    d->mutex.lock();
-    unsigned priority = 0;
-    const QMimeType mt = d->findByNameAndData(fileName, device, &priority);
-    d->mutex.unlock();
-    if (mt.isValid())
-        return mt.preferredSuffix(); // already does Mutex locking
-    return QString();
-}
-
-bool QMimeDatabaseBuilder::setPreferredSuffix(const QString &nameOrAlias, const QString &suffix)
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->setPreferredSuffix(nameOrAlias, suffix);
-}
-
-QList<QMimeGlobPattern> QMimeDatabaseBuilder::toGlobPatterns(const QStringList &patterns, const QString &mimeType, int weight)
-{
-    return QMimeDatabasePrivate::toGlobPatterns(patterns, mimeType, weight);
-}
-
-QStringList QMimeDatabaseBuilder::fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns)
-{
-    return QMimeDatabasePrivate::fromGlobPatterns(globPatterns);
-}
-
-QStringList QMimeDatabaseBuilder::globPatterns() const
-{
-    QMutexLocker locker(&d->mutex);
-
-    return fromGlobPatterns(d->globPatterns());
-}
-
-void QMimeDatabaseBuilder::setGlobPatterns(const QString &nameOrAlias,
-                                           const QStringList &globPatterns)
-{
-    QMutexLocker locker(&d->mutex);
-
-    d->setGlobPatterns(nameOrAlias, globPatterns);
-}
-#endif
-
+// TODO: needed?
 QStringList QMimeDatabase::filterStrings() const
 {
     QMutexLocker locker(&d->mutex);

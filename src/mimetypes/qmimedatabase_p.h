@@ -55,35 +55,14 @@ struct QMimeDatabasePrivate
     void setProvider(QMimeProviderBase *theProvider);
 
     bool addMimeType(const QMimeType &mt);
-    //void addGlobPattern(const QMimeGlobPattern &glob);
 
     QStringList filterStrings() const;
 
     bool inherits(const QString &mime, const QString &parent);
 
-#if 0
-    QList<QMimeGlobPattern> globPatterns() const;
-    void setGlobPatterns(const QString &nameOrAlias, const QStringList &globPatterns);
-
-    QStringList suffixes() const;
-    bool setPreferredSuffix(const QString &nameOrAlias, const QString &suffix);
-
-    void setMagicMatchers(const QString &nameOrAlias,
-                          const QList<QMimeMagicRuleMatcher> &matchers);
-#endif
-
     QList<QMimeType> mimeTypes() const;
 
-#if 0
-    static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns, const QString &mimeType,
-                                                  int weight = QMimeGlobPattern::MaxWeight);
-    static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
-#endif
-
     typedef QHash<QString, MimeTypeMapEntry *> NameMimeTypeMap;
-#if 0 // This parentChildrenMap seems to be unused?
-    typedef QMultiHash<QString, QString> ParentChildrenMap;
-#endif
     typedef QHash<QString, QString> AliasMap;
 
     QMimeType mimeTypeForName(const QString &nameOrAlias);
@@ -95,45 +74,9 @@ struct QMimeDatabasePrivate
 
     NameMimeTypeMap nameMimeTypeMap;
     AliasMap aliasMap;
-#if 0 // This parentChildrenMap seems to be unused?
-    ParentChildrenMap parentChildrenMap;
-#endif
     mutable QMimeProviderBase *m_provider;
     QMutex mutex;
 };
-
-
-#if 0
-class QMIME_EXPORT QMimeDatabaseBuilder
-{
-    Q_DISABLE_COPY(QMimeDatabaseBuilder)
-
-public:
-    QMimeDatabaseBuilder(QMimeDatabase *mimeDatabase);
-    ~QMimeDatabaseBuilder();
-
-    bool addMimeType(const QMimeType &mt);
-
-    QStringList suffixes() const;
-    bool setPreferredSuffix(const QString &nameOrAlias, const QString &suffix);
-    QString preferredSuffixByType(const QString &type) const;
-    QString preferredSuffixByNameAndData(const QString &fileName, QIODevice *device) const;
-
-    QStringList globPatterns() const;
-    void setGlobPatterns(const QString &nameOrAlias, const QStringList &globPatterns);
-
-    void setMagicMatchers(const QString &nameOrAlias,
-                          const QList<QMimeMagicRuleMatcher> &matchers);
-
-    static QList<QMimeGlobPattern> toGlobPatterns(const QStringList &patterns,
-                                                  const QString &mimeType,
-                                                  int weight = QMimeGlobPattern::MaxWeight);
-    static QStringList fromGlobPatterns(const QList<QMimeGlobPattern> &globPatterns);
-
-private:
-    QMimeDatabasePrivate *const d;
-};
-#endif
 
 QT_END_NAMESPACE
 
