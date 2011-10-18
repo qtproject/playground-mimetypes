@@ -139,17 +139,22 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
 }
 
 // Returns a MIME type or Null one if none found
-QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *priorityPtr)
+QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, unsigned *accuracyPtr)
 {
     provider()->ensureMagicLoaded();
 
     QMimeType candidate;
 
+    if (data.isEmpty()) {
+        *accuracyPtr = 100;
+        return mimeTypeForName(QLatin1String("application/x-zerosize"));
+    }
+
     // TODO delegate to backend, implement properly.
     foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap) {
         const unsigned contentPriority = entry->type.d->matchesData(data);
-        if (contentPriority && contentPriority > *priorityPtr) {
-            *priorityPtr = contentPriority;
+        if (contentPriority && contentPriority > *accuracyPtr) {
+            *accuracyPtr = contentPriority;
             candidate = entry->type;
         }
     }
