@@ -207,6 +207,7 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
     return mimeTypeForName(defaultMimeType());
 }
 
+#if 0
 QStringList QMimeDatabasePrivate::filterStrings() const
 {
     QStringList rc;
@@ -219,6 +220,7 @@ QStringList QMimeDatabasePrivate::filterStrings() const
 
     return rc;
 }
+#endif
 
 QList<QMimeType> QMimeDatabasePrivate::mimeTypes() const
 {

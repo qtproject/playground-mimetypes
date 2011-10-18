@@ -59,7 +59,9 @@ struct QMimeDatabasePrivate
 
     bool addMimeType(const QMimeType &mt);
 
+#if 0
     QStringList filterStrings() const;
+#endif
 
     bool inherits(const QString &mime, const QString &parent);
 
