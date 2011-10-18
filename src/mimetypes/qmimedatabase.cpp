@@ -185,12 +185,10 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
             // "if glob_match is subclass or equal to sniffed_type, use glob_match"
             const QString sniffedMime = candidateByData.name();
             foreach(const QString &m, candidatesByName) {
-                // TODO for speed: provider->inherits(a,b) without loading QMimeType(a).
-                QMimeType mimeFromPattern = mimeTypeForName(m);
-                if (mimeFromPattern.inherits(sniffedMime)) {
+                if (inherits(m, sniffedMime)) {
                     // We have magic + pattern pointing to this, so it's a pretty good match
                     *accuracyPtr = 100;
-                    return mimeFromPattern;
+                    return mimeTypeForName(m);
                 }
             }
             *accuracyPtr = magicAccuracy;
