@@ -18,7 +18,7 @@
 **
 **************************************************************************/
 
-#include "qmimemagicrule.h"
+#include "qmimemagicrule_p.h"
 
 #include <QtCore/QList>
 #include <qendian.h>

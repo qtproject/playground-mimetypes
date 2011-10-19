@@ -23,21 +23,22 @@ mac|darwin: {
 
 SOURCES += qmimedatabase.cpp \
     qmimetype.cpp \
-    magicmatcher.cpp \
+    qmimemagicrulematcher.cpp \
     mimetypeparser.cpp \
     qmimemagicrule.cpp \
     qmimeglobpattern.cpp \
-    qmimeprovider.cpp
+    qmimeprovider.cpp \
+    qmimefilematchcontext.cpp
 
 HEADERS += qmime_global.h \
     qmimedatabase.h \
     qmimetype.h \
-    magicmatcher.h \
+    qmimemagicrulematcher_p.h \
     qmimetype_p.h \
-    magicmatcher_p.h \
+    qmimefilematchcontext_p.h \
     mimetypeparser_p.h \
     qmimedatabase_p.h \
-    qmimemagicrule.h \
+    qmimemagicrule_p.h \
     qmimeglobpattern_p.h \
     qmimeprovider_p.h
 
@@ -72,3 +73,4 @@ unix:!symbian {
     }
     INSTALLS += target
 }
+

@@ -21,7 +21,7 @@
 #include "mimetypeparser_p.h"
 
 #include "qmimetype_p.h"
-#include "magicmatcher_p.h"
+#include "qmimemagicrulematcher_p.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>

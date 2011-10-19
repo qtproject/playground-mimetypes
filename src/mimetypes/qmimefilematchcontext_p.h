@@ -1,7 +1,6 @@
-#ifndef MAGICMATCHER_P_H
-#define MAGICMATCHER_P_H
+#ifndef QMIMEFILEMATCHCONTEXT_P_H
+#define QMIMEFILEMATCHCONTEXT_P_H
 
-#include "magicmatcher.h"
 #include "qmimetype.h"
 
 #include <QtCore/QFileInfo>
@@ -44,4 +43,4 @@ private:
 
 QT_END_NAMESPACE
 
-#endif // MAGICMATCHER_P_H
+#endif // QMIMEFILEMATCHCONTEXT_P_H

@@ -28,7 +28,8 @@
 //#include <QtCore/QDebug>
 #include <QtCore/QLocale>
 
-#include "magicmatcher_p.h"
+#include "qmimefilematchcontext_p.h"
+#include "qmimemagicrulematcher_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -125,8 +126,6 @@ static inline bool isTextFile(const QByteArray &data)
 unsigned QMimeTypeData::matchesData(const QByteArray &data) const
 {
     unsigned priority = 0;
-    if (name == QLatin1String("text/plain"))
-        Q_ASSERT(magicMatchers.isEmpty());
     // TODO: discuss - this code is slow :(
     // Hack for text/plain and application/octet-stream
     if (magicMatchers.isEmpty()) {

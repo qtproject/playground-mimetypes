@@ -33,8 +33,8 @@
 #include <algorithm>
 #include <functional>
 
-#include "magicmatcher_p.h"
 #include "qmimeprovider_p.h"
+#include "qmimefilematchcontext_p.h"
 #include "qmimetype_p.h"
 
 QT_BEGIN_NAMESPACE

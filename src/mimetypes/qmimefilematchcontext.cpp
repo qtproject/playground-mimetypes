@@ -18,8 +18,7 @@
 **
 **************************************************************************/
 
-#include "magicmatcher.h"
-#include "magicmatcher_p.h"
+#include "qmimefilematchcontext_p.h"
 
 #include "qmimetype_p.h"
 
@@ -75,69 +74,6 @@ QByteArray FileMatchContext::data()
         }
     }
     return m_data;
-}
-
-/*!
-    \class QMimeMagicRuleMatcher
-
-    \brief A Magic matcher that checks a number of rules based on operator "or".
-
-    It is used for rules parsed from XML files.
-
-    \sa QMimeType, QMimeDatabase, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa BaseMimeTypeParser, MimeTypeParser
-*/
-
-QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(unsigned thePriority) :
-    m_list(),
-    m_priority(thePriority)
-{
-}
-
-bool QMimeMagicRuleMatcher::operator==(const QMimeMagicRuleMatcher &other)
-{
-    return m_list == other.m_list &&
-           m_priority == other.m_priority;
-}
-
-void QMimeMagicRuleMatcher::addRule(const QMimeMagicRule &rule)
-{
-    m_list.append(rule);
-}
-
-void QMimeMagicRuleMatcher::addRules(const QList<QMimeMagicRule> &rules)
-{
-    m_list.append(rules);
-}
-
-QList<QMimeMagicRule> QMimeMagicRuleMatcher::magicRules() const
-{
-    return m_list;
-}
-
-// Check for a match on contents of a file
-bool QMimeMagicRuleMatcher::matches(const QByteArray &data) const
-{
-    if (m_list.isEmpty())
-        return false;
-
-    foreach (const QMimeMagicRule &magicRule, m_list) {
-        if (!magicRule.matches(data))
-            return false;
-    }
-
-    return true;
-}
-
-// Return a priority value from 1..100
-unsigned QMimeMagicRuleMatcher::priority() const
-{
-    return m_priority;
-}
-
-void QMimeMagicRuleMatcher::setPriority(unsigned thePriority)
-{
-    m_priority = thePriority;
 }
 
 QT_END_NAMESPACE

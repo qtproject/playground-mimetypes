@@ -18,47 +18,42 @@
 **
 **************************************************************************/
 
-#ifndef QMIMEMAGICRULE_H
-#define QMIMEMAGICRULE_H
+#ifndef MAGICMATCHER_H
+#define MAGICMATCHER_H
 
 #include "qmime_global.h"
 
 #include <QtCore/QByteArray>
-#include <QtCore/QScopedPointer>
+#include <QtCore/QHash>
+#include <QtCore/QList>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QString>
+
+#include "qmimemagicrule_p.h"
 
 QT_BEGIN_NAMESPACE
 
-class QMimeMagicRulePrivate;
-class QMIME_EXPORT QMimeMagicRule
+class QMIME_EXPORT QMimeMagicRuleMatcher
 {
 public:
-    enum Type { Invalid = 0, String, Host16, Host32, Big16, Big32, Little16, Little32, Byte };
+    explicit QMimeMagicRuleMatcher(unsigned priority = 65535);
 
-    QMimeMagicRule(Type type, const QByteArray &value, int startPos, int endPos, const QByteArray &mask = QByteArray());
-    QMimeMagicRule(const QMimeMagicRule &other);
-    ~QMimeMagicRule();
+    bool operator==(const QMimeMagicRuleMatcher &other);
 
-    QMimeMagicRule &operator=(const QMimeMagicRule &other);
-
-    bool operator==(const QMimeMagicRule &other) const;
-
-    Type type() const;
-    QByteArray value() const;
-    int startPos() const;
-    int endPos() const;
-    QByteArray mask() const;
-
-    bool isValid() const;
+    void addRule(const QMimeMagicRule &rule);
+    void addRules(const QList<QMimeMagicRule> &rules);
+    QList<QMimeMagicRule> magicRules() const;
 
     bool matches(const QByteArray &data) const;
 
-    static Type type(const QByteArray &type);
-    static QByteArray typeName(Type type);
+    unsigned priority() const;
+    void setPriority(unsigned priority);
 
 private:
-    const QScopedPointer<QMimeMagicRulePrivate> d;
+    QList<QMimeMagicRule> m_list;
+    unsigned m_priority;
 };
 
 QT_END_NAMESPACE
 
-#endif // QMIMEMAGICRULE_H
+#endif // MAGICMATCHER_H
