@@ -41,6 +41,7 @@
 
 #include "qdeclarativemimetype_p.h"
 
+#include "qmimemagicrulematcher_p.h"
 #include "qmimetype_p.h"
 
 #include <QtCore/QDebug>
