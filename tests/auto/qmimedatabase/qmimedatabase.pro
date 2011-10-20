@@ -15,6 +15,6 @@ INCLUDEPATH *= $$PWD/../../../include/QtMimeTypes
 #DEFINES += SRC_DIR $$PWD
 
 SOURCES += tst_qmimedatabase.cpp
-DEFINES += SRCDIR='"\\"$$PWD/\\""'
+DEFINES += SRCDIR='"\\"./\\""'
 
 OTHER_FILES = testfiles/list

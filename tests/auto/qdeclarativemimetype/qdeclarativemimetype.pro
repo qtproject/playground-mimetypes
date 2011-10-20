@@ -14,4 +14,4 @@ SOURCES += tst_qdeclarativemimetype.cpp
 
 
 # this reads the QML files from the same directory as this pro file
-DEFINES += QUICK_TEST_SOURCE_DIR=\"\\\"$$PWD\\\"\"
+DEFINES += QUICK_TEST_SOURCE_DIR=\"\\\".\\\"\"
