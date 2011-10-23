@@ -28,6 +28,7 @@
 QT_BEGIN_NAMESPACE
 
 /*!
+    \internal
     \class QMimeMagicRuleMatcher
 
     \brief A Magic matcher that checks a number of rules based on operator "or".
