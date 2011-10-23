@@ -11,7 +11,13 @@ int main(int argc, char *argv[])
         printf( "No filename specified\n" );
         return 1;
     }
-    const QString fileName = QFile::decodeName(argv[1]);
+    QString option;
+    int fnPos = 1;
+    if (argc > 2) {
+        option = QString::fromLatin1(argv[1]);
+        ++fnPos;
+    }
+    const QString fileName = QFile::decodeName(argv[fnPos]);
     //int accuracy;
     QMimeDatabase db;
     QMimeType mime;
@@ -21,8 +27,11 @@ int main(int argc, char *argv[])
         const QByteArray data = qstdin.readAll();
         //mime = QMimeType::findByContent(data, &accuracy);
         mime = db.findByData(data);
-    //} else if (args->isSet("c")) {
-        //mime = QMimeType::findByFileContent(fileName, &accuracy);
+    } else if (option == "-c") {
+        QFile file(fileName);
+        if (file.open(QIODevice::ReadOnly)) {
+            mime = db.findByData(file.read(32000));
+        }
     } else {
         //mime = QMimeType::findByPath(fileName, 0, args->isSet("f"), &accuracy);
         mime = db.findByFile(fileName);
