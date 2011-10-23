@@ -150,6 +150,10 @@ static inline QByteArray makePattern(const QByteArray &value)
                         c = (c << 3) + *(++p) - '0';
                 }
                 *data++ = c;
+            } else if (*p == 'n') {
+                *data++ = '\n';
+            } else if (*p == 'r') {
+                *data++ = '\r';
             } else { // escaped
                 *data++ = *p;
             }
