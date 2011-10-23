@@ -21,6 +21,7 @@
 #include "qmimemagicrule_p.h"
 
 #include <QtCore/QList>
+#include <QtCore/QDebug>
 #include <qendian.h>
 
 QT_BEGIN_NAMESPACE
@@ -295,7 +296,26 @@ bool QMimeMagicRule::isValid() const
 
 bool QMimeMagicRule::matches(const QByteArray &data) const
 {
-    return d->matchFunction && d->matchFunction(d.data(), data);
+    const bool ok = d->matchFunction && d->matchFunction(d.data(), data);
+    if (!ok)
+        return false;
+
+    // No submatch? Then we are done.
+    if (m_subMatches.isEmpty())
+        return true;
+
+    //qDebug() << "Checking" << m_subMatches.count() << "sub-rules";
+    // Check that one of the submatches matches too
+    for ( QList<QMimeMagicRule>::const_iterator it = m_subMatches.begin(), end = m_subMatches.end() ;
+          it != end ; ++it ) {
+        if ((*it).matches(data)) {
+            // One of the hierarchies matched -> mimetype recognized.
+            return true;
+        }
+    }
+    return false;
+
+
 }
 
 QT_END_NAMESPACE

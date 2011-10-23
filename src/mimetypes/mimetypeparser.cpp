@@ -29,6 +29,7 @@
 #include <QtCore/QPair>
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
+#include <QtCore/QStack>
 
 QT_BEGIN_NAMESPACE
 
@@ -147,8 +148,8 @@ static bool parseNumber(const QString &n, int *target, QString *errorMessage)
 // Evaluate a magic match rule like
 //  <match value="must be converted with BinHex" type="string" offset="11"/>
 //  <match value="0x9501" type="big16" offset="0:64"/>
-static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
-                              QString *errorMessage, QMimeMagicRule *&rule)
+static bool createMagicMatchRule(const QXmlStreamAttributes &atts,
+                                 QString *errorMessage, QMimeMagicRule *&rule)
 {
     const QString type = atts.value(QLatin1String(matchTypeAttributeC)).toString();
     QMimeMagicRule::Type magicType = QMimeMagicRule::type(type.toLatin1());
@@ -171,7 +172,6 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
         return false;
     const QString mask = atts.value(QLatin1String(matchMaskAttributeC)).toString();
 
-//    ruleMatcher->addRule(QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1()));
     rule = new QMimeMagicRule(magicType, value.toUtf8(), startPos, endPos, mask.toLatin1());
 
     return true;
@@ -180,9 +180,9 @@ static bool addMagicMatchRule(const QXmlStreamAttributes &atts,
 bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString *errorMessage)
 {
     QMimeTypeData data;
-    QMimeMagicRuleMatcher *ruleMatcher = 0;
     int priority = 50;
-    QList<QMimeMagicRule> rules;
+    QStack<QMimeMagicRule *> currentRules; // stack for the nesting of rules
+    QList<QMimeMagicRule> rules; // toplevel rules
     QXmlStreamReader reader(dev);
     ParseState ps = ParseBeginning;
     QXmlStreamAttributes atts;
@@ -252,23 +252,22 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                         return false;
 
                 }
-                if (!ruleMatcher)
-                    ruleMatcher = new QMimeMagicRuleMatcher;
-                ruleMatcher->setPriority(priority);
+                currentRules.clear();
+                //qDebug() << "MAGIC start for mimetype" << data.name;
             }
                 break;
             case ParseMagicMatchRule: {
-                if (!ruleMatcher) {
-                    ruleMatcher = new QMimeMagicRuleMatcher;
-                    ruleMatcher->setPriority(priority);
-                }
-
-                // TODO this does not handle nesting!
-
                 QMimeMagicRule *rule = 0;
-                if (!addMagicMatchRule(atts, /*ruleMatcher, */errorMessage, rule))
+                if (!createMagicMatchRule(atts, errorMessage, rule))
                     return false;
-                rules.append(*rule);
+                QList<QMimeMagicRule> *ruleList;
+                if (currentRules.isEmpty())
+                    ruleList = &rules;
+                else // nest this rule into the proper parent
+                    ruleList = &currentRules.top()->m_subMatches;
+                ruleList->append(*rule);
+                //qDebug() << " MATCH added. Stack size was" << currentRules.size();
+                currentRules.push(&ruleList->last());
                 delete rule;
                 break;
             }
@@ -282,23 +281,27 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             break;
         // continue switch QXmlStreamReader::Token...
         case QXmlStreamReader::EndElement: // Finished element
-            if (reader.name() == QLatin1String(mimeTypeTagC)) {
+        {
+            const QStringRef elementName = reader.name();
+            if (elementName == QLatin1String(mimeTypeTagC)) {
                 if (!process(QMimeType(data), errorMessage))
                     return false;
                 data.clear();
-            } else {
-                // Finished a match sequence
-                if (reader.name() == QLatin1String(matchTagC)) {
-                    if (ruleMatcher) {
-                        ruleMatcher->addRules(rules);
-                        data.magicMatchers.append(*ruleMatcher);
-                        ruleMatcher = 0;
-                    }
-                    rules.takeLast();
-                }
+            } else if (elementName == QLatin1String(matchTagC)) {
+                // Closing a <match> tag, pop stack
+                currentRules.pop();
+                //qDebug() << " MATCH closed. Stack size is now" << currentRules.size();
+            } else if (elementName == QLatin1String(magicTagC)) {
+                //qDebug() << "MAGIC ended, we got" << rules.count() << "rules, with prio" << priority;
+                // Finished a <magic> sequence
+                QMimeMagicRuleMatcher ruleMatcher;
+                ruleMatcher.addRules(rules);
+                ruleMatcher.setPriority(priority);
+                data.magicMatchers.append(ruleMatcher);
+                rules.clear();
             }
             break;
-
+        }
         default:
             break;
         }

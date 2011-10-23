@@ -23,6 +23,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QList>
 
 QT_BEGIN_NAMESPACE
 
@@ -49,6 +50,8 @@ public:
     bool isValid() const;
 
     bool matches(const QByteArray &data) const;
+
+    QList<QMimeMagicRule> m_subMatches;
 
     static Type type(const QByteArray &type);
     static QByteArray typeName(Type type);

@@ -71,11 +71,11 @@ bool QMimeMagicRuleMatcher::matches(const QByteArray &data) const
         return false;
 
     foreach (const QMimeMagicRule &magicRule, m_list) {
-        if (!magicRule.matches(data))
-            return false;
+        if (magicRule.matches(data))
+            return true;
     }
 
-    return true;
+    return false;
 }
 
 // Return a priority value from 1..100
