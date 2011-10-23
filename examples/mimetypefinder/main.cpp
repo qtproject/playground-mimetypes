@@ -32,8 +32,9 @@ int main(int argc, char *argv[])
         if (file.open(QIODevice::ReadOnly)) {
             mime = db.findByData(file.read(32000));
         }
+    } else if (option == "-f") {
+        mime = db.findByName(fileName);
     } else {
-        //mime = QMimeType::findByPath(fileName, 0, args->isSet("f"), &accuracy);
         mime = db.findByFile(fileName);
     }
     if ( mime.isValid() /*&& !mime.isDefault()*/ ) {
