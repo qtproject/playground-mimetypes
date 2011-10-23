@@ -128,16 +128,14 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     unsigned priority = 0;
     // TODO: discuss - this code is slow :(
     // Hack for text/plain and application/octet-stream
-    if (magicMatchers.isEmpty()) {
-        if (name == QLatin1String("text/plain") && isTextFile(data))
-            priority = 2;
-        else if (name == QLatin1String("application/octet-stream"))
-            priority = 1;
-    } else {
-        foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
-            if (matcher.priority() > priority && matcher.matches(data))
-                priority = matcher.priority();
-        }
+    if (name == QLatin1String("text/plain") && isTextFile(data))
+        priority = 2;
+    else if (name == QLatin1String("application/octet-stream"))
+        priority = 1;
+
+    foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
+        if (matcher.priority() > priority && matcher.matches(data))
+            priority = matcher.priority();
     }
     return priority;
 }
