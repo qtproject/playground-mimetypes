@@ -29,7 +29,6 @@
 #include <QtCore/QLocale>
 
 #include "qmimefilematchcontext_p.h"
-#include "qmimemagicrulematcher_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -56,7 +55,6 @@ QMimeTypeData::QMimeTypeData(const QMimeType &other)
     , globPatterns(other.d->globPatterns)
     , preferredSuffix(other.d->preferredSuffix)
     , suffixes(other.d->suffixes)
-    , magicMatchers(other.d->magicMatchers)
 {
     if (!suffixPattern.isValid())
         qWarning("MimeTypeData(): invalid suffixPattern");
@@ -73,7 +71,6 @@ void QMimeTypeData::clear()
     globPatterns.clear();
     preferredSuffix.clear();
     suffixes.clear();
-    magicMatchers.clear();
 }
 
 bool QMimeTypeData::operator==(const QMimeTypeData &other) const
@@ -86,8 +83,7 @@ bool QMimeTypeData::operator==(const QMimeTypeData &other) const
            iconName == other.iconName &&
            globPatterns == other.globPatterns &&
            preferredSuffix == other.preferredSuffix &&
-           suffixes == other.suffixes &&
-           magicMatchers == other.magicMatchers;
+           suffixes == other.suffixes;
 }
 
 void QMimeTypeData::addGlobPattern(const QString &pattern)
@@ -102,42 +98,6 @@ void QMimeTypeData::addGlobPattern(const QString &pattern)
     else {
         //qDebug() << Q_FUNC_INFO << "Skipping suffix" << pattern;
     }
-}
-
-static inline bool isTextFile(const QByteArray &data)
-{
-    // UTF16 byte order marks
-    static const char bigEndianBOM[] = "\xFE\xFF";
-    static const char littleEndianBOM[] = "\xFF\xFE";
-    if (data.startsWith(bigEndianBOM) || data.startsWith(littleEndianBOM))
-        return true;
-
-    // Check the first 32 bytes (see shared-mime spec)
-    const char *p = data.constData();
-    const char *e = p + qMin(32, data.size());
-    for ( ; p < e; ++p) {
-        if ((unsigned char)(*p) < 32 && *p != 9 && *p !=10 && *p != 13)
-            return false;
-    }
-
-    return true;
-}
-
-unsigned QMimeTypeData::matchesData(const QByteArray &data) const
-{
-    unsigned priority = 0;
-    // TODO: discuss - this code is slow :(
-    // Hack for text/plain and application/octet-stream
-    if (name == QLatin1String("text/plain") && isTextFile(data))
-        priority = 2;
-    else if (name == QLatin1String("application/octet-stream"))
-        priority = 1;
-
-    foreach (const QMimeMagicRuleMatcher &matcher, magicMatchers) {
-        if (matcher.priority() > priority && matcher.matches(data))
-            priority = matcher.priority();
-    }
-    return priority;
 }
 
 /*!
@@ -163,7 +123,7 @@ unsigned QMimeTypeData::matchesData(const QByteArray &data) const
     </mime-info>
     \endcode
 
-    \sa QMimeDatabase, QMimeMagicRuleMatcher, QMimeMagicRule, QMimeGlobPattern
+    \sa QMimeDatabase
 */
 
 QMimeType::QMimeType() :

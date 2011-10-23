@@ -21,6 +21,7 @@
 #include "qmimemagicrulematcher_p.h"
 
 #include "qmimetype_p.h"
+#include <QtCore/QDebug>
 
 #include <qendian.h>
 
@@ -37,9 +38,10 @@ QT_BEGIN_NAMESPACE
     \sa BaseMimeTypeParser, MimeTypeParser
 */
 
-QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(unsigned thePriority) :
+QMimeMagicRuleMatcher::QMimeMagicRuleMatcher(const QString &mime, unsigned thePriority) :
     m_list(),
-    m_priority(thePriority)
+    m_priority(thePriority),
+    m_mimetype(mime)
 {
 }
 
@@ -84,9 +86,11 @@ unsigned QMimeMagicRuleMatcher::priority() const
     return m_priority;
 }
 
+#if 0 // unused
 void QMimeMagicRuleMatcher::setPriority(unsigned thePriority)
 {
     m_priority = thePriority;
 }
+#endif
 
 QT_END_NAMESPACE

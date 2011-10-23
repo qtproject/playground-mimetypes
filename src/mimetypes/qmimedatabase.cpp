@@ -107,6 +107,25 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
     return matchingMimeTypes;
 }
 
+static inline bool isTextFile(const QByteArray &data)
+{
+    // UTF16 byte order marks
+    static const char bigEndianBOM[] = "\xFE\xFF";
+    static const char littleEndianBOM[] = "\xFF\xFE";
+    if (data.startsWith(bigEndianBOM) || data.startsWith(littleEndianBOM))
+        return true;
+
+    // Check the first 32 bytes (see shared-mime spec)
+    const char *p = data.constData();
+    const char *e = p + qMin(32, data.size());
+    for ( ; p < e; ++p) {
+        if ((unsigned char)(*p) < 32 && *p != 9 && *p !=10 && *p != 13)
+            return false;
+    }
+
+    return true;
+}
+
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, int *accuracyPtr)
 {
     if (data.isEmpty()) {
@@ -119,6 +138,11 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, int *accuracy
 
     if (candidate.isValid())
         return candidate;
+
+    if (isTextFile(data)) {
+        *accuracyPtr = 5;
+        return mimeTypeForName(QLatin1String("text/plain"));
+    }
 
     return mimeTypeForName(defaultMimeType());
 }

@@ -67,6 +67,7 @@ protected:
     virtual bool process(const QMimeGlobPattern &t, QString *errorMessage) = 0;
     virtual void processParent(const QString& child, const QString& parent) = 0;
     virtual void processAlias(const QString& alias, const QString& name) = 0;
+    virtual void processMagicMatcher(const QMimeMagicRuleMatcher& matcher) = 0;
 
 private:
     enum ParseState {
@@ -106,6 +107,9 @@ protected:
 
     inline void processAlias(const QString &alias, const QString &name)
     { m_provider.addAlias(alias, name); }
+
+    inline void processMagicMatcher(const QMimeMagicRuleMatcher& matcher)
+    { m_provider.addMagicMatcher(matcher); }
 
 private:
     QMimeXMLProvider &m_provider;

@@ -294,10 +294,9 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
             } else if (elementName == QLatin1String(magicTagC)) {
                 //qDebug() << "MAGIC ended, we got" << rules.count() << "rules, with prio" << priority;
                 // Finished a <magic> sequence
-                QMimeMagicRuleMatcher ruleMatcher;
+                QMimeMagicRuleMatcher ruleMatcher(data.name, priority);
                 ruleMatcher.addRules(rules);
-                ruleMatcher.setPriority(priority);
-                data.magicMatchers.append(ruleMatcher);
+                processMagicMatcher(ruleMatcher);
                 rules.clear();
             }
             break;

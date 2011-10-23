@@ -22,6 +22,7 @@
 
 #include "mimetypeparser_p.h"
 #include <qstandardpaths.h>
+#include "qmimemagicrulematcher_p.h"
 
 #include <QDir>
 #include <QFile>
@@ -359,17 +360,18 @@ QMimeType QMimeXMLProvider::findByMagic(const QByteArray &data, int *accuracyPtr
 {
     ensureLoaded();
 
-    QMimeType candidate;
+    QString candidate;
 
-    // TODO implement properly.
-    foreach (const QMimeType &mime, m_nameMimeTypeMap) {
-        const int contentPriority = mime.d->matchesData(data);
-        if (contentPriority && contentPriority > *accuracyPtr) {
-            *accuracyPtr = contentPriority;
-            candidate = mime;
+    foreach (const QMimeMagicRuleMatcher &matcher, m_magicMatchers) {
+        if (matcher.matches(data)) {
+            const int priority = matcher.priority();
+            if (priority > *accuracyPtr) {
+                *accuracyPtr = priority;
+                candidate = matcher.mimetype();
+            }
         }
     }
-    return candidate;
+    return mimeTypeForName(candidate);
 }
 
 void QMimeXMLProvider::ensureLoaded()
@@ -466,4 +468,9 @@ void QMimeXMLProvider::addAlias(const QString &alias, const QString &name)
 QList<QMimeType> QMimeXMLProvider::allMimeTypes()
 {
     return m_nameMimeTypeMap.values();
+}
+
+void QMimeXMLProvider::addMagicMatcher(const QMimeMagicRuleMatcher &matcher)
+{
+    m_magicMatchers.append(matcher);
 }

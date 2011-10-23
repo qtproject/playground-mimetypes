@@ -43,7 +43,7 @@ struct QMIME_EXPORT QMimeTypeData : public QSharedData
     void addGlobPattern(const QString &pattern);
 
     //unsigned matchesFileBySuffix(const QString &fileName) const;
-    unsigned matchesData(const QByteArray &data) const;
+    //unsigned matchesData(const QByteArray &data) const;
 
     const QRegExp suffixPattern;
 
@@ -56,7 +56,6 @@ struct QMIME_EXPORT QMimeTypeData : public QSharedData
     QStringList globPatterns;
     QString preferredSuffix;
     QStringList suffixes;
-    QList<QMimeMagicRuleMatcher> magicMatchers;
 };
 
 QT_END_NAMESPACE

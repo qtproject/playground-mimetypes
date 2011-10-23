@@ -98,6 +98,7 @@ public:
     void addGlobPattern(const QMimeGlobPattern& glob);
     void addParent(const QString &child, const QString &parent);
     void addAlias(const QString &alias, const QString &name);
+    void addMagicMatcher(const QMimeMagicRuleMatcher& matcher);
 
 private:
     void ensureLoaded();
@@ -114,6 +115,8 @@ private:
     typedef QHash<QString, QStringList> ParentsHash;
     ParentsHash m_parents;
     QMimeAllGlobPatterns m_mimeTypeGlobs;
+
+    QList<QMimeMagicRuleMatcher> m_magicMatchers;
 };
 
 #endif // QMIMEPROVIDER_P_H

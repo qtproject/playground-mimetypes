@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 class QMIME_EXPORT QMimeMagicRuleMatcher
 {
 public:
-    explicit QMimeMagicRuleMatcher(unsigned priority = 65535);
+    explicit QMimeMagicRuleMatcher(const QString &mime, unsigned priority = 65535);
 
     bool operator==(const QMimeMagicRuleMatcher &other);
 
@@ -47,11 +47,16 @@ public:
     bool matches(const QByteArray &data) const;
 
     unsigned priority() const;
+#if 0
     void setPriority(unsigned priority);
+#endif
+
+    QString mimetype() const { return m_mimetype; }
 
 private:
     QList<QMimeMagicRule> m_list;
     unsigned m_priority;
+    QString m_mimetype;
 };
 
 QT_END_NAMESPACE
