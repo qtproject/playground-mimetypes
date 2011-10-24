@@ -90,8 +90,8 @@ ooo-test.fodt application/vnd.oasis.opendocument.text-flat-xml ox
 # Copied from https://bugs.freedesktop.org/show_bug.cgi?id=20604
 foo.doc application/msword
 # Copied from http://bugzilla.abisource.com/show_bug.cgi?id=6435
-# The last 'x' is xdgmime bug #18109.
-test-template.dot application/msword-template oxx
+test-template.dot application/msword-template ox
+test-template.dot application/msword xox
 # Copied from http://www.ebooktechnologies.com/downloads/ocf10-20060911.epub
 ocf10-20060911.epub application/epub+zip
 # Copied from http://libwps.svn.sourceforge.net/viewvc/libwps/trunk/reference/
@@ -111,11 +111,8 @@ internet.ez application/andrew-inset ox
 Anaphraseus-1.21-beta.oxt application/vnd.openofficeorg.extension ox
 # Copied from http://lilypond.org/doc/v2.10/examples
 petite-ouverture-a-danser.ly text/x-lilypond ox
-# xdgmime bug: *.kexi maps to two mimetypes, so it uses sniffing, but doesn't select
-# the candidate mimetype that derives from the sniffing result. (bug #18109)
-# Both gio and kio do it right though.
-sqlite2.kexi application/x-kexiproject-sqlite2 oxx
-sqlite3.kexi application/x-kexiproject-sqlite3 xxx
+sqlite2.kexi application/x-kexiproject-sqlite2 ox
+sqlite3.kexi application/x-kexiproject-sqlite3 xx
 # Copied from KOffice 2.1.1 source tarball
 combined.karbon application/x-karbon
 Empty.chrt application/x-kchart
@@ -243,6 +240,8 @@ project.glade application/x-glade
 ISOcyr1.ent application/xml-external-parsed-entity ox
 # Copied from http://www.metalinker.org/samples/abiword-setup-2.4.6.exe.metalink
 test.metalink application/metalink+xml
+# Copied from http://ooo.mirrorbrain.org/contrib/dictionaries/en_US.zip.meta4
+en_US.zip.meta4 application/metalink4+xml
 test.mml application/mathml+xml ox
 # Copied from http://doc.trolltech.com/4.4/linguist-hellotr.html
 linguist.ts text/vnd.trolltech.linguist

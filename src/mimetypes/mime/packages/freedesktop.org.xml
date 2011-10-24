@@ -445,9 +445,51 @@
     <comment xml:lang="zh_TW">Metalink 檔案</comment>
     <sub-class-of type="application/xml"/>
     <magic priority="50">
-      <match value="&lt;metalink" type="string" offset="0:256"/>
+      <match value="&lt;metalink version=&quot;3.0&quot;" type="string" offset="0:256"/>
     </magic>
     <glob pattern="*.metalink"/>
+    <root-XML namespaceURI="http://www.metalinker.org/" localName="metalink"/>
+  </mime-type>
+  <mime-type type="application/metalink4+xml">
+    <comment>Metalink file</comment>
+    <comment xml:lang="ar">ملف ميتالنك</comment>
+    <comment xml:lang="bg">Изтегляне — Metalink</comment>
+    <comment xml:lang="ca">fitxer Metalink</comment>
+    <comment xml:lang="cs">Soubor metalink</comment>
+    <comment xml:lang="da">Metahenvisningsfil</comment>
+    <comment xml:lang="de">Metalink-Datei</comment>
+    <comment xml:lang="eo">Metalink-dosiero</comment>
+    <comment xml:lang="es">archivo de metaenlace</comment>
+    <comment xml:lang="eu">Metaestekaren fitxategia</comment>
+    <comment xml:lang="fi">Metalink-tiedosto</comment>
+    <comment xml:lang="fo">Metalink fíla</comment>
+    <comment xml:lang="fr">fichier metalink</comment>
+    <comment xml:lang="ga">comhad Metalink</comment>
+    <comment xml:lang="gl">Ficheiro Metalink</comment>
+    <comment xml:lang="he">קובץ Metalink</comment>
+    <comment xml:lang="hu">Metalink fájl</comment>
+    <comment xml:lang="id">Berkas Metalink</comment>
+    <comment xml:lang="it">File Metalink</comment>
+    <comment xml:lang="ja">Metalink ファイル</comment>
+    <comment xml:lang="kk">Metalink файлы</comment>
+    <comment xml:lang="ko">Metalink 파일</comment>
+    <comment xml:lang="lt">Metalink failas</comment>
+    <comment xml:lang="lv">Metalink fails</comment>
+    <comment xml:lang="pl">Plik Metalink</comment>
+    <comment xml:lang="ro">Fișier Metalink</comment>
+    <comment xml:lang="ru">файл Metalink</comment>
+    <comment xml:lang="sk">Súbor Metalink</comment>
+    <comment xml:lang="sl">Datoteka povezave Metalink</comment>
+    <comment xml:lang="sv">Metalink-fil</comment>
+    <comment xml:lang="uk">файл метапосилання</comment>
+    <comment xml:lang="zh_CN">元链接文件</comment>
+    <comment xml:lang="zh_TW">Metalink 檔案</comment>
+    <sub-class-of type="application/xml"/>
+    <magic priority="50">
+      <match value="&lt;metalink xmlns=&quot;urn" type="string" offset="0:256"/>
+    </magic>
+    <glob pattern="*.meta4"/>
+    <root-XML namespaceURI="urn:ietf:params:xml:ns:metalink" localName="metalink"/>
   </mime-type>
   <mime-type type="application/octet-stream">
     <comment>unknown</comment>
@@ -1538,6 +1580,9 @@
     <magic priority="55">
       <match value="&lt;smil" type="string" offset="0:256"/>
     </magic>
+    <root-XML namespaceURI="http://www.w3.org/2001/SMIL20/Language" localName="smil"/>
+    <root-XML namespaceURI="http://www.w3.org/2005/SMIL21/Language" localName="smil"/>
+    <root-XML namespaceURI="http://www.w3.org/ns/SMIL" localName="smil"/>
   </mime-type>
   <mime-type type="application/vnd.ms-wpl">
     <comment>WPL playlist</comment>
@@ -28604,6 +28649,8 @@
     <expanded-acronym>XML Metadata Interchange</expanded-acronym>
     <sub-class-of type="application/xml"/>
     <glob pattern="*.xmi"/>
+    <root-XML namespaceURI="http://schema.omg.org/spec/XMI/2.0" localName="XMI"/>
+    <root-XML namespaceURI="http://schema.omg.org/spec/XMI/2.1" localName="XMI"/>
   </mime-type>
   <mime-type type="text/x-xslfo">
     <comment>XSL FO file</comment>
@@ -29121,6 +29168,7 @@
     <glob pattern="*.mp2"/>
     <glob pattern="*.mpe"/>
     <glob pattern="*.vob"/>
+    <glob pattern="[0-9][0-9][0-9].vdr"/>
   </mime-type>
   <mime-type type="video/vnd.mpegurl">
     <comment>MPEG video (streamed)</comment>
