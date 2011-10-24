@@ -184,6 +184,7 @@ QString QMimeType::name() const
 
 QString QMimeType::comment() const
 {
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
     return d->comment;
 }
 
@@ -202,10 +203,12 @@ static inline QString systemLanguage()
 */
 QString QMimeType::localeComment(const QString &localeArg) const
 {
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
     const QString locale = localeArg.isEmpty() ? systemLanguage() : localeArg;
     return d->localeComments.value(locale, d->comment);
 }
 
+// What is the use case for this? [apart from mimetypeviewer.cpp ...]
 QStringList QMimeType::aliases() const
 {
     return d->aliases;
@@ -213,11 +216,13 @@ QStringList QMimeType::aliases() const
 
 QString QMimeType::genericIconName() const
 {
+    // TODO QMimeDatabasePrivate::instance()->provider()->loadIcons(*d);
     return d->genericIconName;
 }
 
 QString QMimeType::iconName() const
 {
+    // TODO QMimeDatabasePrivate::instance()->provider()->loadIcons(*d);
     if (d->iconName.isEmpty()) {
         // Make default icon name from the mimetype name
         d->iconName = name();
@@ -230,6 +235,7 @@ QString QMimeType::iconName() const
 
 QStringList QMimeType::globPatterns() const
 {
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
     return d->globPatterns;
 }
 
@@ -271,6 +277,7 @@ QStringList QMimeType::allParentMimeTypes() const
 */
 QStringList QMimeType::suffixes() const
 {
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
     return d->suffixes;
 }
 
@@ -281,6 +288,7 @@ QStringList QMimeType::suffixes() const
 */
 QString QMimeType::preferredSuffix() const
 {
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
     return d->preferredSuffix;
 }
 
@@ -289,6 +297,7 @@ QString QMimeType::preferredSuffix() const
 */
 QString QMimeType::filterString() const
 {
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
     QString filter;
 
     if (!d->globPatterns.empty()) { // !Binary files

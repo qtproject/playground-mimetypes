@@ -24,6 +24,7 @@
 #include <qstandardpaths.h>
 #include "qmimemagicrulematcher_p.h"
 
+#include <QXmlStreamReader>
 #include <QDir>
 #include <QFile>
 #include <QDebug>
@@ -116,8 +117,9 @@ enum { PosAliasListOffset = 4,
 bool QMimeBinaryProvider::isValid()
 {
 #if defined(QT_USE_MMAP)
-    // TODO qgetenv, so that the unittest can choose between with or without mime.cache
-    return false; // HACK FOR NOW
+    if (!qgetenv("QT_NO_MIME_CACHE").isEmpty()) {
+        return false;
+    }
 
     const QStringList cacheFilenames = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/mime.cache"));
     qDeleteAll(m_cacheFiles);
@@ -153,10 +155,10 @@ bool QMimeBinaryProvider::isValid()
 
 QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 {
-    // TODO implement, including a QCache
-    QMimeType mime;
-    Q_UNUSED(name);
-    return mime;
+    // TODO cache with a QCache
+    QMimeTypeData data;
+    data.name = name;
+    return QMimeType(data);
 }
 
 QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *foundSuffix)
@@ -216,7 +218,7 @@ void QMimeBinaryProvider::matchGlobList(GlobMatchResult& result, CacheFile *cach
         const QString pattern = QLatin1String(cacheFile->getCharStar(globOffset));
 
         const char* mimeType = cacheFile->getCharStar(mimeTypeOffset);
-        qDebug() << pattern << mimeType << weight << caseSensitive;
+        //qDebug() << pattern << mimeType << weight << caseSensitive;
         QMimeGlobPattern glob(pattern, QString() /*unused*/, weight, qtCaseSensitive);
 
         // TODO: this could be done faster for literals where a simple == would do.
@@ -328,6 +330,116 @@ QList<QMimeType> QMimeBinaryProvider::allMimeTypes()
     return result;
 }
 
+void QMimeBinaryProvider::loadMimeTypeData(QMimeTypeData &data)
+{
+    // load comment, aliases?, globPatterns, suffixes, preferredSuffix
+
+    const QString file = data.name + QLatin1String(".xml");
+    const QStringList mimeFiles = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QString::fromLatin1("mime/") + file);
+    if (mimeFiles.isEmpty()) {
+        // TODO: ask Thiago about this
+        qWarning() << "No file found for" << file << ", even though the file appeared in a directory listing.";
+        qWarning() << "Either it was just removed, or the directory doesn't have executable permission...";
+        qWarning() << QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime"), QStandardPaths::LocateDirectory);
+        return;
+    }
+
+    QString comment;
+    QString mainPattern;
+    const QStringList languageList = QLocale::system().uiLanguages();
+    //qDebug() << "languages=" << languageList;
+    const QString preferredLanguage = languageList.first();
+    QMap<QString, QString> commentsByLanguage;
+
+    QListIterator<QString> mimeFilesIter(mimeFiles);
+    mimeFilesIter.toBack();
+    while (mimeFilesIter.hasPrevious()) { // global first, then local.
+        const QString fullPath = mimeFilesIter.previous();
+        QFile qfile(fullPath);
+        if (!qfile.open(QFile::ReadOnly))
+            continue;
+
+        QXmlStreamReader xml(&qfile);
+        if (xml.readNextStartElement()) {
+            if (xml.name() != "mime-type") {
+                continue;
+            }
+            const QString name = xml.attributes().value(QLatin1String("type")).toString();
+            if (name.isEmpty())
+                continue;
+            if (name != data.name) {
+                qWarning() << "Got name" << name << "in file" << file << "expected" << data.name;
+            }
+
+            while (xml.readNextStartElement()) {
+                const QStringRef tag = xml.name();
+                if (tag == "comment") {
+                    QString lang = xml.attributes().value(QLatin1String("xml:lang")).toString();
+                    const QString text = xml.readElementText();
+                    if (lang.isEmpty()) {
+                        lang = QLatin1String("en-US");
+                    }
+                    if (lang == preferredLanguage) {
+                        comment = text;
+                    } else {
+                        commentsByLanguage.insert(lang, text);
+                    }
+                    continue; // we called readElementText, so we're at the EndElement already.
+                } else if (tag == "icon") { // as written out by shared-mime-info >= 0.40
+                    data.iconName = xml.attributes().value(QLatin1String("name")).toString();
+                } else if (tag == "glob-deleteall") { // as written out by shared-mime-info >= 0.70
+                    data.preferredSuffix.clear();
+                    data.globPatterns.clear();
+                } else if (tag == "glob") { // as written out by shared-mime-info >= 0.70
+                    const QString pattern = xml.attributes().value(QLatin1String("pattern")).toString();
+                    if (mainPattern.isEmpty() && pattern.startsWith(QLatin1Char('*'))) {
+                        mainPattern = pattern;
+                    }
+                    if (!data.globPatterns.contains(pattern))
+                        data.globPatterns.append(pattern);
+                }
+                xml.skipCurrentElement();
+            }
+            Q_ASSERT(xml.name() == "mime-type");
+        }
+    }
+
+    if (comment.isEmpty()) {
+        Q_FOREACH(const QString& lang, languageList) {
+            const QString comm = commentsByLanguage.value(lang);
+            if (!comm.isEmpty()) {
+                comment = comm;
+                break;
+            }
+            const int pos = lang.indexOf(QLatin1Char('_'));
+            if (pos != -1) {
+                // "pt_BR" not found? try just "pt"
+                const QString shortLang = lang.left(pos);
+                const QString commShort = commentsByLanguage.value(shortLang);
+                if (!commShort.isEmpty()) {
+                    comment = commShort;
+                    break;
+                }
+            }
+        }
+        if (comment.isEmpty()) {
+            qWarning() << "Missing <comment> field in" << file;
+        }
+    }
+    data.comment = comment;
+
+    const bool globsInXml = true; // ## (KMimeType::sharedMimeInfoVersion() >= KDE_MAKE_VERSION(0, 70, 0));
+    if (globsInXml) {
+        if (!mainPattern.isEmpty() && data.globPatterns.first() != mainPattern) {
+            // ensure it's first in the list of patterns
+            data.globPatterns.removeAll(mainPattern);
+            data.globPatterns.prepend(mainPattern);
+        }
+    } else {
+        // Fallback: get the patterns from the globs file
+        //TODO data.globPatterns = KMimeTypeRepository::self()->patternsForMimetype(data.name);
+    }
+}
 
 ////
 

@@ -36,6 +36,7 @@ public:
     virtual QString resolveAlias(const QString &name) = 0;
     virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr) = 0;
     virtual QList<QMimeType> allMimeTypes() = 0;
+    virtual void loadMimeTypeData(QMimeTypeData &) {}
 
     QMimeDatabasePrivate* m_db;
 };
@@ -56,6 +57,7 @@ public:
     virtual QString resolveAlias(const QString &name);
     virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr);
     virtual QList<QMimeType> allMimeTypes();
+    virtual void loadMimeTypeData(QMimeTypeData &);
 
 private:
     struct CacheFile;

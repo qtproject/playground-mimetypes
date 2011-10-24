@@ -51,6 +51,7 @@ public:
 
     QString name() const;
 
+    // What is the use case for this? [apart from mimetypeviewer.cpp ...]
     QStringList aliases() const;
 
     QString comment() const;
@@ -79,6 +80,7 @@ protected:
     friend class MimeTypeMapEntry;
     friend class QMimeDatabasePrivate;
     friend class QMimeXMLProvider;
+    friend class QMimeBinaryProvider;
     friend class QMimeTypeData;
 
     QExplicitlySharedDataPointer<QMimeTypeData> d;
