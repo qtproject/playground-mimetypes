@@ -127,6 +127,7 @@ QVariantMap QDeclarativeMimeType::properties() const
 
 void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 {
+    m_MimeType = QMimeType(QMimeTypeData());
     ASSIGN_FROM_PROPERTY(name, setName, String, toString)
     ASSIGN_FROM_PROPERTY(comment, setComment, String, toString)
     ASSIGN_FROM_PROPERTY(genericIconName, setGenericIconName, String, toString)
