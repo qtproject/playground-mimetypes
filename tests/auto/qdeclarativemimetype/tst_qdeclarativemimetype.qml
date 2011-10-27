@@ -72,6 +72,7 @@ TestCase {
         comment: pngMimeTypeComment()
         genericIconName: pngMimeTypeGenericIconName()
         iconName: pngMimeTypeIconName()
+        globPatterns: [ "*.png" ]
         suffixes: [ firstPngMimeTypeSuffixes() ]
     }
 
@@ -186,6 +187,34 @@ TestCase {
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
 
         javaScriptObject.iconName = instantiatedPngMimeType.iconName
+        compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), true)
+        otherPngMimeType.assignProperties(javaScriptObject);
+        compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
+    }
+
+    function test_globPatterns() {
+        // Verify that the Suffixes is part of the equality test:
+        compare(instantiatedPngMimeType.globPatterns.length, 1)
+        compare(instantiatedPngMimeType.globPatterns[0], "*.png")
+
+        otherPngMimeType.assign(instantiatedPngMimeType)
+
+        otherPngMimeType.globPatterns = []
+        compare(otherPngMimeType.globPatterns.length, 0)
+        compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
+        otherPngMimeType.globPatterns = instantiatedPngMimeType.globPatterns
+        compare(otherPngMimeType.globPatterns.length, 1)
+        compare(otherPngMimeType.globPatterns[0], "*.png")
+        compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
+
+        var javaScriptObject = instantiatedPngMimeType.properties()
+
+        javaScriptObject.globPatterns = []   // simulate an error
+        compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), false)
+        otherPngMimeType.assignProperties(javaScriptObject);
+        compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
+
+        javaScriptObject.globPatterns = instantiatedPngMimeType.globPatterns
         compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), true)
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
