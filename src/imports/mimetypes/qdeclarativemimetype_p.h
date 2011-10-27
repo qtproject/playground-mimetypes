@@ -72,6 +72,7 @@ class QDeclarativeMimeType : public QObject
 
     Q_PROPERTY(QVariantList globPatterns
                READ globPatterns
+               WRITE setGlobPatterns
                STORED false)
 
     Q_PROPERTY(QVariantList suffixes
@@ -99,6 +100,10 @@ public:
     Q_INVOKABLE void assign(QDeclarativeMimeType *other);
     Q_INVOKABLE bool equals(QDeclarativeMimeType *other) const;
 
+    Q_INVOKABLE QVariantMap properties() const;
+    Q_INVOKABLE void assignProperties(const QVariantMap &other);
+    Q_INVOKABLE bool equalsProperties(const QVariantMap &other) const;
+
     QMimeType mimeType() const;
 
     bool isValid() const;
@@ -112,6 +117,7 @@ public:
     QString iconName() const;
     void setIconName(const QString &newIconName);
     QVariantList globPatterns() const;
+    void setGlobPatterns(const QVariantList &newGlobPatterns);
     QVariantList suffixes() const;
     void setSuffixes(const QVariantList &newSuffixes);
 
