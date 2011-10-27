@@ -5,6 +5,8 @@ moc*
 qrc_*
 ui_*
 *.o
+*.so
+*.so.*
 *.moc
 *~
 Makefile*
