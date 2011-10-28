@@ -66,7 +66,9 @@ void tst_qmimedatabase::findByName()
     const QMimeType resultMimeType(database.findByName(filePath));
     if (resultMimeType.isValid()) {
         //qDebug() << Q_FUNC_INFO << "MIME type" << resultMimeType.name() << "has generic icon name" << resultMimeType.genericIconName() << "and icon name" << resultMimeType.iconName();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+
+// Loading icons depend on the icon theme, we can't enable this test
+#if 0 // (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         QCOMPARE(resultMimeType.genericIconName(), QIcon::fromTheme(resultMimeType.genericIconName()).name());
         QVERIFY2(!QIcon::fromTheme(resultMimeType.genericIconName()).isNull(), qPrintable(resultMimeType.genericIconName()));
         QVERIFY2(QIcon::hasThemeIcon(resultMimeType.genericIconName()), qPrintable(resultMimeType.genericIconName()));
@@ -150,6 +152,7 @@ void tst_qmimedatabase::findByFile()
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+//QTEST_MAIN(tst_qmimedatabase)
 QTEST_APPLESS_MAIN(tst_qmimedatabase)
 #else
 // If tests with icons were activated in Qt4 we'd use QTEST_MAIN:
