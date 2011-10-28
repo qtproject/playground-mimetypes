@@ -15,7 +15,7 @@ QT     = core
 
 DEFINES += QT_NO_CAST_FROM_ASCII
 
-QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -ansi -pedantic -Wshadow -Wno-long-long -Wnon-virtual-dtor
+QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -ansi -Wshadow -Wno-long-long -Wnon-virtual-dtor
 mac|darwin: {
 } else {
     QMAKE_CXXFLAGS += -Wc++0x-compat
