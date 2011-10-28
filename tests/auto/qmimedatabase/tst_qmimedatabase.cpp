@@ -1,3 +1,5 @@
+#include "tst_qmimedatabase.h"
+
 #include <QtCore/QFile>
 
 #include <QtTest/QtTest>
@@ -9,45 +11,6 @@
 #endif
 
 #include <QMimeDatabase>
-
-static int initializeDataDirs()
-{
-    // To make sure that other mime packages don't change our test results
-    qputenv("XDG_DATA_DIRS", SRCDIR "../../../src/mimetypes/mime");
-    qputenv("XDG_DATA_HOME", QByteArray());
-    return 0;
-}
-
-Q_CONSTRUCTOR_FUNCTION(initializeDataDirs)
-
-class tst_qmimedatabase : public QObject
-{
-    Q_OBJECT
-
-public:
-    tst_qmimedatabase();
-    ~tst_qmimedatabase();
-
-private Q_SLOTS:
-    void initTestCase();
-
-    void findByName_data();
-    void findByName();
-
-    void findByData_data();
-    void findByData();
-
-    void findByFile_data();
-    void findByFile();
-
-private:
-    QMimeDatabase database;
-};
-
-tst_qmimedatabase::tst_qmimedatabase() :
-        database()
-{
-}
 
 tst_qmimedatabase::~tst_qmimedatabase()
 {
@@ -95,6 +58,8 @@ void tst_qmimedatabase::findByName()
     QFETCH(QString, filePath);
     QFETCH(QString, mimeTypeName);
     QFETCH(QString, xFail);
+
+    QMimeDatabase database;
 
     //qDebug() << Q_FUNC_INFO << filePath;
 
@@ -148,6 +113,7 @@ void tst_qmimedatabase::findByData()
     QFETCH(QString, mimeTypeName);
     QFETCH(QString, xFail);
 
+    QMimeDatabase database;
     QFile f(filePath);
     QVERIFY(f.open(QIODevice::ReadOnly));
     QByteArray data = f.readAll();
@@ -172,6 +138,7 @@ void tst_qmimedatabase::findByFile()
     QFETCH(QString, mimeTypeName);
     QFETCH(QString, xFail);
 
+    QMimeDatabase database;
     const QString resultMimeTypeName = database.findByFile(QFileInfo(filePath)).name();
     //qDebug() << Q_FUNC_INFO << filePath << "->" << resultMimeTypeName;
     if (xFail.length() >= 3 && xFail.at(2) == QLatin1Char('x')) {
@@ -189,5 +156,3 @@ QTEST_APPLESS_MAIN(tst_qmimedatabase)
 //QTEST_MAIN(tst_qmimedatabase)
 QTEST_APPLESS_MAIN(tst_qmimedatabase)
 #endif
-
-#include "tst_qmimedatabase.moc"

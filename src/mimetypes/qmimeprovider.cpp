@@ -166,6 +166,7 @@ QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *fo
     GlobMatchResult result;
     result.m_weight = 0;
     result.m_matchingPatternLength = 0;
+    // TODO this parses in the order (local, global). Check that it handles "NOGLOBS" correctly.
     foreach (CacheFile *cacheFile, m_cacheFiles) {
         matchGlobList(result, cacheFile, cacheFile->getUint32(PosLiteralListOffset), fileName);
         matchGlobList(result, cacheFile, cacheFile->getUint32(PosGlobListOffset), fileName);
@@ -269,13 +270,67 @@ bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryPr
     return false;
 }
 
+bool QMimeBinaryProvider::matchMagicRule(QMimeBinaryProvider::CacheFile *cacheFile, int numMatchlets, int firstOffset, const QByteArray &data)
+{
+    const char* dataPtr = data.constData();
+    for (int matchlet = 0; matchlet < numMatchlets; ++matchlet) {
+        const int off = firstOffset + matchlet * 32;
+        const int rangeStart = cacheFile->getUint32(off);
+        const int rangeLength = cacheFile->getUint32(off + 4);
+        //const int wordSize = cacheFile->getUint32(off + 8);
+        const int valueLength = cacheFile->getUint32(off + 12);
+        const int valueOffset = cacheFile->getUint32(off + 16);
+        // TODO const int maskOffset = cacheFile->getUint32(off + 20);
+
+        bool ok = false;
+
+        for (int i = rangeStart; i < rangeStart + rangeLength; ++i) {
+            if (i + valueLength > data.length())
+                break;
+
+            if (memcmp(cacheFile->data + valueOffset, dataPtr + i, valueLength) == 0) {
+                ok = true;
+                break;
+            }
+        }
+
+        if (!ok)
+            continue;
+
+        const int numChildren = cacheFile->getUint32(off + 24);
+        const int firstChildOffset = cacheFile->getUint32(off + 28);
+        if (numChildren == 0) // No submatch? Then we are done.
+            return true;
+        // Check that one of the submatches matches too
+        if (matchMagicRule(cacheFile, numChildren, firstChildOffset, data))
+            return true;
+    }
+    return false;
+}
+
 QMimeType QMimeBinaryProvider::findByMagic(const QByteArray &data, int *accuracyPtr)
 {
-    QMimeType candidate;
-    Q_UNUSED(data);
-    *accuracyPtr = 0;
-    // TODO implement
-    return candidate;
+    foreach (CacheFile *cacheFile, m_cacheFiles) {
+        const int magicListOffset = cacheFile->getUint32(PosMagicListOffset);
+        const int numMatches = cacheFile->getUint32(magicListOffset);
+        //const int maxExtent = cacheFile->getUint32(magicListOffset + 4);
+        const int firstMatchOffset = cacheFile->getUint32(magicListOffset + 8);
+
+        for (int i = 0; i < numMatches; ++i) {
+            const int off = firstMatchOffset + i * 16;
+            const int numMatchlets = cacheFile->getUint32(off + 8);
+            const int firstMatchletOffset = cacheFile->getUint32(off + 12);
+            if (matchMagicRule(cacheFile, numMatchlets, firstMatchletOffset, data)) {
+                const int mimeTypeOffset = cacheFile->getUint32(off + 4);
+                const char* mimeType = cacheFile->getCharStar(mimeTypeOffset);
+                *accuracyPtr = cacheFile->getUint32(off);
+                // Return the first match. We have no rules for conflicting magic data...
+                // (mime.cache itself is sorted, but what about local overrides with a lower prio?)
+                return mimeTypeForName(QLatin1String(mimeType));
+            }
+        }
+    }
+    return QMimeType();
 }
 
 QStringList QMimeBinaryProvider::parents(const QString &mime)
