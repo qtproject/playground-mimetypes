@@ -27,6 +27,7 @@
 #include <QXmlStreamReader>
 #include <QDir>
 #include <QFile>
+#include <QByteArrayMatcher>
 #include <QDebug>
 #include <qendian.h>
 
@@ -280,22 +281,63 @@ bool QMimeBinaryProvider::matchMagicRule(QMimeBinaryProvider::CacheFile *cacheFi
         //const int wordSize = cacheFile->getUint32(off + 8);
         const int valueLength = cacheFile->getUint32(off + 12);
         const int valueOffset = cacheFile->getUint32(off + 16);
-        // TODO const int maskOffset = cacheFile->getUint32(off + 20);
+        const int maskOffset = cacheFile->getUint32(off + 20);
 
-        bool ok = false;
+        const int dataNeeded = qMin(rangeLength + valueLength - 1, data.size() - rangeStart);
 
-        for (int i = rangeStart; i < rangeStart + rangeLength; ++i) {
-            if (i + valueLength > data.length())
-                break;
+// callgrind says QByteArray::indexOf is much slower
+// #define WITH_BYTEARRAY
+#ifdef WITH_BYTEARRAY
+        // Size of searched data.
+        // Example: value="ABC", rangeLength=3 -> we need 3+3-1=5 bytes (ABCxx,xABCx,xxABC would match)
+        const QByteArray searchedData = QByteArray::fromRawData(dataPtr + rangeStart, dataNeeded);
+#endif
 
-            if (memcmp(cacheFile->data + valueOffset, dataPtr + i, valueLength) == 0) {
-                ok = true;
-                break;
+        if (!maskOffset) {
+#ifdef WITH_BYTEARRAY
+            const QByteArray value = QByteArray::fromRawData(cacheFile->getCharStar(valueOffset), valueLength);
+            if (searchedData.indexOf(value) == -1)
+                continue;
+#else
+            bool found = false;
+            for (int i = rangeStart; i < rangeStart + rangeLength; ++i) {
+                if (i + valueLength > data.length())
+                    break;
+
+                if (memcmp(cacheFile->data + valueOffset, dataPtr + i, valueLength) == 0) {
+                    found = true;
+                    break;
+                }
             }
+            if (!found)
+                continue;
+#endif
+        } else {
+            bool found = false;
+            const char* mask = cacheFile->getCharStar(maskOffset);
+            const char* valueData = cacheFile->getCharStar(valueOffset);
+            const char* readDataBase = dataPtr + rangeStart;
+            // Example (continued from above):
+            // deviceSize is 4, so dataNeeded was max'ed to 4.
+            // maxStartPos = 4 - 3 + 1 = 2, and indeed
+            // we need to check for a match a positions 0 and 1 (ABCx and xABC).
+            const int maxStartPos = dataNeeded - valueLength + 1;
+            for (int i = 0; i < maxStartPos; ++i) {
+                const char* d = readDataBase + i;
+                bool valid = true;
+                for (int idx = 0; idx < valueLength; ++idx) {
+                    if (((*d++) & mask[idx]) != (valueData[idx] & mask[idx])) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid)
+                    found = true;
+            }
+            if (!found)
+                continue;
         }
-
-        if (!ok)
-            continue;
+        //qDebug() << "Found" << value << "in" << searchedData;
 
         const int numChildren = cacheFile->getUint32(off + 24);
         const int firstChildOffset = cacheFile->getUint32(off + 28);
