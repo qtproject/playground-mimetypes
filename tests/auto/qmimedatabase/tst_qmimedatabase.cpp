@@ -20,6 +20,96 @@ void tst_qmimedatabase::initTestCase()
 {
 }
 
+void tst_qmimedatabase::test_mimeTypeForName()
+{
+    QMimeDatabase db;
+    QMimeType s0 = db.mimeTypeForName("application/x-zerosize");
+    QVERIFY(s0.isValid());
+    QCOMPARE(s0.name(), QString::fromLatin1("application/x-zerosize"));
+    QCOMPARE(s0.comment(), QString::fromLatin1("empty document"));
+
+    QMimeType s0Again = db.mimeTypeForName("application/x-zerosize");
+    QCOMPARE(s0Again.name(), s0.name());
+
+    QMimeType s1 = db.mimeTypeForName("text/plain");
+    QVERIFY(s1.isValid());
+    QCOMPARE(s1.name(), QString::fromLatin1("text/plain"));
+    //qDebug("Comment is %s", qPrintable(s1.comment()));
+
+    QMimeType krita = db.mimeTypeForName("application/x-krita");
+    QVERIFY(krita.isValid());
+
+    // Test <comment> parsing with application/rdf+xml which has the english comment after the other ones
+    QMimeType rdf = db.mimeTypeForName("application/rdf+xml");
+    QVERIFY(rdf.isValid());
+    QCOMPARE(rdf.comment(), QString::fromLatin1("RDF file"));
+
+    QMimeType bzip2 = db.mimeTypeForName("application/x-bzip2");
+    QVERIFY(bzip2.isValid());
+    QCOMPARE(bzip2.comment(), QString::fromLatin1("Bzip archive"));
+
+    QMimeType defaultMime = db.mimeTypeForName("application/octet-stream");
+    QVERIFY(defaultMime.isValid());
+    QVERIFY(defaultMime.isDefault());
+
+    // TODO move to test_findByFile
+#ifdef Q_OS_LINUX
+    QString exePath = QStandardPaths::findExecutable("ls");
+    if (exePath.isEmpty())
+        qWarning() << "ls not found";
+    else {
+        const QString executableType = QString::fromLatin1("application/x-executable");
+        //QTest::newRow("executable") << exePath << executableType;
+        QCOMPARE(db.findByFile(exePath).name(), executableType);
+    }
+#endif
+
+}
+
+void tst_qmimedatabase::test_findByName_data()
+{
+    QTest::addColumn<QString>("fileName");
+    QTest::addColumn<QString>("expectedMimeType");
+    // Maybe we could also add a expectedAccuracy column...
+
+    QTest::newRow("text") << "textfile.txt" << "text/plain";
+    QTest::newRow("case-insensitive search") << "textfile.TxT" << "text/plain";
+    QTest::newRow("case-insensitive match on a non-lowercase glob") << "foo.z" << "application/x-compress";
+
+    QTest::newRow("case-sensitive uppercase match") << "textfile.C" << "text/x-c++src";
+    QTest::newRow("case-sensitive lowercase match") << "textfile.c" << "text/x-csrc";
+    QTest::newRow("case-sensitive long-extension match") << "foo.PS.gz" << "application/x-gzpostscript";
+    QTest::newRow("case-sensitive-only match") << "core" << "application/x-core";
+    QTest::newRow("case-sensitive-only match") << "Core" << "application/octet-stream"; // #198477
+
+    QTest::newRow("desktop file") << "foo.desktop" << "application/x-desktop";
+    QTest::newRow("old kdelnk file is x-desktop too") << "foo.kdelnk" << "application/x-desktop";
+    QTest::newRow("double-extension file") << "foo.tar.bz2" << "application/x-bzip-compressed-tar";
+    QTest::newRow("single-extension file") << "foo.bz2" << "application/x-bzip";
+    QTest::newRow(".doc should assume msword") << "somefile.doc" << "application/msword"; // #204139
+    QTest::newRow("glob that uses [] syntax, 1") << "Makefile" << "text/x-makefile";
+    QTest::newRow("glob that uses [] syntax, 2") << "makefile" << "text/x-makefile";
+    QTest::newRow("glob that ends with *, no extension") << "README" << "text/x-readme";
+    QTest::newRow("glob that ends with *, extension") << "README.foo" << "text/x-readme";
+    QTest::newRow("glob that ends with *, also matches *.txt. Higher weight wins.") << "README.txt" << "text/plain";
+    QTest::newRow("glob that ends with *, also matches *.nfo. Higher weight wins.") << "README.nfo" << "text/x-nfo";
+    // fdo bug 15436, needs shared-mime-info >= 0.40 (and this tests the globs2-parsing code).
+    QTest::newRow("glob that ends with *, also matches *.pdf. *.pdf has higher weight") << "README.pdf" << "application/pdf";
+    QTest::newRow("directory") << "/" << "inode/directory";
+    QTest::newRow("doesn't exist, no extension") << "IDontExist" << "application/octet-stream";
+    QTest::newRow("doesn't exist but has known extension") << "IDontExist.txt" << "text/plain";
+}
+
+void tst_qmimedatabase::test_findByName()
+{
+    QFETCH(QString, fileName);
+    QFETCH(QString, expectedMimeType);
+    QMimeDatabase db;
+    QMimeType mime = db.findByName(fileName);
+    QVERIFY(mime.isValid());
+    QCOMPARE(mime.name(), expectedMimeType);
+}
+
 void tst_qmimedatabase::test_inheritance()
 {
     QMimeDatabase db;

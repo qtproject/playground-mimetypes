@@ -101,6 +101,9 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
 {
     QString foundSuffix;
 
+    if (fileName.endsWith(QLatin1Char('/')))
+        return QStringList() << QLatin1String("inode/directory");
+
     const QStringList matchingMimeTypes = provider()->findByName(QFileInfo(fileName).fileName(), &foundSuffix);
     // TODO a method that returns the found suffix
 

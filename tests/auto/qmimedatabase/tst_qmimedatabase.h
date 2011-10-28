@@ -16,6 +16,11 @@ private Q_SLOTS:
 
     void test_inheritance();
     void test_aliases();
+    void test_mimeTypeForName();
+    void test_findByName_data();
+    void test_findByName();
+
+    // shared-mime-info test suite
 
     void findByName_data();
     void findByName();

@@ -164,6 +164,7 @@ QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 
 QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *foundSuffix)
 {
+    const QString lowerFileName = fileName.toLower();
     GlobMatchResult result;
     result.m_weight = 0;
     result.m_matchingPatternLength = 0;
@@ -174,7 +175,9 @@ QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *fo
         const int reverseSuffixTreeOffset = cacheFile->getUint32(PosReverseSuffixTreeOffset);
         const int numRoots = cacheFile->getUint32(reverseSuffixTreeOffset);
         const int firstRootOffset = cacheFile->getUint32(reverseSuffixTreeOffset + 4);
-        matchSuffixTree(result, cacheFile, numRoots, firstRootOffset, fileName, fileName.length() - 1);
+        matchSuffixTree(result, cacheFile, numRoots, firstRootOffset, lowerFileName, fileName.length() - 1, false);
+        if (result.m_matchingMimeTypes.isEmpty())
+            matchSuffixTree(result, cacheFile, numRoots, firstRootOffset, fileName, fileName.length() - 1, true);
     }
     *foundSuffix = result.m_foundSuffix;
     return result.m_matchingMimeTypes;
@@ -229,7 +232,7 @@ void QMimeBinaryProvider::matchGlobList(GlobMatchResult& result, CacheFile *cach
     }
 }
 
-bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryProvider::CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName, int charPos)
+bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryProvider::CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName, int charPos, bool caseSensitiveCheck)
 {
     QChar fileChar = fileName[charPos];
     int min = 0;
@@ -248,7 +251,7 @@ bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryPr
             int childrenOffset = cacheFile->getUint32(off + 8);
             bool success = false;
             if (charPos > 0)
-                success = matchSuffixTree(result, cacheFile, numChildren, childrenOffset, fileName, charPos);
+                success = matchSuffixTree(result, cacheFile, numChildren, childrenOffset, fileName, charPos, caseSensitiveCheck);
             if (!success) {
                 for (int i = 0; i < numChildren; ++i) {
                     const int childOff = childrenOffset + 12 * i;
@@ -259,10 +262,11 @@ bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryPr
                     const char* mimeType = cacheFile->getCharStar(mimeTypeOffset);
                     const int flagsAndWeight = cacheFile->getUint32(childOff + 8);
                     const int weight = flagsAndWeight & 0xff;
-                    //const bool caseSensitive = flagsAndWeight & 0x100;
-                    // TODO handle caseSensitive
-                    result.addMatch(QLatin1String(mimeType), weight, QLatin1String("*.") + fileName.mid(charPos));
-                    success = true;
+                    const bool caseSensitive = flagsAndWeight & 0x100;
+                    if (caseSensitiveCheck || !caseSensitive) {
+                        result.addMatch(QLatin1String(mimeType), weight, QLatin1String("*.") + fileName.mid(charPos));
+                        success = true;
+                    }
                 }
             }
             return success;
