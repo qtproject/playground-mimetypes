@@ -145,7 +145,7 @@ bool QMimeBinaryProvider::isValid()
 
     // We found exactly one file; is it the user-modified mimes, or a system file?
     const QString foundFile = m_cacheFiles.first()->file->fileName();
-    const QString localCacheFile = QStandardPaths::storageLocation(QStandardPaths::GenericDataLocation) + QLatin1String("/mime/mime.cache");
+    const QString localCacheFile = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QLatin1String("/mime/mime.cache");
 
     return foundFile != localCacheFile;
 #else
