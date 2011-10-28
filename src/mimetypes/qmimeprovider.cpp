@@ -385,11 +385,11 @@ QStringList QMimeBinaryProvider::parents(const QString &mime)
 
         int begin = 0;
         int end = numEntries - 1;
-        while (end >= begin) {
-            const int medium = (begin + end)/2;
+        while (begin <= end) {
+            const int medium = (begin + end) / 2;
             const int off = parentListOffset + 4 + 8 * medium;
             const int mimeOffset = cacheFile->getUint32(off);
-            const char* aMime = cacheFile->getCharStar(mimeOffset);
+            const char *aMime = cacheFile->getCharStar(mimeOffset);
             const int cmp = strcmp(aMime, mimeStr.constData());
             if (cmp < 0)
                 begin = medium + 1;
@@ -399,7 +399,8 @@ QStringList QMimeBinaryProvider::parents(const QString &mime)
                 const int parentsOffset = cacheFile->getUint32(off + 4);
                 const int numParents = cacheFile->getUint32(parentsOffset);
                 for (int i = 0; i < numParents; ++i) {
-                    const char* aParent = cacheFile->getCharStar(parentsOffset + 4 + 4 * i);
+                    const int parentOffset = cacheFile->getUint32(parentsOffset + 4 + 4 * i);
+                    const char *aParent = cacheFile->getCharStar(parentOffset);
                     result.append(QString::fromLatin1(aParent));
                 }
                 break;
@@ -416,7 +417,30 @@ QStringList QMimeBinaryProvider::parents(const QString &mime)
 
 QString QMimeBinaryProvider::resolveAlias(const QString &name)
 {
-    // TODO implement
+    const QByteArray input = name.toLatin1();
+    foreach (CacheFile *cacheFile, m_cacheFiles) {
+        const int aliasListOffset = cacheFile->getUint32(PosAliasListOffset);
+        const int numEntries = cacheFile->getUint32(aliasListOffset);
+        int begin = 0;
+        int end = numEntries - 1;
+        while (begin <= end) {
+            const int medium = (begin + end) / 2;
+            const int off = aliasListOffset + 4 + 8 * medium;
+            const int aliasOffset = cacheFile->getUint32(off);
+            const char *alias = cacheFile->getCharStar(aliasOffset);
+            const int cmp = strcmp(alias, input.constData());
+            if (cmp < 0)
+                begin = medium + 1;
+            else if (cmp > 0)
+                end = medium - 1;
+            else {
+                const int mimeOffset = cacheFile->getUint32(off + 4);
+                const char *mimeType = cacheFile->getCharStar(mimeOffset);
+                return QLatin1String(mimeType);
+            }
+        }
+    }
+
     return name;
 }
 

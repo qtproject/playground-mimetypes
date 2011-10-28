@@ -57,8 +57,6 @@ private slots:
     void test_genericIconName();
     void test_iconName();
     void test_suffixes();
-    void test_inheritance();
-    void test_aliases();
 };
 
 #endif // TST_QMIMETYPE_H_INCLUDED

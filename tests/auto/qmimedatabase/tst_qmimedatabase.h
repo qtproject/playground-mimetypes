@@ -14,6 +14,9 @@ public:
 private Q_SLOTS:
     void initTestCase();
 
+    void test_inheritance();
+    void test_aliases();
+
     void findByName_data();
     void findByName();
 
