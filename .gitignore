@@ -1,5 +1,10 @@
-qtmimetypes.pro.user
+qtmimetypes.pro.user*
 examples/mimetypeviewer/MimeTypeViewer
+examples/mimetypefinder/mimetypefinder
+tests/auto/qmimetype/tst_qmimetype
+tests/auto/qmimedatabase/qmimedatabase-cache/mime/
+tests/auto/qmimedatabase/qmimedatabase-cache/tst_qmimedatabase-cache
+tests/auto/qmimedatabase/qmimedatabase-xml/tst_qmimedatabase-xml
 *.DS_Store
 moc*
 qrc_*
