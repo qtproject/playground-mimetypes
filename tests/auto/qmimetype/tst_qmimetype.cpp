@@ -53,6 +53,7 @@
 
 void tst_qmimetype::initTestCase()
 {
+    qputenv("XDG_DATA_DIRS", "doesnotexist");
 }
 
 // ------------------------------------------------------------------------------------------------
