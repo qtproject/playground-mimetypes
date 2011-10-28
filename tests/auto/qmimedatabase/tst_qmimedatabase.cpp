@@ -29,7 +29,7 @@ void tst_qmimedatabase::findByName_data()
     QString prefix = QLatin1String(SRCDIR "testfiles/");
 
     QFile f(prefix + QLatin1String("list"));
-    QVERIFY(f.open(QIODevice::ReadOnly));
+    QVERIFY2(f.open(QIODevice::ReadOnly), qPrintable(prefix));
 
     QByteArray line(1024, Qt::Uninitialized);
 

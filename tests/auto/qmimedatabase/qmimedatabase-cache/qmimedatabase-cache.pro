@@ -15,4 +15,4 @@ INCLUDEPATH *= $$PWD/../../../../src/mimetypes/inqt5
 
 SOURCES += tst_qmimedatabase-cache.cpp
 HEADERS += ../tst_qmimedatabase.h
-DEFINES += SRCDIR='"\\"../\\""'
+DEFINES += SRCDIR='"\\"$$PWD/../\\""'

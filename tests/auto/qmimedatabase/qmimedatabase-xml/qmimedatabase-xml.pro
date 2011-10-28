@@ -14,4 +14,4 @@ INCLUDEPATH *= $$PWD/../../../../include/QtMimeTypes
 
 SOURCES += tst_qmimedatabase-xml.cpp
 HEADERS += ../tst_qmimedatabase.h
-DEFINES += SRCDIR='"\\"../\\""'
+DEFINES += SRCDIR='"\\"$$PWD/../\\""'
