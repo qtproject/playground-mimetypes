@@ -8,7 +8,7 @@
 
 tst_qmimedatabase::tst_qmimedatabase()
 {
-    qputenv("XDG_DATA_HOME", QByteArray());
+    qputenv("XDG_DATA_HOME", QByteArray("doesnotexist"));
     // Copy SRCDIR "../../../src/mimetypes/mime to a temp dir
     // then run update-mime-database
     // then set XDG_DATA_DIRS to the TEMP dir
