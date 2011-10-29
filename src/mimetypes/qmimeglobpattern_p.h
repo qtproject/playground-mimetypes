@@ -1,9 +1,18 @@
 #ifndef QMIMEGLOBPATTERN_H
 #define QMIMEGLOBPATTERN_H
 
-#include <QString>
-#include <QList>
+#include <QStringList>
 #include <QHash>
+
+struct QMimeGlobMatchResult
+{
+    void addMatch(const QString& mimeType, int weight, const QString &pattern);
+
+    QStringList m_matchingMimeTypes;
+    int m_weight;
+    int m_matchingPatternLength;
+    QString m_foundSuffix;
+};
 
 class QMimeGlobPattern
 {

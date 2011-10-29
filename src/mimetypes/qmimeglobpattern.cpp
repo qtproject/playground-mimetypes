@@ -5,11 +5,45 @@
 #include <QDebug>
 
 /*!
+    \internal
+    \class QMimeGlobMatchResult
+    \brief Accumulates results from glob matching.
+
+    Handles glob weights, and preferring longer matches over shorter matches.
+*/
+
+void QMimeGlobMatchResult::addMatch(const QString &mimeType, int weight, const QString &pattern)
+{
+    // Is this a lower-weight pattern than the last match? Skip this match then.
+    if (weight < m_weight)
+        return;
+    bool replace = weight > m_weight;
+    if (!replace) {
+        // Compare the length of the match
+        if (pattern.length() < m_matchingPatternLength)
+            return; // too short, ignore
+        else if (pattern.length() > m_matchingPatternLength) {
+            // longer: clear any previous match (like *.bz2, when pattern is *.tar.bz2)
+            replace = true;
+        }
+    }
+    if (replace) {
+        m_matchingMimeTypes.clear();
+        // remember the new "longer" length
+        m_matchingPatternLength = pattern.length();
+        m_weight = weight;
+    }
+    m_matchingMimeTypes.append(mimeType);
+    if (pattern.startsWith(QLatin1String("*.")))
+        m_foundSuffix = pattern.mid(2);
+}
+
+/*!
+    \internal
     \class QMimeGlobPattern
     \brief Glob pattern for file names for MIME type matching.
 
     \sa QMimeType, QMimeDatabase, QMimeMagicRuleMatcher, QMimeMagicRule
-    \sa BaseMimeTypeParser, MimeTypeParser
 */
 
 bool QMimeGlobPattern::matchFileName(const QString& _filename) const

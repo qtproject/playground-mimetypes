@@ -62,17 +62,8 @@ public:
 private:
     struct CacheFile;
 
-    struct GlobMatchResult
-    {
-        void addMatch(const QString& mimeType, int weight, const QString &pattern);
-        QStringList m_matchingMimeTypes;
-        int m_weight;
-        int m_matchingPatternLength;
-        QString m_foundSuffix;
-    };
-
-    void matchGlobList(GlobMatchResult &result, CacheFile *cacheFile, int offset, const QString &fileName);
-    bool matchSuffixTree(GlobMatchResult &result, CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName, int charPos, bool caseSensitiveCheck);
+    void matchGlobList(QMimeGlobMatchResult &result, CacheFile *cacheFile, int offset, const QString &fileName);
+    bool matchSuffixTree(QMimeGlobMatchResult &result, CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName, int charPos, bool caseSensitiveCheck);
     bool matchMagicRule(CacheFile *cacheFile, int numMatchlets, int firstOffset, const QByteArray &data);
 
     QList<CacheFile *> m_cacheFiles;

@@ -165,7 +165,7 @@ QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *foundSuffix)
 {
     const QString lowerFileName = fileName.toLower();
-    GlobMatchResult result;
+    QMimeGlobMatchResult result;
     result.m_weight = 0;
     result.m_matchingPatternLength = 0;
     // TODO this parses in the order (local, global). Check that it handles "NOGLOBS" correctly.
@@ -183,33 +183,7 @@ QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *fo
     return result.m_matchingMimeTypes;
 }
 
-void QMimeBinaryProvider::GlobMatchResult::addMatch(const QString &mimeType, int weight, const QString &pattern)
-{
-    // Is this a lower-weight pattern than the last match? Skip this match then.
-    if (weight < m_weight)
-        return;
-    bool replace = weight > m_weight;
-    if (!replace) {
-        // Compare the length of the match
-        if (pattern.length() < m_matchingPatternLength)
-            return; // too short, ignore
-        else if (pattern.length() > m_matchingPatternLength) {
-            // longer: clear any previous match (like *.bz2, when pattern is *.tar.bz2)
-            replace = true;
-        }
-    }
-    if (replace) {
-        m_matchingMimeTypes.clear();
-        // remember the new "longer" length
-        m_matchingPatternLength = pattern.length();
-        m_weight = weight;
-    }
-    m_matchingMimeTypes.append(mimeType);
-    if (pattern.startsWith(QLatin1String("*.")))
-        m_foundSuffix = pattern.mid(2);
-}
-
-void QMimeBinaryProvider::matchGlobList(GlobMatchResult& result, CacheFile *cacheFile, int off, const QString &fileName)
+void QMimeBinaryProvider::matchGlobList(QMimeGlobMatchResult& result, CacheFile *cacheFile, int off, const QString &fileName)
 {
     const int numGlobs = cacheFile->getUint32(off);
     //qDebug() << "Loading" << numGlobs << "globs from" << cacheFile->file->fileName() << "at offset" << cacheFile->globListOffset;
@@ -232,7 +206,7 @@ void QMimeBinaryProvider::matchGlobList(GlobMatchResult& result, CacheFile *cach
     }
 }
 
-bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryProvider::CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName, int charPos, bool caseSensitiveCheck)
+bool QMimeBinaryProvider::matchSuffixTree(QMimeGlobMatchResult& result, QMimeBinaryProvider::CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName, int charPos, bool caseSensitiveCheck)
 {
     QChar fileChar = fileName[charPos];
     int min = 0;
@@ -278,6 +252,7 @@ bool QMimeBinaryProvider::matchSuffixTree(GlobMatchResult& result, QMimeBinaryPr
 bool QMimeBinaryProvider::matchMagicRule(QMimeBinaryProvider::CacheFile *cacheFile, int numMatchlets, int firstOffset, const QByteArray &data)
 {
     const char* dataPtr = data.constData();
+    const int dataSize = data.size();
     for (int matchlet = 0; matchlet < numMatchlets; ++matchlet) {
         const int off = firstOffset + matchlet * 32;
         const int rangeStart = cacheFile->getUint32(off);
@@ -287,7 +262,7 @@ bool QMimeBinaryProvider::matchMagicRule(QMimeBinaryProvider::CacheFile *cacheFi
         const int valueOffset = cacheFile->getUint32(off + 16);
         const int maskOffset = cacheFile->getUint32(off + 20);
 
-        const int dataNeeded = qMin(rangeLength + valueLength - 1, data.size() - rangeStart);
+        const int dataNeeded = qMin(rangeLength + valueLength - 1, dataSize - rangeStart);
 
 // callgrind says QByteArray::indexOf is much slower
 // #define WITH_BYTEARRAY
@@ -305,7 +280,7 @@ bool QMimeBinaryProvider::matchMagicRule(QMimeBinaryProvider::CacheFile *cacheFi
 #else
             bool found = false;
             for (int i = rangeStart; i < rangeStart + rangeLength; ++i) {
-                if (i + valueLength > data.length())
+                if (i + valueLength > dataSize)
                     break;
 
                 if (memcmp(cacheFile->data + valueOffset, dataPtr + i, valueLength) == 0) {
