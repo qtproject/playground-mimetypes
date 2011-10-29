@@ -56,6 +56,8 @@ public:
     static Type type(const QByteArray &type);
     static QByteArray typeName(Type type);
 
+    static bool matchSubstring(const char* dataPtr, int dataSize, int rangeStart, int rangeLength, int valueLength, const char* valueData, const char* mask);
+
 private:
     const QScopedPointer<QMimeMagicRulePrivate> d;
 };

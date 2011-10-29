@@ -320,6 +320,7 @@ text.wwf application/x-wwf oxo
 README.pdf application/pdf
 # From https://bugs.freedesktop.org/show_bug.cgi?id=29083#c2
 testcase.is-really-a-pdf application/pdf xo
+pdf-not-matlab application/pdf x
 test.pdf.xz application/x-xzpdf ox
 Makefile text/x-makefile ox
 Makefile.gnu text/x-makefile ox
@@ -351,3 +352,5 @@ test.h5 application/x-hdf
 # From http://wiki.wireshark.org/SampleCaptures (ancp.pcap.gz, dns.cap)
 ancp.pcap application/vnd.tcpdump.pcap
 dns.cap application/vnd.tcpdump.pcap
+# Case-insensitive glob -- needs uptodate shared-mime-info
+#testcompress.z application/x-compress

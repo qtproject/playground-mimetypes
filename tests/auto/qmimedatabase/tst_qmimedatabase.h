@@ -20,6 +20,7 @@ private Q_SLOTS:
     void test_inheritance();
     void test_aliases();
     void test_icons();
+    void test_findByFileWithContent();
 
     // shared-mime-info test suite
 

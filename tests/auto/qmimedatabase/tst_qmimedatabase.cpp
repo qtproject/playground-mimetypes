@@ -209,6 +209,55 @@ void tst_qmimedatabase::test_icons()
     QCOMPARE(pub.genericIconName(), QString("x-office-document"));
 }
 
+// In here we do the tests that need some content in a temporary file.
+// This could also be added to shared-mime-info's testsuite...
+void tst_qmimedatabase::test_findByFileWithContent()
+{
+    QMimeDatabase db;
+    QMimeType mime;
+
+    // Test a real PDF file.
+    // If we find x-matlab because it starts with '%' then we are not ordering by priority.
+    QTemporaryFile tempFile;
+    QVERIFY(tempFile.open());
+    QString tempFileName = tempFile.fileName();
+    tempFile.write("%PDF-");
+    tempFile.close();
+    mime = db.findByFile(tempFileName);
+    QCOMPARE(mime.name(), QString::fromLatin1("application/pdf"));
+    // by name only, we cannot find the mimetype
+    mime = db.findByName(tempFileName);
+    QVERIFY(mime.isValid());
+    QVERIFY(mime.isDefault());
+
+    // Test the case where the extension doesn't match the contents: extension wins
+    {
+        QTemporaryFile txtTempFile(QDir::tempPath() + QLatin1String("/kmimetypetest_XXXXXX.txt"));
+        QVERIFY(txtTempFile.open());
+        txtTempFile.write("%PDF-");
+        QString txtTempFileName = txtTempFile.fileName();
+        txtTempFile.close();
+        mime = db.findByFile(txtTempFileName);
+        QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
+        // fast mode finds the same
+        mime = db.findByName(txtTempFileName);
+        QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
+    }
+
+    // Now the case where extension differs from contents, but contents has >80 magic rule
+    // XDG spec says: contents wins. But we can't sniff all files...
+    {
+        QTemporaryFile txtTempFile(QDir::tempPath() + QLatin1String("/kmimetypetest_XXXXXX.txt"));
+        QVERIFY(txtTempFile.open());
+        txtTempFile.write("<smil");
+        QString txtTempFileName = txtTempFile.fileName();
+        txtTempFile.close();
+        mime = db.findByFile(txtTempFileName);
+        QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
+    }
+
+}
+
 void tst_qmimedatabase::findByName_data()
 {
     QTest::addColumn<QString>("filePath");

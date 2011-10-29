@@ -88,19 +88,69 @@ bool QMimeMagicRulePrivate::operator==(const QMimeMagicRulePrivate &other) const
            matchFunction == other.matchFunction;
 }
 
+// Used by both providers
+bool QMimeMagicRule::matchSubstring(const char* dataPtr, int dataSize, int rangeStart, int rangeLength, int valueLength, const char* valueData, const char* mask)
+{
+    const int dataNeeded = qMin(rangeLength + valueLength - 1, dataSize - rangeStart);
+
+// callgrind says QByteArray::indexOf is much slower
+// #define WITH_BYTEARRAY
+#ifdef WITH_BYTEARRAY
+    // Size of searched data.
+    // Example: value="ABC", rangeLength=3 -> we need 3+3-1=5 bytes (ABCxx,xABCx,xxABC would match)
+    const QByteArray searchedData = QByteArray::fromRawData(dataPtr + rangeStart, dataNeeded);
+#endif
+
+    if (!mask) {
+#ifdef WITH_BYTEARRAY
+        const QByteArray value = QByteArray::fromRawData(valueData, valueLength);
+        if (searchedData.indexOf(value) == -1)
+            return false;
+#else
+        bool found = false;
+        for (int i = rangeStart; i < rangeStart + rangeLength; ++i) {
+            if (i + valueLength > dataSize)
+                break;
+
+            if (memcmp(valueData, dataPtr + i, valueLength) == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return false;
+#endif
+    } else {
+        bool found = false;
+        const char* readDataBase = dataPtr + rangeStart;
+        // Example (continued from above):
+        // deviceSize is 4, so dataNeeded was max'ed to 4.
+        // maxStartPos = 4 - 3 + 1 = 2, and indeed
+        // we need to check for a match a positions 0 and 1 (ABCx and xABC).
+        const int maxStartPos = dataNeeded - valueLength + 1;
+        for (int i = 0; i < maxStartPos; ++i) {
+            const char* d = readDataBase + i;
+            bool valid = true;
+            for (int idx = 0; idx < valueLength; ++idx) {
+                if (((*d++) & mask[idx]) != (valueData[idx] & mask[idx])) {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid)
+                found = true;
+        }
+        if (!found)
+            return false;
+    }
+    //qDebug() << "Found" << value << "in" << searchedData;
+    return true;
+}
+
 static bool matchString(QMimeMagicRulePrivate *d, const QByteArray &data)
 {
-    const char *p = data.constData() + d->startPos;
-    const char *e = data.constData() + qMin(data.size() - d->pattern.size(), d->endPos + 1);
-    for ( ; p < e; ++p) {
-        int i = 0;
-        while (i < d->pattern.size() && (p[i] & d->mask.at(i)) == d->pattern.at(i))
-            ++i;
-        if (i == d->pattern.size())
-            return true;
-    }
-
-    return false;
+    const int rangeLength = d->endPos - d->startPos + 1;
+    return QMimeMagicRule::matchSubstring(data.constData(), data.size(), d->startPos, rangeLength, d->pattern.size(), d->pattern.constData(), d->mask.constData());
 }
 
 template <typename T>
