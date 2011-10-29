@@ -204,13 +204,13 @@ QStringList QMimeType::aliases() const
 
 QString QMimeType::genericIconName() const
 {
-    // TODO QMimeDatabasePrivate::instance()->provider()->loadIcons(*d);
+    QMimeDatabasePrivate::instance()->provider()->loadGenericIcon(*d);
     return d->genericIconName;
 }
 
 QString QMimeType::iconName() const
 {
-    // TODO QMimeDatabasePrivate::instance()->provider()->loadIcons(*d);
+    QMimeDatabasePrivate::instance()->provider()->loadIcon(*d);
     if (d->iconName.isEmpty()) {
         // Make default icon name from the mimetype name
         d->iconName = name();

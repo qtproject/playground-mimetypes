@@ -14,11 +14,12 @@ public:
 private Q_SLOTS:
     void initTestCase();
 
-    void test_inheritance();
-    void test_aliases();
     void test_mimeTypeForName();
     void test_findByName_data();
     void test_findByName();
+    void test_inheritance();
+    void test_aliases();
+    void test_icons();
 
     // shared-mime-info test suite
 

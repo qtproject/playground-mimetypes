@@ -194,6 +194,19 @@ void tst_qmimedatabase::test_aliases()
     QVERIFY(!mustWriteMimeType);
 }
 
+void tst_qmimedatabase::test_icons()
+{
+    QMimeDatabase db;
+    QMimeType directory = db.findByName("/");
+    QCOMPARE(directory.name(), QString("inode/directory"));
+    QCOMPARE(directory.iconName(), QString("inode-directory"));
+
+    QMimeType pub = db.findByName("foo.epub");
+    QCOMPARE(pub.name(), QString("application/epub+zip"));
+    QCOMPARE(pub.iconName(), QString("application-epub+zip"));
+    QCOMPARE(pub.genericIconName(), QString("x-office-document"));
+}
+
 void tst_qmimedatabase::findByName_data()
 {
     QTest::addColumn<QString>("filePath");

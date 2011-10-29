@@ -38,6 +38,8 @@ public:
     virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr) = 0;
     virtual QList<QMimeType> allMimeTypes() = 0;
     virtual void loadMimeTypeData(QMimeTypeData &) {}
+    virtual void loadIcon(QMimeTypeData &) {}
+    virtual void loadGenericIcon(QMimeTypeData &) {}
 
     QMimeDatabasePrivate* m_db;
 };
@@ -59,6 +61,8 @@ public:
     virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr);
     virtual QList<QMimeType> allMimeTypes();
     virtual void loadMimeTypeData(QMimeTypeData &);
+    virtual void loadIcon(QMimeTypeData &);
+    virtual void loadGenericIcon(QMimeTypeData &);
 
 private:
     struct CacheFile;
@@ -66,6 +70,7 @@ private:
     void matchGlobList(QMimeGlobMatchResult &result, CacheFile *cacheFile, int offset, const QString &fileName);
     bool matchSuffixTree(QMimeGlobMatchResult &result, CacheFile *cacheFile, int numEntries, int firstOffset, const QString &fileName, int charPos, bool caseSensitiveCheck);
     bool matchMagicRule(CacheFile *cacheFile, int numMatchlets, int firstOffset, const QByteArray &data);
+    QString iconForMime(CacheFile *cacheFile, int posListOffset, const QByteArray& inputMime);
 
     QList<CacheFile *> m_cacheFiles;
 };
