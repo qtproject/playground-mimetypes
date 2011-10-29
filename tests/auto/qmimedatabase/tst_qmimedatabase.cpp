@@ -257,19 +257,22 @@ void tst_qmimedatabase::findByName()
     const QString resultMimeTypeName = resultMimeType.name();
     //qDebug() << Q_FUNC_INFO << "findByName() returned" << resultMimeTypeName;
 
-    // Results are ambiguous when multiple MIME types have the same glob
-    // -> accept the current result if the found MIME type actually
-    // matches the file's extension.
-    const QMimeType foundMimeType = database.mimeTypeForName(resultMimeTypeName);
-    QVERIFY2(resultMimeType == foundMimeType, qPrintable(resultMimeType.name() + " vs. " + foundMimeType.name()));
-    if (foundMimeType.isValid()) {
-        const QString extension = QFileInfo(filePath).suffix();
-        //qDebug() << Q_FUNC_INFO << "globPatterns:" << foundMimeType.globPatterns() << "- extension:" << QString() + "*." + extension;
-        if (foundMimeType.globPatterns().contains("*." + extension))
-            return;
-    }
-
+    const bool failed = resultMimeTypeName != mimeTypeName;
     const bool shouldFail = (xFail.length() >= 1 && xFail.at(0) == QLatin1Char('x'));
+    if (shouldFail != failed) {
+        // Results are ambiguous when multiple MIME types have the same glob
+        // -> accept the current result if the found MIME type actually
+        // matches the file's extension.
+        // TODO: a better file format in testfiles/list!
+        const QMimeType foundMimeType = database.mimeTypeForName(resultMimeTypeName);
+        QVERIFY2(resultMimeType == foundMimeType, qPrintable(resultMimeType.name() + " vs. " + foundMimeType.name()));
+        if (foundMimeType.isValid()) {
+            const QString extension = QFileInfo(filePath).suffix();
+            //qDebug() << Q_FUNC_INFO << "globPatterns:" << foundMimeType.globPatterns() << "- extension:" << QString() + "*." + extension;
+            if (foundMimeType.globPatterns().contains("*." + extension))
+                return;
+        }
+    }
     if (shouldFail) {
         // Expected to fail
         QVERIFY2(resultMimeTypeName != mimeTypeName, qPrintable(resultMimeTypeName));
