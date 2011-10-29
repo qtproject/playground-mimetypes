@@ -27,8 +27,6 @@
 
 QT_BEGIN_NAMESPACE
 
-class QMimeMagicRuleMatcher;
-
 struct QMIME_EXPORT QMimeTypeData : public QSharedData
 {
     typedef QHash<QString, QString> LocaleHash;
@@ -44,8 +42,6 @@ struct QMIME_EXPORT QMimeTypeData : public QSharedData
 
     //unsigned matchesFileBySuffix(const QString &fileName) const;
     //unsigned matchesData(const QByteArray &data) const;
-
-    const QRegExp suffixPattern;
 
     QString name;
     QString comment;

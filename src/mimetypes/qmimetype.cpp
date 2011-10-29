@@ -30,21 +30,12 @@
 
 QT_BEGIN_NAMESPACE
 
-/*!
-    \var QMimeTypeData::suffixPattern
-    \brief Regular expression to match a suffix glob pattern: "*.ext" or "*.ext1.ext2" (and not sth like "Makefile" or "*.log[1-9]"
-*/
-
 QMimeTypeData::QMimeTypeData()
-    : suffixPattern(QLatin1String("^\\*[\\.\\w+]+$")) // TODO don't use a regexp for this
 {
-    if (!suffixPattern.isValid())
-        qWarning("MimeTypeData(): invalid suffixPattern");
 }
 
 QMimeTypeData::QMimeTypeData(const QMimeType &other)
-    : suffixPattern(other.d->suffixPattern)
-    , name(other.d->name)
+    : name(other.d->name)
     , comment(other.d->comment)
     , localeComments(other.d->localeComments)
     , aliases(other.d->aliases)
@@ -54,8 +45,6 @@ QMimeTypeData::QMimeTypeData(const QMimeType &other)
     , preferredSuffix(other.d->preferredSuffix)
     , suffixes(other.d->suffixes)
 {
-    if (!suffixPattern.isValid())
-        qWarning("MimeTypeData(): invalid suffixPattern");
 }
 
 void QMimeTypeData::clear()
@@ -87,14 +76,15 @@ bool QMimeTypeData::operator==(const QMimeTypeData &other) const
 void QMimeTypeData::addGlobPattern(const QString &pattern)
 {
     globPatterns.append(pattern);
-    if (suffixPattern.exactMatch(pattern)) {
-        const QString suffix = pattern.right(pattern.size() - 2);
+
+    // Not a simple suffix if if looks like: README or *. or *.* or *.JP*G or *.JP?
+    if (pattern.startsWith(QLatin1String("*.")) &&
+        pattern.length() > 2 &&
+        pattern.indexOf(QLatin1Char('*'), 2) < 0 && pattern.indexOf(QLatin1Char('?'), 2) < 0) {
+        const QString suffix = pattern.mid(2);
         suffixes.append(suffix);
         if (preferredSuffix.isEmpty())
             preferredSuffix = suffix;
-    }
-    else {
-        //qDebug() << Q_FUNC_INFO << "Skipping suffix" << pattern;
     }
 }
 
@@ -260,7 +250,7 @@ static void collectParentMimeTypes(const QString& mime, QStringList& allParents)
 QStringList QMimeType::allParentMimeTypes() const
 {
     QStringList allParents;
-    const QString canonical = d->name; // TODO QMimeDatabasePrivate::instance()->resolveAlias(d->name);
+    const QString canonical = d->name;
     if (!canonical.isEmpty())
         allParents.append(canonical);
     collectParentMimeTypes(d->name, allParents);
@@ -270,8 +260,6 @@ QStringList QMimeType::allParentMimeTypes() const
 
 /*!
     Returns the known suffixes for the MIME type.
-
-    Extension over standard MIME data
 */
 QStringList QMimeType::suffixes() const
 {
@@ -281,8 +269,6 @@ QStringList QMimeType::suffixes() const
 
 /*!
     Returns the preferred suffix for the MIME type.
-
-    Extension over standard MIME data
 */
 QString QMimeType::preferredSuffix() const
 {
