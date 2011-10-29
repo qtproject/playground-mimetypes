@@ -23,7 +23,10 @@ tst_qmimedatabase::tst_qmimedatabase()
     if (umd.isEmpty())
         QSKIP("shared-mime-info not found, skipping mime.cache test", SkipAll);
 
-    QProcess::execute(umd, QStringList() << tempMime);
+    QProcess proc;
+    proc.setProcessChannelMode(QProcess::MergedChannels); // silence output
+    proc.start(umd, QStringList() << tempMime);
+    proc.waitForFinished();
 
     QVERIFY(QFile::exists(tempMime + "/mime.cache"));
     qputenv("XDG_DATA_DIRS", QFile::encodeName(here.absolutePath()));
