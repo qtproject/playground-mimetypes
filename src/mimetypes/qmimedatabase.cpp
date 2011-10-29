@@ -34,7 +34,6 @@
 #include <functional>
 
 #include "qmimeprovider_p.h"
-#include "qmimefilematchcontext_p.h"
 #include "qmimetype_p.h"
 
 QT_BEGIN_NAMESPACE
@@ -158,11 +157,9 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
     // a glob pattern weight) is selected. Matching starts from max level (most
     // specific) in both cases, even when there is already a suffix matching candidate.
     *accuracyPtr = 0;
-    FileMatchContext context(device, fileName);
 
     // Pass 1) Try to match on the file name
     QStringList candidatesByName = findByName(fileName);
-
     if (candidatesByName.count() == 1) {
         *accuracyPtr = 100;
         const QMimeType mime = mimeTypeForName(candidatesByName.at(0));
@@ -173,10 +170,14 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
 
     // Extension is unknown, or matches multiple mimetypes.
     // Pass 2) Match on content, if we can read the data
-    if (context.isReadable()) {
+    if (device->isOpen() || device->open(QIODevice::ReadOnly)) {
+
+        // Read 16K in one go (QIODEVICE_BUFFERSIZE in qiodevice_p.h).
+        // This is much faster than seeking back and forth into QIODevice.
+        const QByteArray data = device->read(16384);
 
         int magicAccuracy = 0;
-        QMimeType candidateByData(findByData(context.data(), &magicAccuracy));
+        QMimeType candidateByData(findByData(data, &magicAccuracy));
 
         // Disambiguate conflicting extensions (if magic found something and the magicrule was < 80)
         if (candidateByData.isValid() && magicAccuracy > 0) {

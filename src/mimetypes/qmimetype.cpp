@@ -28,8 +28,6 @@
 //#include <QtCore/QDebug>
 #include <QtCore/QLocale>
 
-#include "qmimefilematchcontext_p.h"
-
 QT_BEGIN_NAMESPACE
 
 /*!

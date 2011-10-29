@@ -27,15 +27,13 @@ SOURCES += qmimedatabase.cpp \
     mimetypeparser.cpp \
     qmimemagicrule.cpp \
     qmimeglobpattern.cpp \
-    qmimeprovider.cpp \
-    qmimefilematchcontext.cpp
+    qmimeprovider.cpp
 
 HEADERS += qmime_global.h \
     qmimedatabase.h \
     qmimetype.h \
     qmimemagicrulematcher_p.h \
     qmimetype_p.h \
-    qmimefilematchcontext_p.h \
     mimetypeparser_p.h \
     qmimedatabase_p.h \
     qmimemagicrule_p.h \
@@ -73,4 +71,3 @@ unix:!symbian {
     }
     INSTALLS += target
 }
-
