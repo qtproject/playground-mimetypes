@@ -63,7 +63,7 @@ bool QMimeGlobPattern::matchFileName(const QString& _filename) const
     // Patterns like "*~", "*.extension"
     if (m_pattern[0] == QLatin1Char('*') && m_pattern.indexOf(QLatin1Char('[')) == -1 && starCount == 1)
     {
-        if ( len + 1 < pattern_len ) return false;
+        if (len + 1 < pattern_len) return false;
 
         const QChar *c1 = m_pattern.unicode() + pattern_len - 1;
         const QChar *c2 = filename.unicode() + len - 1;
@@ -75,7 +75,7 @@ bool QMimeGlobPattern::matchFileName(const QString& _filename) const
 
     // Patterns like "README*" (well this is currently the only one like that...)
     if (starCount == 1 && m_pattern.at(pattern_len - 1) == QLatin1Char('*')) {
-        if ( len + 1 < pattern_len ) return false;
+        if (len + 1 < pattern_len) return false;
         if (m_pattern.at(0) == QLatin1Char('*'))
             return filename.indexOf(m_pattern.mid(1, pattern_len - 2)) != -1;
 
@@ -145,74 +145,45 @@ void QMimeAllGlobPatterns::removeMimeType(const QString& mimeType)
     m_lowWeightGlobs.removeMimeType(mimeType);
 }
 
-void QMimeGlobPatternList::match(QStringList &matchingMimeTypes,
-                                 const QString &fileName,
-                                 QString *foundSuffix) const
+void QMimeGlobPatternList::match(QMimeGlobMatchResult &result,
+                                 const QString &fileName) const
 {
-    int matchingPatternLength = 0;
-    qint32 lastMatchedWeight = 0;
-    if (!matchingMimeTypes.isEmpty()) {
-        // We found matches in the fast pattern dict already:
-        matchingPatternLength = foundSuffix->length() + 2; // *.foo -> length=5
-        lastMatchedWeight = 50;
-    }
 
     QMimeGlobPatternList::const_iterator it = this->constBegin();
     const QMimeGlobPatternList::const_iterator endIt = this->constEnd();
-    for ( ; it != endIt; ++it ) {
+    for (; it != endIt; ++it) {
         const QMimeGlobPattern &glob = *it;
-        if (glob.matchFileName(fileName)) {
-            // TODO factorize with algorithm used by QMimeBinaryProvider?
-            const int weight = glob.weight();
-            const QString pattern = glob.pattern();
-            // Is this a lower-weight pattern than the last match? Stop here then.
-            if (weight < lastMatchedWeight)
-                break;
-            if (lastMatchedWeight > 0 && weight > lastMatchedWeight) // can't happen
-                // TODO FIX, we are not parsing globs2 here.
-                qWarning() << "Assumption failed; globs2 weights not sorted correctly"
-                           << weight << ">" << lastMatchedWeight;
-            // Is this a shorter or a longer match than an existing one, or same length?
-            if (pattern.length() < matchingPatternLength) {
-                continue; // too short, ignore
-            } else if (pattern.length() > matchingPatternLength) {
-                // longer: clear any previous match (like *.bz2, when pattern is *.tar.bz2)
-                matchingMimeTypes.clear();
-                // remember the new "longer" length
-                matchingPatternLength = pattern.length();
-            }
-            matchingMimeTypes.push_back(glob.mimeType());
-            if (pattern.startsWith(QLatin1String("*.")))
-                *foundSuffix = pattern.mid(2);
-        }
+        if (glob.matchFileName(fileName))
+            result.addMatch(glob.mimeType(), glob.weight(), glob.pattern());
     }
 }
 
 QStringList QMimeAllGlobPatterns::matchingGlobs(const QString &fileName, QString *foundSuffix) const
 {
     // First try the high weight matches (>50), if any.
-    QStringList matchingMimeTypes;
-    m_highWeightGlobs.match(matchingMimeTypes, fileName, foundSuffix);
-    if (matchingMimeTypes.isEmpty()) {
+    QMimeGlobMatchResult result;
+    m_highWeightGlobs.match(result, fileName);
+    if (result.m_matchingMimeTypes.isEmpty()) {
 
         // Now use the "fast patterns" dict, for simple *.foo patterns with weight 50
         // (which is most of them, so this optimization is definitely worth it)
         const int lastDot = fileName.lastIndexOf(QLatin1Char('.'));
         if (lastDot != -1) { // if no '.', skip the extension lookup
             const int ext_len = fileName.length() - lastDot - 1;
-            const QString simpleExtension = fileName.right( ext_len ).toLower();
+            const QString simpleExtension = fileName.right(ext_len).toLower();
             // (toLower because fast patterns are always case-insensitive and saved as lowercase)
 
-            matchingMimeTypes = m_fastPatterns.value(simpleExtension);
-            if (!matchingMimeTypes.isEmpty()) {
-                *foundSuffix = simpleExtension;
-                // Can't return yet; *.tar.bz2 has to win over *.bz2, so we need the low-weight mimetypes anyway,
-                // at least those with weight 50.
+            const QStringList matchingMimeTypes = m_fastPatterns.value(simpleExtension);
+            foreach (const QString &mime, matchingMimeTypes) {
+                result.addMatch(mime, 50, simpleExtension);
             }
+            // Can't return yet; *.tar.bz2 has to win over *.bz2, so we need the low-weight mimetypes anyway,
+            // at least those with weight 50.
         }
 
         // Finally, try the low weight matches (<=50)
-        m_lowWeightGlobs.match(matchingMimeTypes, fileName, foundSuffix);
+        m_lowWeightGlobs.match(result, fileName);
     }
-    return matchingMimeTypes;
+    *foundSuffix = result.m_foundSuffix;
+    return result.m_matchingMimeTypes;
 }

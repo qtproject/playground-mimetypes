@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 */
 
 QMimeTypeData::QMimeTypeData()
-    : suffixPattern(QLatin1String("^\\*[\\.\\w+]+$"))
+    : suffixPattern(QLatin1String("^\\*[\\.\\w+]+$")) // TODO don't use a regexp for this
 {
     if (!suffixPattern.isValid())
         qWarning("MimeTypeData(): invalid suffixPattern");

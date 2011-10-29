@@ -6,6 +6,10 @@
 
 struct QMimeGlobMatchResult
 {
+    QMimeGlobMatchResult()
+    : m_weight(0), m_matchingPatternLength(0)
+    {}
+
     void addMatch(const QString& mimeType, int weight, const QString &pattern);
 
     QStringList m_matchingMimeTypes;
@@ -73,9 +77,7 @@ public:
         }
     }
 
-    void match(QStringList &matchingMimeTypes,
-               const QString &fileName,
-               QString *foundSuffix) const;
+    void match(QMimeGlobMatchResult &result, const QString &fileName) const;
 };
 
 /*!

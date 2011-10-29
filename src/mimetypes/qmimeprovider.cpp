@@ -166,8 +166,6 @@ QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *fo
 {
     const QString lowerFileName = fileName.toLower();
     QMimeGlobMatchResult result;
-    result.m_weight = 0;
-    result.m_matchingPatternLength = 0;
     // TODO this parses in the order (local, global). Check that it handles "NOGLOBS" correctly.
     foreach (CacheFile *cacheFile, m_cacheFiles) {
         matchGlobList(result, cacheFile, cacheFile->getUint32(PosLiteralListOffset), fileName);
