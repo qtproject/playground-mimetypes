@@ -43,37 +43,19 @@ import Qt 4.7
 import QtTest 1.0
 import QtMimeTypes 1.0
 
+import "tst_qdeclarativemimetypedata.js" as Data
+
 TestCase {
-    name: "tst_QDeclarativeMimetype"
-
-    function pngMimeTypeName() {
-        return "image/png"
-    }
-
-    function pngMimeTypeComment() {
-        return "PNG File";
-    }
-
-    function pngMimeTypeGenericIconName() {
-        return "/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png"
-    }
-
-    function pngMimeTypeIconName() {
-        return "/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png"
-    }
-
-    function firstPngMimeTypeSuffixes() {
-        return ".png"
-    }
+    name: "tst_QDeclarativeMimeType"
 
     MimeType {
         id: instantiatedPngMimeType
-        name: pngMimeTypeName()
-        comment: pngMimeTypeComment()
-        genericIconName: pngMimeTypeGenericIconName()
-        iconName: pngMimeTypeIconName()
-        globPatterns: [ "*.png" ]
-        suffixes: [ firstPngMimeTypeSuffixes() ]
+        name: Data.mimeTypeName()
+        comment: Data.mimeTypeComment()
+        genericIconName: Data.mimeTypeGenericIconName()
+        iconName: Data.mimeTypeIconName()
+        globPatterns: Data.mimeTypeGlobPatterns()
+        suffixes: Data.mimeTypeSuffixes()
     }
 
     MimeType {
@@ -96,6 +78,20 @@ TestCase {
         compare(defaultMimeType.isValid, false)
     }
 
+    function test_Elements() {
+        otherPngMimeType.assign(instantiatedPngMimeType)
+        compare(otherPngMimeType.equals(instantiatedPngMimeType), true)
+        compare(otherPngMimeType.equals(defaultMimeType), false)
+        compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
+        compare(defaultMimeType.equals(otherPngMimeType), false)
+
+        otherPngMimeType.assign(defaultMimeType)
+        compare(otherPngMimeType.equals(instantiatedPngMimeType), false)
+        compare(otherPngMimeType.equals(defaultMimeType), true)
+        compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
+        compare(defaultMimeType.equals(otherPngMimeType), true)
+    }
+
     function test_JavaScriptObjects() {
         otherPngMimeType.assign(instantiatedPngMimeType)   // to uncover problems in assignProperties()
         var javaScriptObject = new Object
@@ -104,12 +100,12 @@ TestCase {
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
 
-        javaScriptObject.name = pngMimeTypeName()
-        javaScriptObject.comment = pngMimeTypeComment()
-        javaScriptObject.genericIconName = pngMimeTypeGenericIconName()
-        javaScriptObject.iconName = pngMimeTypeIconName()
-        javaScriptObject.globPatterns = [ "*.png" ]
-        javaScriptObject.suffixes = [ firstPngMimeTypeSuffixes() ]
+        javaScriptObject.name = Data.mimeTypeName()
+        javaScriptObject.comment = Data.mimeTypeComment()
+        javaScriptObject.genericIconName = Data.mimeTypeGenericIconName()
+        javaScriptObject.iconName = Data.mimeTypeIconName()
+        javaScriptObject.globPatterns = Data.mimeTypeGlobPatterns()
+        javaScriptObject.suffixes = Data.mimeTypeSuffixes()
         compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), true)
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
@@ -117,7 +113,7 @@ TestCase {
 
     function test_name() {
         // Verify that the Name is part of the equality test:
-        compare(instantiatedPngMimeType.name, pngMimeTypeName())
+        compare(instantiatedPngMimeType.name, Data.mimeTypeName())
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
@@ -141,7 +137,7 @@ TestCase {
 
     function test_comment() {
         // Verify that the Comment is part of the equality test:
-        compare(instantiatedPngMimeType.comment, pngMimeTypeComment())
+        compare(instantiatedPngMimeType.comment, Data.mimeTypeComment())
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
@@ -165,7 +161,7 @@ TestCase {
 
     function test_genericIconName() {
         // Verify that the GenericIconName is part of the equality test:
-        compare(instantiatedPngMimeType.genericIconName, pngMimeTypeGenericIconName())
+        compare(instantiatedPngMimeType.genericIconName, Data.mimeTypeGenericIconName())
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
@@ -189,7 +185,7 @@ TestCase {
 
     function test_iconName() {
         // Verify that the IconName is part of the equality test:
-        compare(instantiatedPngMimeType.iconName, pngMimeTypeIconName())
+        compare(instantiatedPngMimeType.iconName, Data.mimeTypeIconName())
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
@@ -212,7 +208,7 @@ TestCase {
     }
 
     function test_globPatterns() {
-        // Verify that the Suffixes is part of the equality test:
+        // Verify that the GlobPatterns is part of the equality test:
         compare(instantiatedPngMimeType.globPatterns.length, 1)
         compare(instantiatedPngMimeType.globPatterns[0], "*.png")
 
