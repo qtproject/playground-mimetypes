@@ -113,18 +113,19 @@ TestCase {
 
     function test_name() {
         // Verify that the Name is part of the equality test:
-        compare(instantiatedPngMimeType.name, Data.mimeTypeName())
+        //compare(instantiatedPngMimeType.name, Data.mimeTypeName())
+        compare(Data.equalMimeTypeName(instantiatedPngMimeType.name, Data.mimeTypeName()), true)
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
-        otherPngMimeType.name = ""   // simulate an error
+        otherPngMimeType.name = defaultMimeType.name   // simulate an error
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
         otherPngMimeType.name = instantiatedPngMimeType.name
         compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
 
         var javaScriptObject = instantiatedPngMimeType.properties()
 
-        javaScriptObject.name = ""   // simulate an error
+        javaScriptObject.name = defaultMimeType.name   // simulate an error
         compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), false)
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
@@ -137,18 +138,19 @@ TestCase {
 
     function test_comment() {
         // Verify that the Comment is part of the equality test:
-        compare(instantiatedPngMimeType.comment, Data.mimeTypeComment())
+        //compare(instantiatedPngMimeType.comment, Data.mimeTypeComment())
+        compare(Data.equalMimeTypeComment(instantiatedPngMimeType.comment, Data.mimeTypeComment()), true)
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
-        otherPngMimeType.comment = ""   // simulate an error
+        otherPngMimeType.comment = defaultMimeType.comment   // simulate an error
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
         otherPngMimeType.comment = instantiatedPngMimeType.comment
         compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
 
         var javaScriptObject = instantiatedPngMimeType.properties()
 
-        javaScriptObject.comment = ""   // simulate an error
+        javaScriptObject.comment = defaultMimeType.comment   // simulate an error
         compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), false)
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
@@ -161,18 +163,19 @@ TestCase {
 
     function test_genericIconName() {
         // Verify that the GenericIconName is part of the equality test:
-        compare(instantiatedPngMimeType.genericIconName, Data.mimeTypeGenericIconName())
+        //compare(instantiatedPngMimeType.genericIconName, Data.mimeTypeGenericIconName())
+        compare(Data.equalMimeTypeGenericIconName(instantiatedPngMimeType.genericIconName, Data.mimeTypeGenericIconName()), true)
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
-        otherPngMimeType.genericIconName = ""   // simulate an error
+        otherPngMimeType.genericIconName = defaultMimeType.genericIconName   // simulate an error
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
         otherPngMimeType.genericIconName = instantiatedPngMimeType.genericIconName
         compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
 
         var javaScriptObject = instantiatedPngMimeType.properties()
 
-        javaScriptObject.genericIconName = ""   // simulate an error
+        javaScriptObject.genericIconName = defaultMimeType.genericIconName   // simulate an error
         compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), false)
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
@@ -185,18 +188,19 @@ TestCase {
 
     function test_iconName() {
         // Verify that the IconName is part of the equality test:
-        compare(instantiatedPngMimeType.iconName, Data.mimeTypeIconName())
+        //compare(instantiatedPngMimeType.iconName, Data.mimeTypeIconName())
+        compare(Data.equalMimeTypeIconName(instantiatedPngMimeType.iconName, Data.mimeTypeIconName()), true)
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
-        otherPngMimeType.iconName = ""
+        otherPngMimeType.iconName = defaultMimeType.iconName   // simulate an error
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
         otherPngMimeType.iconName = instantiatedPngMimeType.iconName
         compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
 
         var javaScriptObject = instantiatedPngMimeType.properties()
 
-        javaScriptObject.iconName = ""   // simulate an error
+        javaScriptObject.iconName = defaultMimeType.iconName   // simulate an error
         compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), false)
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
@@ -209,22 +213,19 @@ TestCase {
 
     function test_globPatterns() {
         // Verify that the GlobPatterns is part of the equality test:
-        compare(instantiatedPngMimeType.globPatterns.length, 1)
-        compare(instantiatedPngMimeType.globPatterns[0], "*.png")
+        //compare(instantiatedPngMimeType.globPatterns, Data.mimeTypeGlobPatterns())
+        compare(Data.equalMimeTypeGlobPatterns(instantiatedPngMimeType.globPatterns, Data.mimeTypeGlobPatterns()), true)
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
-        otherPngMimeType.globPatterns = []
-        compare(otherPngMimeType.globPatterns.length, 0)
+        otherPngMimeType.globPatterns = defaultMimeType.globPatterns   // simulate an error
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
         otherPngMimeType.globPatterns = instantiatedPngMimeType.globPatterns
-        compare(otherPngMimeType.globPatterns.length, 1)
-        compare(otherPngMimeType.globPatterns[0], "*.png")
         compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
 
         var javaScriptObject = instantiatedPngMimeType.properties()
 
-        javaScriptObject.globPatterns = []   // simulate an error
+        javaScriptObject.globPatterns = defaultMimeType.globPatterns   // simulate an error
         compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), false)
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
@@ -237,22 +238,19 @@ TestCase {
 
     function test_suffixes() {
         // Verify that the Suffixes is part of the equality test:
-        compare(instantiatedPngMimeType.suffixes.length, 1)
-        compare(instantiatedPngMimeType.suffixes[0], ".png")
+        //compare(instantiatedPngMimeType.suffixes, Data.mimeTypeSuffixes())
+        compare(Data.equalMimeTypeSuffixes(instantiatedPngMimeType.suffixes, Data.mimeTypeSuffixes()), true)
 
         otherPngMimeType.assign(instantiatedPngMimeType)
 
-        otherPngMimeType.suffixes = []
-        compare(otherPngMimeType.suffixes.length, 0)
+        otherPngMimeType.suffixes = defaultMimeType.suffixes   // simulate an error
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
         otherPngMimeType.suffixes = instantiatedPngMimeType.suffixes
-        compare(otherPngMimeType.suffixes.length, 1)
-        compare(otherPngMimeType.suffixes[0], ".png")
         compare(instantiatedPngMimeType.equals(otherPngMimeType), true)
 
         var javaScriptObject = instantiatedPngMimeType.properties()
 
-        javaScriptObject.suffixes = []   // simulate an error
+        javaScriptObject.suffixes = defaultMimeType.suffixes   // simulate an error
         compare(instantiatedPngMimeType.equalsProperties(javaScriptObject), false)
         otherPngMimeType.assignProperties(javaScriptObject);
         compare(instantiatedPngMimeType.equals(otherPngMimeType), false)
