@@ -22,8 +22,11 @@ private Q_SLOTS:
     void test_icons();
     void test_findByFileWithContent();
     void test_findByUrl();
+    void test_findByContent_data();
+    void test_findByContent();
     void test_findByNameAndContent_data();
     void test_findByNameAndContent();
+    void test_allMimeTypes();
 
     // shared-mime-info test suite
 

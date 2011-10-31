@@ -372,7 +372,27 @@ QString QMimeBinaryProvider::resolveAlias(const QString &name)
 QList<QMimeType> QMimeBinaryProvider::allMimeTypes()
 {
     QList<QMimeType> result;
-    // TODO implement
+    QSet<QString> mimetypes;
+    // Unfortunately mime.cache doesn't have a full list of all mimetypes.
+    // So we'll have to parse the plain-text files called "types".
+    // We did say it would be slow, in the documentation :-)
+    const QStringList typesFilenames = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/types"));
+    foreach (const QString& typeFilename, typesFilenames) {
+        QFile file(typeFilename);
+        if (file.open(QIODevice::ReadOnly)) {
+            while (!file.atEnd()) {
+                QByteArray line = file.readLine();
+                line.chop(1);
+                mimetypes.insert(QString::fromLatin1(line));
+            }
+        }
+    }
+
+    for (QSet<QString>::const_iterator it = mimetypes.constBegin();
+          it != mimetypes.constEnd(); ++it) {
+        result.append(mimeTypeForName(*it));
+    }
+
     return result;
 }
 

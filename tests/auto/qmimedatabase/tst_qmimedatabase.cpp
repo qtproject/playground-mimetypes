@@ -256,6 +256,9 @@ void tst_qmimedatabase::test_findByFileWithContent()
         QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
     }
 
+    // Test what happens with an incorrect path
+    mime = db.findByFile("file:///etc/passwd" /* incorrect code, use a path instead */);
+    QVERIFY(mime.isDefault());
 }
 
 void tst_qmimedatabase::test_findByUrl()
@@ -264,6 +267,25 @@ void tst_qmimedatabase::test_findByUrl()
     QVERIFY(db.findByUrl(QUrl("http://foo/bar.png")).isDefault()); // HTTP can't know before downloading
     QCOMPARE(db.findByUrl(QUrl("ftp://foo/bar.png")).name(), QString::fromLatin1("image/png"));
     QCOMPARE(db.findByUrl(QUrl("ftp://foo/bar")).name(), QString::fromLatin1("application/octet-stream")); // unknown extension
+}
+
+void tst_qmimedatabase::test_findByContent_data()
+{
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<QString>("expectedMimeTypeName");
+
+    QTest::newRow("tnef data, needs smi >= 0.20") << QByteArray("\x78\x9f\x3e\x22") << "application/vnd.ms-tnef";
+    QTest::newRow("PDF magic") << QByteArray("%PDF-") << "application/pdf";
+    QTest::newRow("PHP, High-priority rule") << QByteArray("<?php") << "application/x-php";
+}
+
+void tst_qmimedatabase::test_findByContent()
+{
+    QFETCH(QByteArray, data);
+    QFETCH(QString, expectedMimeTypeName);
+
+    QMimeDatabase db;
+    QCOMPARE(db.findByData(data).name(), expectedMimeTypeName);
 }
 
 void tst_qmimedatabase::test_findByNameAndContent_data()
@@ -279,14 +301,10 @@ void tst_qmimedatabase::test_findByNameAndContent_data()
 
     // If you get powerpoint instead, then you're hit by https://bugs.freedesktop.org/show_bug.cgi?id=435,
     // upgrade to shared-mime-info >= 0.22
-    const QByteArray oleData("\320\317\021\340\241\261\032\341");
+    const QByteArray oleData("\320\317\021\340\241\261\032\341"); // same as \xD0\xCF\x11\xE0 \xA1\xB1\x1A\xE1
     QTest::newRow("msword file, unknown extension") << QString("mswordfile") << oleData << "application/x-ole-storage";
     QTest::newRow("excel file, found by extension") << QString("excelfile.xls") << oleData << "application/vnd.ms-excel";
     QTest::newRow("text.xls, found by extension, user is in control") << QString("text.xls") << oleData << "application/vnd.ms-excel";
-
-    QTest::newRow("tnef data, needs smi >= 0.20") << QString("tneffile") << QByteArray("\x78\x9f\x3e\x22") << "application/vnd.ms-tnef";
-    QTest::newRow("PDF magic") << QString("pdf") << QByteArray("%PDF-") << "application/pdf";
-
 }
 
 void tst_qmimedatabase::test_findByNameAndContent()
@@ -297,6 +315,25 @@ void tst_qmimedatabase::test_findByNameAndContent()
 
     QMimeDatabase db;
     QCOMPARE(db.findByNameAndData(name, data).name(), expectedMimeTypeName);
+}
+
+void tst_qmimedatabase::test_allMimeTypes()
+{
+    QMimeDatabase db;
+    const QList<QMimeType> lst = db.allMimeTypes(); // does NOT include aliases
+    QVERIFY(!lst.isEmpty());
+
+    // Hardcoding this is the only way to check both providers find the same number of mimetypes.
+    QCOMPARE(lst.count(), 660);
+
+    foreach (const QMimeType& mime, lst) {
+        const QString name = mime.name();
+        QVERIFY(!name.isEmpty());
+        QCOMPARE(name.count('/'), 1);
+        const QMimeType lookedupMime = db.mimeTypeForName(name);
+        QVERIFY(lookedupMime.isValid());
+        QCOMPARE(lookedupMime.name(), name); // if this fails, you have an alias defined as a real mimetype too!
+    }
 }
 
 void tst_qmimedatabase::findByName_data()
