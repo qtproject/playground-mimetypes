@@ -354,3 +354,5 @@ ancp.pcap application/vnd.tcpdump.pcap
 dns.cap application/vnd.tcpdump.pcap
 # Case-insensitive glob -- needs uptodate shared-mime-info
 #testcompress.z application/x-compress
+one-file.tnef application/vnd.ms-tnef
+

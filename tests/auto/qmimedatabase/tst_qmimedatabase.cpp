@@ -258,6 +258,47 @@ void tst_qmimedatabase::test_findByFileWithContent()
 
 }
 
+void tst_qmimedatabase::test_findByUrl()
+{
+    QMimeDatabase db;
+    QVERIFY(db.findByUrl(QUrl("http://foo/bar.png")).isDefault()); // HTTP can't know before downloading
+    QCOMPARE(db.findByUrl(QUrl("ftp://foo/bar.png")).name(), QString::fromLatin1("image/png"));
+    QCOMPARE(db.findByUrl(QUrl("ftp://foo/bar")).name(), QString::fromLatin1("application/octet-stream")); // unknown extension
+}
+
+void tst_qmimedatabase::test_findByNameAndContent_data()
+{
+    QTest::addColumn<QString>("name");
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<QString>("expectedMimeTypeName");
+
+    QTest::newRow("plain text, no extension") << QString("textfile") << QByteArray("Hello world") << "text/plain";
+    QTest::newRow("plain text, unknown extension") << QString("textfile.foo") << QByteArray("Hello world") << "text/plain";
+    // Needs kde/mimetypes.xml
+    //QTest::newRow("plain text, doc extension") << QString("textfile.doc") << QByteArray("Hello world") << "text/plain";
+
+    // If you get powerpoint instead, then you're hit by https://bugs.freedesktop.org/show_bug.cgi?id=435,
+    // upgrade to shared-mime-info >= 0.22
+    const QByteArray oleData("\320\317\021\340\241\261\032\341");
+    QTest::newRow("msword file, unknown extension") << QString("mswordfile") << oleData << "application/x-ole-storage";
+    QTest::newRow("excel file, found by extension") << QString("excelfile.xls") << oleData << "application/vnd.ms-excel";
+    QTest::newRow("text.xls, found by extension, user is in control") << QString("text.xls") << oleData << "application/vnd.ms-excel";
+
+    QTest::newRow("tnef data, needs smi >= 0.20") << QString("tneffile") << QByteArray("\x78\x9f\x3e\x22") << "application/vnd.ms-tnef";
+    QTest::newRow("PDF magic") << QString("pdf") << QByteArray("%PDF-") << "application/pdf";
+
+}
+
+void tst_qmimedatabase::test_findByNameAndContent()
+{
+    QFETCH(QString, name);
+    QFETCH(QByteArray, data);
+    QFETCH(QString, expectedMimeTypeName);
+
+    QMimeDatabase db;
+    QCOMPARE(db.findByNameAndData(name, data).name(), expectedMimeTypeName);
+}
+
 void tst_qmimedatabase::findByName_data()
 {
     QTest::addColumn<QString>("filePath");
