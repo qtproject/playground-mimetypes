@@ -1,5 +1,7 @@
 #include "tst_qmimedatabase.h"
 
+#include "qstandardpaths.h"
+
 #include <QtCore/QFile>
 
 #include <QtTest/QtTest>
