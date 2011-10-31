@@ -77,7 +77,6 @@ class QDeclarativeMimeType : public QObject
 
     Q_PROPERTY(QVariantList suffixes
                READ suffixes
-               WRITE setSuffixes
                STORED false)
 
     Q_PROPERTY(bool isValid
@@ -119,7 +118,6 @@ public:
     QVariantList globPatterns() const;
     void setGlobPatterns(const QVariantList &newGlobPatterns);
     QVariantList suffixes() const;
-    void setSuffixes(const QVariantList &newSuffixes);
 
 private:
     QMimeType m_MimeType;

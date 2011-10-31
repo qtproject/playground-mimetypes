@@ -50,8 +50,6 @@ struct QMIME_EXPORT QMimeTypePrivate : public QSharedData
     QString genericIconName;
     QString iconName;
     QStringList globPatterns;
-    QString preferredSuffix;
-    QStringList suffixes;
 };
 
 QT_END_NAMESPACE

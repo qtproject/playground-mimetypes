@@ -76,20 +76,6 @@ void QMimeDatabasePrivate::setProvider(QMimeProviderBase *theProvider)
     m_provider = theProvider;
 }
 
-#if 0
-bool QMimeDatabasePrivate::setPreferredSuffix(const QString &nameOrAlias, const QString &suffix)
-{
-    NameMimeTypeMap::iterator tit =  nameMimeTypeMap.find(resolveAlias(nameOrAlias));
-    if (tit != nameMimeTypeMap.end()) {
-        QMimeTypePrivate mimeTypeData = QMimeTypePrivate(tit.value()->type);
-        mimeTypeData.preferredSuffix = suffix;
-        tit.value()->type = QMimeType(mimeTypeData);
-        return true;
-    }
-    return false;
-}
-#endif
-
 // Returns a MIME type or an invalid one if none found
 QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
 {
@@ -231,7 +217,7 @@ QList<QMimeType> QMimeDatabasePrivate::allMimeTypes()
 bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
 {
     const QString resolvedParent = provider()->resolveAlias(parent);
-    Q_ASSERT(provider()->resolveAlias(mime) == mime);
+    //Q_ASSERT(provider()->resolveAlias(mime) == mime);
     QStack<QString> toCheck;
     toCheck.push(mime);
     while (!toCheck.isEmpty()) {

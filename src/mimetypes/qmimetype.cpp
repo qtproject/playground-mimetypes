@@ -42,8 +42,6 @@ QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
     , genericIconName(other.d->genericIconName)
     , iconName(other.d->iconName)
     , globPatterns(other.d->globPatterns)
-    , preferredSuffix(other.d->preferredSuffix)
-    , suffixes(other.d->suffixes)
 {
 }
 
@@ -56,8 +54,6 @@ void QMimeTypePrivate::clear()
     genericIconName.clear();
     iconName.clear();
     globPatterns.clear();
-    preferredSuffix.clear();
-    suffixes.clear();
 }
 
 bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
@@ -68,26 +64,15 @@ bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
            aliases == other.aliases &&
            genericIconName == other.genericIconName &&
            iconName == other.iconName &&
-           globPatterns == other.globPatterns &&
-           preferredSuffix == other.preferredSuffix &&
-           suffixes == other.suffixes;
+           globPatterns == other.globPatterns;
 }
 
 void QMimeTypePrivate::addGlobPattern(const QString &pattern)
 {
     globPatterns.append(pattern);
-
-    // Not a simple suffix if if looks like: README or *. or *.* or *.JP*G or *.JP?
-    if (pattern.startsWith(QLatin1String("*.")) &&
-        pattern.length() > 2 &&
-        pattern.indexOf(QLatin1Char('*'), 2) < 0 && pattern.indexOf(QLatin1Char('?'), 2) < 0) {
-        const QString suffix = pattern.mid(2);
-        suffixes.append(suffix);
-        if (preferredSuffix.isEmpty())
-            preferredSuffix = suffix;
-    }
 }
 
+// TODO rewrite this docu!
 /*!
     \class QMimeType
 
@@ -273,7 +258,19 @@ QStringList QMimeType::allParentMimeTypes() const
 QStringList QMimeType::suffixes() const
 {
     QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
-    return d->suffixes;
+
+    QStringList result;
+    foreach (const QString& pattern, d->globPatterns) {
+        // Not a simple suffix if if looks like: README or *. or *.* or *.JP*G or *.JP?
+        if (pattern.startsWith(QLatin1String("*.")) &&
+            pattern.length() > 2 &&
+            pattern.indexOf(QLatin1Char('*'), 2) < 0 && pattern.indexOf(QLatin1Char('?'), 2) < 0) {
+            const QString suffix = pattern.mid(2);
+            result.append(suffix);
+        }
+    }
+
+    return result;
 }
 
 /*!
@@ -281,8 +278,8 @@ QStringList QMimeType::suffixes() const
 */
 QString QMimeType::preferredSuffix() const
 {
-    QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
-    return d->preferredSuffix;
+    const QStringList suffixList = suffixes();
+    return suffixList.isEmpty() ? QString() : suffixList.at(0);
 }
 
 /*!

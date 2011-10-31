@@ -454,7 +454,6 @@ void QMimeBinaryProvider::loadMimeTypePrivate(QMimeTypePrivate &data)
                 } else if (tag == "icon") { // as written out by shared-mime-info >= 0.40
                     data.iconName = xml.attributes().value(QLatin1String("name")).toString();
                 } else if (tag == "glob-deleteall") { // as written out by shared-mime-info >= 0.70
-                    data.preferredSuffix.clear();
                     data.globPatterns.clear();
                 } else if (tag == "glob") { // as written out by shared-mime-info >= 0.70
                     const QString pattern = xml.attributes().value(QLatin1String("pattern")).toString();

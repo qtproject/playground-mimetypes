@@ -27,6 +27,9 @@ private Q_SLOTS:
     void test_findByNameAndContent_data();
     void test_findByNameAndContent();
     void test_allMimeTypes();
+    void test_inheritsPerformance();
+    void test_suffixes_data();
+    void test_suffixes();
 
     // shared-mime-info test suite
 

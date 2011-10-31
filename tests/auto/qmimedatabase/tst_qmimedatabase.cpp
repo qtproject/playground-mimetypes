@@ -336,6 +336,73 @@ void tst_qmimedatabase::test_allMimeTypes()
     }
 }
 
+void tst_qmimedatabase::test_inheritsPerformance()
+{
+    // Check performance of inherits().
+    // This benchmark (which started in 2009 in kmimetypetest.cpp) uses 40 mimetypes.
+    QStringList mimeTypes; mimeTypes << "image/jpeg" << "image/png" << "image/tiff" << "text/plain" << "text/html";
+    mimeTypes += mimeTypes;
+    mimeTypes += mimeTypes;
+    mimeTypes += mimeTypes;
+    QCOMPARE(mimeTypes.count(), 40);
+    QMimeDatabase db;
+    QMimeType mime = db.mimeTypeForName("text/x-chdr");
+    QVERIFY(mime.isValid());
+    QBENCHMARK {
+        QString match;
+        foreach (const QString& mt, mimeTypes) {
+            if (mime.inherits(mt)) {
+                match = mt;
+                // of course there would normally be a "break" here, but we're testing worse-case
+                // performance here
+            }
+        }
+        QCOMPARE(match, QString("text/plain"));
+    }
+    // Numbers from 2011, in release mode:
+    // KDE 4.7 numbers: 0.21 msec / 494,000 ticks / 568,345 instr. loads per iteration
+    // QMimeBinaryProvider (with Qt 5): 0.16 msec / NA / 416,049 instr. reads per iteration
+    // QMimeXmlProvider (with Qt 5): 0.062 msec / NA / 172,889 instr. reads per iteration
+    //   (but the startup time is way higher)
+    // And memory usage is flat at 200K with QMimeBinaryProvider, while it peaks at 6 MB when
+    // parsing XML, and then keeps being around 4.5 MB for all the in-memory hashes.
+}
+
+void tst_qmimedatabase::test_suffixes_data()
+{
+    QTest::addColumn<QString>("mimeType");
+    QTest::addColumn<QString>("patterns");
+    QTest::addColumn<QString>("preferredSuffix");
+
+    QTest::newRow("mimetype with a single pattern") << "application/pdf" << "*.pdf" << "pdf";
+    QTest::newRow("mimetype with multiple patterns") << "application/x-kpresenter" << "*.kpr;*.kpt" << "kpr";
+    //if (KMimeType::sharedMimeInfoVersion() > KDE_MAKE_VERSION(0, 60, 0)) {
+        QTest::newRow("mimetype with many patterns") << "application/vnd.wordperfect" << "*.wp;*.wp4;*.wp5;*.wp6;*.wpd;*.wpp" << "wp";
+    //}
+    QTest::newRow("oasis text mimetype") << "application/vnd.oasis.opendocument.text" << "*.odt" << "odt";
+    QTest::newRow("oasis presentation mimetype") << "application/vnd.oasis.opendocument.presentation" << "*.odp" << "odp";
+    QTest::newRow("mimetype with multiple patterns") << "text/plain" << "*.asc;*.txt;*,v" << "txt";
+    QTest::newRow("mimetype with uncommon pattern") << "text/x-readme" << "README*" << QString();
+    QTest::newRow("mimetype with no patterns") << "application/pkcs7-mime" << QString() << QString();
+}
+
+void tst_qmimedatabase::test_suffixes()
+{
+    QFETCH(QString, mimeType);
+    QFETCH(QString, patterns);
+    QFETCH(QString, preferredSuffix);
+    QMimeDatabase db;
+    QMimeType mime = db.mimeTypeForName(mimeType);
+    QVERIFY(mime.isValid());
+    // Sort both lists; order is unreliable since shared-mime-info uses hashes internally.
+    QStringList expectedPatterns = patterns.split(';');
+    expectedPatterns.sort();
+    QStringList mimePatterns = mime.globPatterns();
+    mimePatterns.sort();
+    QCOMPARE(mimePatterns.join(";"), expectedPatterns.join(";"));
+    QCOMPARE(mime.preferredSuffix(), preferredSuffix);
+}
+
 void tst_qmimedatabase::findByName_data()
 {
     QTest::addColumn<QString>("filePath");
@@ -437,7 +504,7 @@ void tst_qmimedatabase::findByData()
     QMimeDatabase database;
     QFile f(filePath);
     QVERIFY(f.open(QIODevice::ReadOnly));
-    QByteArray data = f.readAll();
+    QByteArray data = f.read(16384);
 
     const QString resultMimeTypeName = database.findByData(data).name();
     if (xFail.length() >= 2 && xFail.at(1) == QLatin1Char('x')) {
@@ -472,9 +539,9 @@ void tst_qmimedatabase::findByFile()
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 //QTEST_MAIN(tst_qmimedatabase)
-QTEST_APPLESS_MAIN(tst_qmimedatabase)
+QTEST_GUILESS_MAIN(tst_qmimedatabase)
 #else
 // If tests with icons were activated in Qt4 we'd use QTEST_MAIN:
 //QTEST_MAIN(tst_qmimedatabase)
-QTEST_APPLESS_MAIN(tst_qmimedatabase)
+QTEST_GUILESS_MAIN(tst_qmimedatabase)
 #endif

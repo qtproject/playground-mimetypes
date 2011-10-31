@@ -132,8 +132,6 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
     ASSIGN_FROM_PROPERTY(comment, setComment, String, toString)
     ASSIGN_FROM_PROPERTY(genericIconName, setGenericIconName, String, toString)
     ASSIGN_FROM_PROPERTY(iconName, setIconName, String, toString)
-    ASSIGN_FROM_PROPERTY(globPatterns, setGlobPatterns, List, toList)
-    ASSIGN_FROM_PROPERTY(suffixes, setSuffixes, List, toList)
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -199,8 +197,7 @@ static QMimeType buildMimeType (
                      const QString &comment,
                      const QString &genericIconName,
                      const QString &iconName,
-                     const QStringList &globPatterns,
-                     const QStringList &suffixes
+                     const QStringList &globPatterns
                  )
 {
     QMimeTypePrivate mimeTypeData;
@@ -209,7 +206,6 @@ static QMimeType buildMimeType (
     mimeTypeData.genericIconName = genericIconName;
     mimeTypeData.iconName = iconName;
     mimeTypeData.globPatterns = globPatterns;
-    mimeTypeData.suffixes = suffixes;
     return QMimeType(mimeTypeData);
 }
 
@@ -217,7 +213,7 @@ static QMimeType buildMimeType (
 
 void QDeclarativeMimeType::setName(const QString &newName)
 {
-    m_MimeType = buildMimeType(newName, m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns(), m_MimeType.suffixes());
+    m_MimeType = buildMimeType(newName, m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -231,7 +227,7 @@ QString QDeclarativeMimeType::comment() const
 
 void QDeclarativeMimeType::setComment(const QString &newComment)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns(), m_MimeType.suffixes());
+    m_MimeType = buildMimeType(m_MimeType.name(), newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -245,7 +241,7 @@ QString QDeclarativeMimeType::genericIconName() const
 
 void QDeclarativeMimeType::setGenericIconName(const QString &newGenericIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), newGenericIconName, m_MimeType.iconName(), m_MimeType.globPatterns(), m_MimeType.suffixes());
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), newGenericIconName, m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -259,7 +255,7 @@ QString QDeclarativeMimeType::iconName() const
 
 void QDeclarativeMimeType::setIconName(const QString &newIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), newIconName, m_MimeType.globPatterns(), m_MimeType.suffixes());
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), newIconName, m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -290,7 +286,7 @@ void QDeclarativeMimeType::setGlobPatterns(const QVariantList &newGlobPatterns)
         newGlobPatternsStringList << newGlobPattern.toString();
     }
 
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), newGlobPatternsStringList, m_MimeType.suffixes());
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), newGlobPatternsStringList);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -306,20 +302,3 @@ QVariantList QDeclarativeMimeType::suffixes() const
     return result;
 }
 
-// ------------------------------------------------------------------------------------------------
-
-void QDeclarativeMimeType::setSuffixes(const QVariantList &newSuffixes)
-{
-    QList<QString> newSuffixesStringList;
-
-    foreach (const QVariant &newSuffix, newSuffixes) {
-        if (newSuffix.type() != QVariant::String) {
-            qWarning() << Q_FUNC_INFO << "newSuffix" << newSuffix << " is not a string!";
-            continue;
-        }
-
-        newSuffixesStringList << newSuffix.toString();
-    }
-
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns(), newSuffixesStringList);
-}
