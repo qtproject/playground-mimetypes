@@ -37,8 +37,20 @@ class QMIME_EXPORT QMimeType
 public:
     QMimeType();
     QMimeType(const QMimeType &other);
-    explicit QMimeType(const QMimeTypeData &dd);
+#if !defined(Q_COMPILER_RVALUE_REFS) || TEST_COMPILER_RVALUE_REFS == 0
     QMimeType &operator=(const QMimeType &other);
+#endif
+#ifdef Q_COMPILER_RVALUE_REFS
+    QMimeType(QMimeType &&other);
+
+    QMimeType &operator=(QMimeType &&other)
+    {
+        qSwap(d, other.d);
+        return *this;
+    }
+#endif
+
+    explicit QMimeType(const QMimeTypeData &dd);
     ~QMimeType();
 
     bool operator==(const QMimeType &other) const;

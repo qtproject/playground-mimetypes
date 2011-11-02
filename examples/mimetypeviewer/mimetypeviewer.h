@@ -15,7 +15,7 @@ class MimeTypeViewer : public QWidget
     Q_OBJECT
 
 public:
-    explicit MimeTypeViewer(QWidget *parent = 0);
+    explicit MimeTypeViewer(QWidget *theParent = 0);
     ~MimeTypeViewer();
 
     void addDatabase(const QString &file);

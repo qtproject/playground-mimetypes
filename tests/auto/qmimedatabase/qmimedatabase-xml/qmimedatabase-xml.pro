@@ -15,3 +15,12 @@ INCLUDEPATH *= $$PWD/../../../../include/QtMimeTypes $$PWD/../../../../src/mimet
 SOURCES += tst_qmimedatabase-xml.cpp
 HEADERS += ../tst_qmimedatabase.h
 DEFINES += SRCDIR='"\\"$$PWD/../\\""'
+
+QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
+mac|darwin: {
+    QMAKE_CXXFLAGS += -ansi
+} else:true {
+    QMAKE_CXXFLAGS += -ansi -Wc++0x-compat
+} else {
+    QMAKE_CXXFLAGS += -std=c++0x
+}

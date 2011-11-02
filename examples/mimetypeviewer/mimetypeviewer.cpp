@@ -5,8 +5,8 @@
 #include <QMimeDatabase>
 #include <QDebug>
 
-MimeTypeViewer::MimeTypeViewer(QWidget *parent) :
-    QWidget(parent),
+MimeTypeViewer::MimeTypeViewer(QWidget *theParent) :
+    QWidget(theParent),
     ui(new Ui::MimeTypeViewer),
     dataBase(new QMimeDatabase)
 {

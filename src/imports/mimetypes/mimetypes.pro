@@ -4,11 +4,14 @@ TARGET   = declarative_mimetypes
 
 # QtCore/qlist.h uses /usr/include/limits.h which uses does not compile with -pedantic.
 # QtDeclarative/qdeclarativeprivate.h will not compile with -pedantic.
-#MAKE_CXXFLAGS += -W -Wall -Wextra -Werror -ansi -pedantic -Wshadow -Wno-long-long -Wnon-virtual-dtor
-QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -ansi           -Wshadow -Wno-long-long -Wnon-virtual-dtor
+#MAKE_CXXFLAGS += -W -Wall -Wextra -Werror -pedantic -Wshadow -Wno-long-long -Wnon-virtual-dtor
+QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror           -Wshadow -Wno-long-long -Wnon-virtual-dtor
 mac|darwin: {
+    QMAKE_CXXFLAGS += -ansi
+} else:true {
+    QMAKE_CXXFLAGS += -ansi -Wc++0x-compat
 } else {
-    QMAKE_CXXFLAGS += -Wc++0x-compat
+    QMAKE_CXXFLAGS += -std=c++0x
 }
 
 

@@ -124,6 +124,22 @@ QMimeType::QMimeType(const QMimeType &other) :
 {
 }
 
+#if !defined(Q_COMPILER_RVALUE_REFS) || TEST_COMPILER_RVALUE_REFS == 0
+QMimeType &QMimeType::operator=(const QMimeType &other)
+{
+    if (d != other.d)
+        d = other.d;
+    return *this;
+}
+#endif
+
+#ifdef Q_COMPILER_RVALUE_REFS
+QMimeType::QMimeType(QMimeType &&other) :
+    d(std::move(other.d))
+{
+}
+#endif
+
 QMimeType::QMimeType(const QMimeTypeData &dd)
     : d(new QMimeTypeData(dd))
 {
@@ -131,13 +147,6 @@ QMimeType::QMimeType(const QMimeTypeData &dd)
 
 QMimeType::~QMimeType()
 {
-}
-
-QMimeType &QMimeType::operator=(const QMimeType &other)
-{
-    if (d != other.d)
-        d = other.d;
-    return *this;
 }
 
 bool QMimeType::operator==(const QMimeType &other) const

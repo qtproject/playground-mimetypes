@@ -3,10 +3,13 @@ TEMPLATE = app
 TARGET   = tst_qmimetype
 DEPENDPATH += .
 
-QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -ansi -Wshadow -Wno-long-long -Wnon-virtual-dtor
+QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
 mac|darwin: {
+    QMAKE_CXXFLAGS += -ansi
+} else:true {
+    QMAKE_CXXFLAGS += -ansi -Wc++0x-compat
 } else {
-    QMAKE_CXXFLAGS += -Wc++0x-compat
+    QMAKE_CXXFLAGS += -std=c++0x
 }
 
 # runtime environment
