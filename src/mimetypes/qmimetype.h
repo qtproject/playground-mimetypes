@@ -50,6 +50,10 @@ public:
     }
 #endif
 
+    void swap(QMimeType &other)
+    {
+        qSwap(d, other.d);
+    }
     explicit QMimeType(const QMimeTypeData &dd);
     ~QMimeType();
 
