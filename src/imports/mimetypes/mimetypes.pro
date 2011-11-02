@@ -8,7 +8,7 @@ TARGET   = declarative_mimetypes
 QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror           -Wshadow -Wno-long-long -Wnon-virtual-dtor
 mac|darwin: {
     QMAKE_CXXFLAGS += -ansi
-} else:true {
+} else:false {
     QMAKE_CXXFLAGS += -ansi -Wc++0x-compat
 } else {
     QMAKE_CXXFLAGS += -std=c++0x
