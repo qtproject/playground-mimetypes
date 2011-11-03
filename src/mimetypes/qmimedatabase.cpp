@@ -81,7 +81,7 @@ bool QMimeDatabasePrivate::setPreferredSuffix(const QString &nameOrAlias, const 
 {
     NameMimeTypeMap::iterator tit =  nameMimeTypeMap.find(resolveAlias(nameOrAlias));
     if (tit != nameMimeTypeMap.end()) {
-        QMimeTypeData mimeTypeData = QMimeTypeData(tit.value()->type);
+        QMimeTypePrivate mimeTypeData = QMimeTypePrivate(tit.value()->type);
         mimeTypeData.preferredSuffix = suffix;
         tit.value()->type = QMimeType(mimeTypeData);
         return true;

@@ -157,7 +157,7 @@ bool QMimeBinaryProvider::isValid()
 QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 {
     // TODO cache with a QCache
-    QMimeTypeData data;
+    QMimeTypePrivate data;
     data.name = name;
     return QMimeType(data);
 }
@@ -376,7 +376,7 @@ QList<QMimeType> QMimeBinaryProvider::allMimeTypes()
     return result;
 }
 
-void QMimeBinaryProvider::loadMimeTypeData(QMimeTypeData &data)
+void QMimeBinaryProvider::loadMimeTypePrivate(QMimeTypePrivate &data)
 {
     // load comment, aliases?, globPatterns, suffixes, preferredSuffix
 
@@ -512,7 +512,7 @@ QString QMimeBinaryProvider::iconForMime(CacheFile *cacheFile, int posListOffset
     return QString();
 }
 
-void QMimeBinaryProvider::loadIcon(QMimeTypeData &data)
+void QMimeBinaryProvider::loadIcon(QMimeTypePrivate &data)
 {
     const QByteArray inputMime = data.name.toLatin1();
     foreach (CacheFile *cacheFile, m_cacheFiles) {
@@ -524,7 +524,7 @@ void QMimeBinaryProvider::loadIcon(QMimeTypeData &data)
     }
 }
 
-void QMimeBinaryProvider::loadGenericIcon(QMimeTypeData &data)
+void QMimeBinaryProvider::loadGenericIcon(QMimeTypePrivate &data)
 {
     const QByteArray inputMime = data.name.toLatin1();
     foreach (CacheFile *cacheFile, m_cacheFiles) {

@@ -30,7 +30,7 @@ QT_BEGIN_NAMESPACE
 
 class QFileInfo;
 
-class QMimeTypeData;
+class QMimeTypePrivate;
 
 class QMIME_EXPORT QMimeType
 {
@@ -54,7 +54,7 @@ public:
     {
         qSwap(d, other.d);
     }
-    explicit QMimeType(const QMimeTypeData &dd);
+    explicit QMimeType(const QMimeTypePrivate &dd);
     ~QMimeType();
 
     bool operator==(const QMimeType &other) const;
@@ -97,9 +97,9 @@ protected:
     friend class QMimeDatabasePrivate;
     friend class QMimeXMLProvider;
     friend class QMimeBinaryProvider;
-    friend class QMimeTypeData;
+    friend class QMimeTypePrivate;
 
-    QExplicitlySharedDataPointer<QMimeTypeData> d;
+    QExplicitlySharedDataPointer<QMimeTypePrivate> d;
 };
 
 QT_END_NAMESPACE

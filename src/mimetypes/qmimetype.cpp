@@ -30,11 +30,11 @@
 
 QT_BEGIN_NAMESPACE
 
-QMimeTypeData::QMimeTypeData()
+QMimeTypePrivate::QMimeTypePrivate()
 {
 }
 
-QMimeTypeData::QMimeTypeData(const QMimeType &other)
+QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
     : name(other.d->name)
     , comment(other.d->comment)
     , localeComments(other.d->localeComments)
@@ -47,7 +47,7 @@ QMimeTypeData::QMimeTypeData(const QMimeType &other)
 {
 }
 
-void QMimeTypeData::clear()
+void QMimeTypePrivate::clear()
 {
     name.clear();
     comment.clear();
@@ -60,7 +60,7 @@ void QMimeTypeData::clear()
     suffixes.clear();
 }
 
-bool QMimeTypeData::operator==(const QMimeTypeData &other) const
+bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
 {
     return name == other.name &&
            comment == other.comment &&
@@ -73,7 +73,7 @@ bool QMimeTypeData::operator==(const QMimeTypeData &other) const
            suffixes == other.suffixes;
 }
 
-void QMimeTypeData::addGlobPattern(const QString &pattern)
+void QMimeTypePrivate::addGlobPattern(const QString &pattern)
 {
     globPatterns.append(pattern);
 
@@ -115,7 +115,7 @@ void QMimeTypeData::addGlobPattern(const QString &pattern)
 */
 
 QMimeType::QMimeType() :
-    d(new QMimeTypeData)
+    d(new QMimeTypePrivate)
 {
 }
 
@@ -140,8 +140,8 @@ QMimeType::QMimeType(QMimeType &&other) :
 }
 #endif
 
-QMimeType::QMimeType(const QMimeTypeData &dd)
-    : d(new QMimeTypeData(dd))
+QMimeType::QMimeType(const QMimeTypePrivate &dd)
+    : d(new QMimeTypePrivate(dd))
 {
 }
 
@@ -181,7 +181,7 @@ QString QMimeType::name() const
 
 QString QMimeType::comment() const
 {
-    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     return d->comment;
 }
 
@@ -200,7 +200,7 @@ static inline QString systemLanguage()
 */
 QString QMimeType::localeComment(const QString &localeArg) const
 {
-    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     const QString locale = localeArg.isEmpty() ? systemLanguage() : localeArg;
     return d->localeComments.value(locale, d->comment);
 }
@@ -232,7 +232,7 @@ QString QMimeType::iconName() const
 
 QStringList QMimeType::globPatterns() const
 {
-    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     return d->globPatterns;
 }
 
@@ -272,7 +272,7 @@ QStringList QMimeType::allParentMimeTypes() const
 */
 QStringList QMimeType::suffixes() const
 {
-    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     return d->suffixes;
 }
 
@@ -281,7 +281,7 @@ QStringList QMimeType::suffixes() const
 */
 QString QMimeType::preferredSuffix() const
 {
-    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     return d->preferredSuffix;
 }
 
@@ -290,7 +290,7 @@ QString QMimeType::preferredSuffix() const
 */
 QString QMimeType::filterString() const
 {
-    QMimeDatabasePrivate::instance()->provider()->loadMimeTypeData(*d);
+    QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     QString filter;
 
     if (!d->globPatterns.empty()) { // !Binary files

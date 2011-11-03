@@ -179,7 +179,7 @@ static bool createMagicMatchRule(const QXmlStreamAttributes &atts,
 
 bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString *errorMessage)
 {
-    QMimeTypeData data;
+    QMimeTypePrivate data;
     int priority = 50;
     QStack<QMimeMagicRule *> currentRules; // stack for the nesting of rules
     QList<QMimeMagicRule> rules; // toplevel rules

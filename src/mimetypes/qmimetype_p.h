@@ -27,16 +27,16 @@
 
 QT_BEGIN_NAMESPACE
 
-struct QMIME_EXPORT QMimeTypeData : public QSharedData
+struct QMIME_EXPORT QMimeTypePrivate : public QSharedData
 {
     typedef QHash<QString, QString> LocaleHash;
 
-    QMimeTypeData();
-    explicit QMimeTypeData(const QMimeType &other);
+    QMimeTypePrivate();
+    explicit QMimeTypePrivate(const QMimeType &other);
 
     void clear();
 
-    bool operator==(const QMimeTypeData &other) const;
+    bool operator==(const QMimeTypePrivate &other) const;
 
     void addGlobPattern(const QString &pattern);
 
