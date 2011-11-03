@@ -30,6 +30,7 @@ private Q_SLOTS:
     void test_inheritsPerformance();
     void test_suffixes_data();
     void test_suffixes();
+    void test_knownSuffix();
 
     // shared-mime-info test suite
 

@@ -177,7 +177,8 @@ QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *fo
         if (result.m_matchingMimeTypes.isEmpty())
             matchSuffixTree(result, cacheFile, numRoots, firstRootOffset, fileName, fileName.length() - 1, true);
     }
-    *foundSuffix = result.m_foundSuffix;
+    if (foundSuffix)
+        *foundSuffix = result.m_foundSuffix;
     return result.m_matchingMimeTypes;
 }
 
@@ -236,7 +237,7 @@ bool QMimeBinaryProvider::matchSuffixTree(QMimeGlobMatchResult& result, QMimeBin
                     const int weight = flagsAndWeight & 0xff;
                     const bool caseSensitive = flagsAndWeight & 0x100;
                     if (caseSensitiveCheck || !caseSensitive) {
-                        result.addMatch(QLatin1String(mimeType), weight, QLatin1String("*.") + fileName.mid(charPos));
+                        result.addMatch(QLatin1String(mimeType), weight, QLatin1Char('*') + fileName.mid(charPos+1));
                         success = true;
                     }
                 }

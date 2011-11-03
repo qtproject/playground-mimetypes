@@ -82,16 +82,12 @@ QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
     return provider()->mimeTypeForName(provider()->resolveAlias(nameOrAlias));
 }
 
-QStringList QMimeDatabasePrivate::findByName(const QString &fileName)
+QStringList QMimeDatabasePrivate::findByName(const QString &fileName, QString *foundSuffix)
 {
-    QString foundSuffix;
-
     if (fileName.endsWith(QLatin1Char('/')))
         return QStringList() << QLatin1String("inode/directory");
 
-    const QStringList matchingMimeTypes = provider()->findByName(QFileInfo(fileName).fileName(), &foundSuffix);
-    // TODO a method that returns the found suffix
-
+    const QStringList matchingMimeTypes = provider()->findByName(QFileInfo(fileName).fileName(), foundSuffix);
     return matchingMimeTypes;
 }
 
@@ -356,6 +352,20 @@ QMimeType QMimeDatabase::findByName(const QString &fileName) const
         matches.sort(); // Make it deterministic
         return d->mimeTypeForName(matches.first());
     }
+}
+
+/*!
+    Returns the suffix for the file \a fileName, as known by the MIME database.
+
+    This allows to pre-select "tar.bz2" for foo.tar.bz2, but still only
+    "txt" for my.file.with.dots.txt.
+*/
+QString QMimeDatabase::suffixForFileName(const QString &fileName) const
+{
+    QMutexLocker locker(&d->mutex);
+    QString foundSuffix;
+    d->findByName(fileName, &foundSuffix);
+    return foundSuffix;
 }
 
 /*!

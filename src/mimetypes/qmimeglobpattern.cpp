@@ -175,7 +175,7 @@ QStringList QMimeAllGlobPatterns::matchingGlobs(const QString &fileName, QString
 
             const QStringList matchingMimeTypes = m_fastPatterns.value(simpleExtension);
             foreach (const QString &mime, matchingMimeTypes) {
-                result.addMatch(mime, 50, simpleExtension);
+                result.addMatch(mime, 50, QLatin1String("*.") + simpleExtension);
             }
             // Can't return yet; *.tar.bz2 has to win over *.bz2, so we need the low-weight mimetypes anyway,
             // at least those with weight 50.
@@ -184,6 +184,7 @@ QStringList QMimeAllGlobPatterns::matchingGlobs(const QString &fileName, QString
         // Finally, try the low weight matches (<=50)
         m_lowWeightGlobs.match(result, fileName);
     }
-    *foundSuffix = result.m_foundSuffix;
+    if (foundSuffix)
+        *foundSuffix = result.m_foundSuffix;
     return result.m_matchingMimeTypes;
 }

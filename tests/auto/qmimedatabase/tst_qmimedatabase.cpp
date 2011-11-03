@@ -403,6 +403,15 @@ void tst_qmimedatabase::test_suffixes()
     QCOMPARE(mime.preferredSuffix(), preferredSuffix);
 }
 
+void tst_qmimedatabase::test_knownSuffix()
+{
+    QMimeDatabase db;
+    QCOMPARE(db.suffixForFileName("foo.tar"), QString("tar"));
+    QCOMPARE(db.suffixForFileName("foo.bz2"), QString("bz2"));
+    QCOMPARE(db.suffixForFileName("foo.bar.bz2"), QString("bz2"));
+    QCOMPARE(db.suffixForFileName("foo.tar.bz2"), QString("tar.bz2"));
+}
+
 void tst_qmimedatabase::findByName_data()
 {
     QTest::addColumn<QString>("filePath");

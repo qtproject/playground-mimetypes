@@ -54,6 +54,8 @@ public:
     QMimeType findByNameAndData(const QString &fileName, QIODevice *device) const;
     QMimeType findByNameAndData(const QString &fileName, const QByteArray &data) const;
 
+    QString suffixForFileName(const QString &fileName) const;
+
     QList<QMimeType> allMimeTypes() const;
 
 #if 0
