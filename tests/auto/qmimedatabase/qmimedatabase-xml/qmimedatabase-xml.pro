@@ -1,6 +1,6 @@
 QT       += testlib
 
-QT       += widgets gui
+QT       -= widgets gui
 
 TARGET = tst_qmimedatabase-xml
 CONFIG   += console

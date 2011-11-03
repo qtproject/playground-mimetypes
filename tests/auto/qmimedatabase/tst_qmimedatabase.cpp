@@ -6,10 +6,12 @@
 
 #include <QtTest/QtTest>
 
+#if 0
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QIcon>
 #else
 #include <QtGui/QIcon>
+#endif
 #endif
 
 #include <QMimeDatabase>
@@ -232,7 +234,7 @@ void tst_qmimedatabase::test_findByFileWithContent()
 
     // Test the case where the extension doesn't match the contents: extension wins
     {
-        QTemporaryFile txtTempFile(QDir::tempPath() + QLatin1String("/kmimetypetest_XXXXXX.txt"));
+        QTemporaryFile txtTempFile(QDir::tempPath() + QLatin1String("/tst_qmimedatabase_XXXXXX.txt"));
         QVERIFY(txtTempFile.open());
         txtTempFile.write("%PDF-");
         QString txtTempFileName = txtTempFile.fileName();
@@ -247,7 +249,7 @@ void tst_qmimedatabase::test_findByFileWithContent()
     // Now the case where extension differs from contents, but contents has >80 magic rule
     // XDG spec says: contents wins. But we can't sniff all files...
     {
-        QTemporaryFile txtTempFile(QDir::tempPath() + QLatin1String("/kmimetypetest_XXXXXX.txt"));
+        QTemporaryFile txtTempFile(QDir::tempPath() + QLatin1String("/tst_qmimedatabase_XXXXXX.txt"));
         QVERIFY(txtTempFile.open());
         txtTempFile.write("<smil");
         QString txtTempFileName = txtTempFile.fileName();
