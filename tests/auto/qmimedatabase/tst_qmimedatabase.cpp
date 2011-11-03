@@ -550,6 +550,27 @@ void tst_qmimedatabase::findByFile()
     }
 }
 
+
+void tst_qmimedatabase::test_fromThreads()
+{
+    // When using -Wshadow, a Qt 4 header breaks
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QThreadPool::globalInstance()->setMaxThreadCount(20);
+    // Note that data-based tests cannot be used here (QTest::fetchData asserts).
+    QList<QFuture<void> > futures;
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_mimeTypeForName);
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_aliases);
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_allMimeTypes);
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_icons);
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_inheritance);
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_knownSuffix);
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_findByFileWithContent);
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_allMimeTypes); // a second time
+    Q_FOREACH(QFuture<void> f, futures) // krazy:exclude=foreach
+        f.waitForFinished();
+#endif
+}
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 //QTEST_MAIN(tst_qmimedatabase)
 QTEST_GUILESS_MAIN(tst_qmimedatabase)

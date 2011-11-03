@@ -31,6 +31,7 @@ private Q_SLOTS:
     void test_suffixes_data();
     void test_suffixes();
     void test_knownSuffix();
+    void test_fromThreads();
 
     // shared-mime-info test suite
 
