@@ -55,7 +55,6 @@ TestCase {
         genericIconName: Data.mimeTypeGenericIconName()
         iconName: Data.mimeTypeIconName()
         globPatterns: Data.mimeTypeGlobPatterns()
-        suffixes: Data.mimeTypeSuffixes()
     }
 
     MimeType {
@@ -93,7 +92,6 @@ TestCase {
         javaScriptObject.genericIconName = Data.mimeTypeGenericIconName()
         javaScriptObject.iconName = Data.mimeTypeIconName()
         javaScriptObject.globPatterns = Data.mimeTypeGlobPatterns()
-        javaScriptObject.suffixes = Data.mimeTypeSuffixes()
         compare(firstMimeType.equalsProperties(javaScriptObject), true)
         secondMimeType.assignProperties(javaScriptObject);
         compare(firstMimeType.equals(secondMimeType), true)
@@ -219,31 +217,6 @@ TestCase {
         compare(firstMimeType.equals(secondMimeType), false)
 
         javaScriptObject.globPatterns = firstMimeType.globPatterns
-        compare(firstMimeType.equalsProperties(javaScriptObject), true)
-        secondMimeType.assignProperties(javaScriptObject);
-        compare(firstMimeType.equals(secondMimeType), true)
-    }
-
-    function test_suffixes() {
-        // Verify that the Suffixes is part of the equality test:
-        //compare(firstMimeType.suffixes, Data.mimeTypeSuffixes())
-        compare(Data.equalMimeTypeSuffixes(firstMimeType.suffixes, Data.mimeTypeSuffixes()), true)
-
-        secondMimeType.assign(firstMimeType)
-
-        secondMimeType.suffixes = defaultMimeType.suffixes   // simulate an error
-        compare(firstMimeType.equals(secondMimeType), false)
-        secondMimeType.suffixes = firstMimeType.suffixes
-        compare(firstMimeType.equals(secondMimeType), true)
-
-        var javaScriptObject = firstMimeType.properties()
-
-        javaScriptObject.suffixes = defaultMimeType.suffixes   // simulate an error
-        compare(firstMimeType.equalsProperties(javaScriptObject), false)
-        secondMimeType.assignProperties(javaScriptObject);
-        compare(firstMimeType.equals(secondMimeType), false)
-
-        javaScriptObject.suffixes = firstMimeType.suffixes
         compare(firstMimeType.equalsProperties(javaScriptObject), true)
         secondMimeType.assignProperties(javaScriptObject);
         compare(firstMimeType.equals(secondMimeType), true)

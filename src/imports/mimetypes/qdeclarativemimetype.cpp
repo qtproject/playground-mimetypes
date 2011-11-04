@@ -104,7 +104,6 @@ QVariantMap QDeclarativeMimeType::properties() const
     ASSIGN_TO_PROPERTY(genericIconName)
     ASSIGN_TO_PROPERTY(iconName)
     ASSIGN_TO_PROPERTY(globPatterns)
-    ASSIGN_TO_PROPERTY(suffixes)
     return result;
 }
 
@@ -132,6 +131,7 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
     ASSIGN_FROM_PROPERTY(comment, setComment, String, toString)
     ASSIGN_FROM_PROPERTY(genericIconName, setGenericIconName, String, toString)
     ASSIGN_FROM_PROPERTY(iconName, setIconName, String, toString)
+    ASSIGN_FROM_PROPERTY(globPatterns, setGlobPatterns, List, toList)
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -164,7 +164,6 @@ bool QDeclarativeMimeType::equalsProperties(const QVariantMap &other) const
     EQUALS_PROPERTY(genericIconName, String, toString)
     EQUALS_PROPERTY(iconName, String, toString)
     EQUALS_PROPERTY(globPatterns, List, toList)
-    EQUALS_PROPERTY(suffixes, List, toList)
 
     return true;
 }
