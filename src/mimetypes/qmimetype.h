@@ -18,19 +18,20 @@
 **
 **************************************************************************/
 
-#ifndef QMIMETYPE_H
-#define QMIMETYPE_H
+#ifndef QMIMETYPE_H_INCLUDED
+#define QMIMETYPE_H_INCLUDED
 
 #include "qmime_global.h"
 
 #include <QtCore/QExplicitlySharedDataPointer>
-#include <QtCore/QStringList>
+#include <QtCore/QString>
+
+QT_BEGIN_NAMESPACE struct QMimeTypePrivate; QT_END_NAMESPACE
+
+QT_BEGIN_NAMESPACE class QFileinfo; QT_END_NAMESPACE
+QT_BEGIN_NAMESPACE class QStringList; QT_END_NAMESPACE
 
 QT_BEGIN_NAMESPACE
-
-class QFileInfo;
-
-class QMimeTypePrivate;
 
 class QMIME_EXPORT QMimeType
 {
@@ -58,8 +59,11 @@ public:
     ~QMimeType();
 
     bool operator==(const QMimeType &other) const;
+
     inline bool operator!=(const QMimeType &other) const
-    { return !operator==(other); }
+    {
+        return !operator==(other);
+    }
 
     bool isValid() const;
 
@@ -104,4 +108,4 @@ protected:
 
 QT_END_NAMESPACE
 
-#endif // QMIMETYPE_H
+#endif   // QMIMETYPE_H_INCLUDED

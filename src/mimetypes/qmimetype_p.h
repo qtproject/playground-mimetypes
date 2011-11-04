@@ -18,12 +18,13 @@
 **
 **************************************************************************/
 
-#ifndef QMIMETYPE_P_H
-#define QMIMETYPE_P_H
+#ifndef QMIMETYPE_P_H_INCLUDED
+#define QMIMETYPE_P_H_INCLUDED
 
 #include "qmimetype.h"
 
 #include <QtCore/QHash>
+#include <QtCore/QStringList>
 
 QT_BEGIN_NAMESPACE
 
@@ -44,9 +45,9 @@ struct QMIME_EXPORT QMimeTypePrivate : public QSharedData
     //unsigned matchesData(const QByteArray &data) const;
 
     QString name;
+    QStringList aliases;
     QString comment;
     LocaleHash localeComments;
-    QStringList aliases;
     QString genericIconName;
     QString iconName;
     QStringList globPatterns;
@@ -54,4 +55,4 @@ struct QMIME_EXPORT QMimeTypePrivate : public QSharedData
 
 QT_END_NAMESPACE
 
-#endif // QMIMETYPE_P_H
+#endif   // QMIMETYPE_P_H_INCLUDED
