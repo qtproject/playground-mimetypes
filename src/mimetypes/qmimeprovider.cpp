@@ -416,10 +416,7 @@ void QMimeBinaryProvider::loadMimeTypePrivate(QMimeTypePrivate &data)
 
     QString comment;
     QString mainPattern;
-    const QStringList languageList = QLocale::system().uiLanguages();
-    //qDebug() << "languages=" << languageList;
-    const QString preferredLanguage = languageList.first();
-    QMap<QString, QString> commentsByLanguage;
+    const QString preferredLanguage = QLocale::system().name();
 
     QListIterator<QString> mimeFilesIter(mimeFiles);
     mimeFilesIter.toBack();
@@ -447,13 +444,9 @@ void QMimeBinaryProvider::loadMimeTypePrivate(QMimeTypePrivate &data)
                     QString lang = xml.attributes().value(QLatin1String("xml:lang")).toString();
                     const QString text = xml.readElementText();
                     if (lang.isEmpty()) {
-                        lang = QLatin1String("en-US");
+                        lang = QLatin1String("en_US");
                     }
-                    if (lang == preferredLanguage) {
-                        comment = text;
-                    } else {
-                        commentsByLanguage.insert(lang, text);
-                    }
+                    data.localeComments.insert(lang, text);
                     continue; // we called readElementText, so we're at the EndElement already.
                 } else if (tag == "icon") { // as written out by shared-mime-info >= 0.40
                     data.iconName = xml.attributes().value(QLatin1String("name")).toString();
@@ -472,30 +465,6 @@ void QMimeBinaryProvider::loadMimeTypePrivate(QMimeTypePrivate &data)
             Q_ASSERT(xml.name() == "mime-type");
         }
     }
-
-    if (comment.isEmpty()) {
-        Q_FOREACH(const QString& lang, languageList) {
-            const QString comm = commentsByLanguage.value(lang);
-            if (!comm.isEmpty()) {
-                comment = comm;
-                break;
-            }
-            const int pos = lang.indexOf(QLatin1Char('_'));
-            if (pos != -1) {
-                // "pt_BR" not found? try just "pt"
-                const QString shortLang = lang.left(pos);
-                const QString commShort = commentsByLanguage.value(shortLang);
-                if (!commShort.isEmpty()) {
-                    comment = commShort;
-                    break;
-                }
-            }
-        }
-        if (comment.isEmpty()) {
-            qWarning() << "Missing <comment> field in" << file;
-        }
-    }
-    data.comment = comment;
 
     const bool globsInXml = true; // ## (KMimeType::sharedMimeInfoVersion() >= KDE_MAKE_VERSION(0, 70, 0));
     if (globsInXml) {

@@ -25,7 +25,7 @@
 
 #include "qmimeglobpattern_p.h"
 
-//#include <QtCore/QDebug>
+#include <QtCore/QDebug>
 #include <QtCore/QLocale>
 
 QT_BEGIN_NAMESPACE
@@ -208,31 +208,35 @@ QStringList QMimeType::aliases() const
 /*!
     \fn QString QMimeType::comment() const;
     \brief Returns the description of the MIME type to be displayed on user interfaces.
+
+    The system language (QLocale::system().name()) is used to select the appropriate translation.
+    Another language can be specified by setting the \a localName argument.
  */
-QString QMimeType::comment() const
+QString QMimeType::comment(const QString& localeName) const
 {
     QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
+
+    QStringList languageList;
+    if (!localeName.isEmpty())
+        languageList << localeName;
+    languageList << QLocale::system().name();
+    languageList << QLocale::system().uiLanguages();
+    Q_FOREACH(const QString& lang, languageList) {
+        const QString comm = d->localeComments.value(lang);
+        if (!comm.isEmpty())
+            return comm;
+        const int pos = lang.indexOf(QLatin1Char('_'));
+        if (pos != -1) {
+            // "pt_BR" not found? try just "pt"
+            const QString shortLang = lang.left(pos);
+            const QString commShort = d->localeComments.value(shortLang);
+            if (!commShort.isEmpty())
+                return commShort;
+        }
+    }
+
+    // Use d->comment as fallback, but this is only used by the declarative bindings
     return d->comment;
-}
-
-// Return "en", "de", etc. derived from "en_US", de_DE".
-static inline QString systemLanguage()
-{
-    QString name = QLocale::system().name();
-    const int underScorePos = name.indexOf(QLatin1Char('_'));
-    if (underScorePos != -1)
-        name.truncate(underScorePos);
-    return name;
-}
-
-/*!
-    \param localeArg en, de...
-*/
-QString QMimeType::localeComment(const QString &localeArg) const // TODO use QTranslator's language?
-{
-    QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
-    const QString locale = localeArg.isEmpty() ? systemLanguage() : localeArg;
-    return d->localeComments.value(locale, d->comment);
 }
 
 /*!
@@ -340,7 +344,7 @@ QString QMimeType::filterString() const
     QString filter;
 
     if (!d->globPatterns.empty()) { // !Binary files
-        filter += localeComment() + QLatin1String(" (");
+        filter += comment() + QLatin1String(" (");
         for (int i = 0; i < d->globPatterns.size(); ++i) {
             if (i != 0)
                 filter += QLatin1Char(' ');

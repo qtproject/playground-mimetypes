@@ -233,9 +233,8 @@ bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString 
                 QString locale = atts.value(QLatin1String(localeAttributeC)).toString();
                 const QString comment = reader.readElementText();
                 if (locale.isEmpty())
-                    data.comment = comment;
-                else
-                    data.localeComments.insert(locale, comment);
+                    locale = QString::fromLatin1("en_US");
+                data.localeComments.insert(locale, comment);
             }
                 break;
             case ParseAlias: {
