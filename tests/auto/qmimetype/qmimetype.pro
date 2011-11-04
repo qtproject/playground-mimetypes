@@ -19,6 +19,7 @@ LIBS += -L../../../src/mimetypes -lQtMimeTypes
 API_DIR = ..
 
 INCLUDEPATH += ../../../include/QtMimeTypes ../../../src/mimetypes $$API_DIR/unittests
+CONFIG += depend_includepath
 
 
 SOURCES += tst_qmimetype.cpp

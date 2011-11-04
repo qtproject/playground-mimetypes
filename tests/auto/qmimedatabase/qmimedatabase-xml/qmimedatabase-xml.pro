@@ -11,6 +11,7 @@ TEMPLATE = app
 LIBS += -L$$OUT_PWD/../../../../src/mimetypes -lQtMimeTypes
 
 INCLUDEPATH *= $$PWD/../../../../include/QtMimeTypes $$PWD/../../../../src/mimetypes/inqt5
+CONFIG += depend_includepath
 
 SOURCES += tst_qmimedatabase-xml.cpp
 HEADERS += ../tst_qmimedatabase.h

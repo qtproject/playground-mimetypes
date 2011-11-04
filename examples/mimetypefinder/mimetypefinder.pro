@@ -5,6 +5,7 @@ TEMPLATE = app
 LIBS += -L$$OUT_PWD/../../src/mimetypes -lQtMimeTypes
 
 INCLUDEPATH *= $$PWD/../../include/QtMimeTypes
+CONFIG += depend_includepath
 
 SOURCES += main.cpp
 

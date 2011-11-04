@@ -12,6 +12,7 @@ LIBS += -L$$OUT_PWD/../../../../src/mimetypes -lQtMimeTypes
 
 INCLUDEPATH *= $$PWD/../../../../include/QtMimeTypes
 INCLUDEPATH *= $$PWD/../../../../src/mimetypes/inqt5
+CONFIG += depend_includepath
 
 SOURCES += tst_qmimedatabase-cache.cpp
 HEADERS += ../tst_qmimedatabase.h

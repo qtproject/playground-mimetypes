@@ -2,7 +2,7 @@ INCLUDEPATH *= $$PWD/../include
 DEPENDPATH  *= $$PWD
 
 INCLUDEPATH += $$PWD/inqt5
-DEPENDPATH  += $$PWD/inqt5
+CONFIG += depend_includepath
 
 QT     = core
 

@@ -8,6 +8,7 @@ LIBS += -L../../../src/mimetypes -lQtMimeTypes
 
 
 INCLUDEPATH += ../../../includes/QtMimeTypes ../../../src/mimetypes
+CONFIG += depend_includepath
 
 
 SOURCES += tst_qdeclarativemimetype.cpp
