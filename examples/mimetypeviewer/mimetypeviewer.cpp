@@ -44,7 +44,6 @@ void MimeTypeViewer::updateNameList()
 void MimeTypeViewer::setMimeType(const QMimeType &mimeType)
 {
     ui->mimeTypeLabel->setText(mimeType.name());
-    ui->aliasesLabel->setText(mimeType.aliases().join(", "));
     ui->commentLabel->setText(mimeType.comment());
     ui->localeCommentLabel->setText(mimeType.localeComment());
     ui->genericIconNameLabel->setText(mimeType.genericIconName());

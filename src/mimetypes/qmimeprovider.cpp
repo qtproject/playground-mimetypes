@@ -156,9 +156,12 @@ bool QMimeBinaryProvider::isValid()
 
 QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 {
-    // TODO cache with a QCache
     QMimeTypePrivate data;
     data.name = name;
+    // The rest is retrieved on demand.
+    // comment and globPatterns: in loadMimeTypePrivate
+    // iconName: in loadIcon
+    // genericIconName: in loadGenericIcon
     return QMimeType(data);
 }
 
@@ -399,7 +402,7 @@ QList<QMimeType> QMimeBinaryProvider::allMimeTypes()
 
 void QMimeBinaryProvider::loadMimeTypePrivate(QMimeTypePrivate &data)
 {
-    // load comment, aliases?, globPatterns, suffixes, preferredSuffix
+    // load comment and globPatterns
 
     const QString file = data.name + QLatin1String(".xml");
     const QStringList mimeFiles = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QString::fromLatin1("mime/") + file);

@@ -45,7 +45,6 @@ struct QMIME_EXPORT QMimeTypePrivate : public QSharedData
     //unsigned matchesData(const QByteArray &data) const;
 
     QString name;
-    QStringList aliases;
     QString comment;
     LocaleHash localeComments;
     QString genericIconName;

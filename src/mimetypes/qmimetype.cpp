@@ -35,7 +35,6 @@ QMimeTypePrivate::QMimeTypePrivate()
 
 QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
         : name(other.d->name)
-        , aliases(other.d->aliases)
         , comment(other.d->comment)
         , localeComments(other.d->localeComments)
         , genericIconName(other.d->genericIconName)
@@ -46,7 +45,6 @@ QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
 void QMimeTypePrivate::clear()
 {
     name.clear();
-    aliases.clear();
     comment.clear();
     localeComments.clear();
     genericIconName.clear();
@@ -57,7 +55,6 @@ void QMimeTypePrivate::clear()
 bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
 {
     return name == other.name &&
-            aliases == other.aliases &&
             comment == other.comment &&
             localeComments == other.localeComments &&
             genericIconName == other.genericIconName &&
@@ -196,6 +193,7 @@ QString QMimeType::name() const
     return d->name;
 }
 
+#if 0
 /*!
     \fn QStringList QMimeType::aliases() const;
     \brief Returns the aliases of the MIME type.
@@ -205,6 +203,7 @@ QStringList QMimeType::aliases() const
 {
     return d->aliases;
 }
+#endif
 
 /*!
     \fn QString QMimeType::comment() const;
@@ -229,7 +228,7 @@ static inline QString systemLanguage()
 /*!
     \param localeArg en, de...
 */
-QString QMimeType::localeComment(const QString &localeArg) const
+QString QMimeType::localeComment(const QString &localeArg) const // TODO use QTranslator's language?
 {
     QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     const QString locale = localeArg.isEmpty() ? systemLanguage() : localeArg;

@@ -71,8 +71,9 @@ public:
 
     QString name() const;
 
-    // What is the use case for this? [apart from mimetypeviewer.cpp ...]
+#if 0
     QStringList aliases() const;
+#endif
 
     QString comment() const;
 
