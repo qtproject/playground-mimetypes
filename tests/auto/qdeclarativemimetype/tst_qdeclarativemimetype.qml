@@ -51,7 +51,6 @@ TestCase {
     MimeType {
         id: instantiatedPngMimeType
         name: Data.mimeTypeName()
-        comment: Data.mimeTypeComment()
         genericIconName: Data.mimeTypeGenericIconName()
         iconName: Data.mimeTypeIconName()
         globPatterns: Data.mimeTypeGlobPatterns()

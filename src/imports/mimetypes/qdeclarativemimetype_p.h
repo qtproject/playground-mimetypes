@@ -61,11 +61,11 @@ class QDeclarativeMimeType : public QObject
                READ aliases
                WRITE setAliases
                STORED false)
-#endif
 
     Q_PROPERTY(QString comment
                READ comment
                WRITE setComment)
+#endif
 
     Q_PROPERTY(QString genericIconName
                READ genericIconName
@@ -117,9 +117,9 @@ public:
 #if 0
     QVariantList aliases() const;
     void setAliases(const QVariantList &newAliases);
-#endif
     QString comment() const;
     void setComment(const QString &newComment);
+#endif
     QString genericIconName() const;
     void setGenericIconName(const QString &newGenericIconName);
     QString iconName() const;

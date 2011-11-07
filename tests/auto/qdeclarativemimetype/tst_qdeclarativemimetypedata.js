@@ -36,13 +36,13 @@ function equalMimeTypeName(lhs, rhs) {
 //    return equalArrays(lhs, rhs)
 //}
 
-function mimeTypeComment() {
-    return "PNG File";
-}
+//function mimeTypeComment() {
+//    return "PNG File";
+//}
 
-function equalMimeTypeComment(lhs, rhs) {
-    return equalStrings(lhs, rhs)
-}
+//function equalMimeTypeComment(lhs, rhs) {
+//    return equalStrings(lhs, rhs)
+//}
 
 function mimeTypeGenericIconName() {
     return "/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png"

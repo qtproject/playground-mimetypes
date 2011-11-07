@@ -35,7 +35,7 @@ QMimeTypePrivate::QMimeTypePrivate()
 
 QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
         : name(other.d->name)
-        , comment(other.d->comment)
+        //, comment(other.d->comment)
         , localeComments(other.d->localeComments)
         , genericIconName(other.d->genericIconName)
         , iconName(other.d->iconName)
@@ -45,7 +45,7 @@ QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
 void QMimeTypePrivate::clear()
 {
     name.clear();
-    comment.clear();
+    //comment.clear();
     localeComments.clear();
     genericIconName.clear();
     iconName.clear();
@@ -55,7 +55,7 @@ void QMimeTypePrivate::clear()
 bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
 {
     return name == other.name &&
-            comment == other.comment &&
+            //comment == other.comment &&
             localeComments == other.localeComments &&
             genericIconName == other.genericIconName &&
             iconName == other.iconName &&
@@ -236,8 +236,8 @@ QString QMimeType::comment(const QString& localeName) const
         }
     }
 
-    // Use d->comment as fallback, but this is only used by the declarative bindings
-    return d->comment;
+    // Use d->name as fallback, but this is only used by filterString()
+    return d->name;
 }
 
 /*!
