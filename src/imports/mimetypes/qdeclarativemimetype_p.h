@@ -56,10 +56,12 @@ class QDeclarativeMimeType : public QObject
                READ name
                WRITE setName)
 
+#if 0
     Q_PROPERTY(QVariantList aliases
                READ aliases
                WRITE setAliases
                STORED false)
+#endif
 
     Q_PROPERTY(QString comment
                READ comment
@@ -112,8 +114,10 @@ public:
 
     QString name() const;
     void setName(const QString &newName);
+#if 0
     QVariantList aliases() const;
     void setAliases(const QVariantList &newAliases);
+#endif
     QString comment() const;
     void setComment(const QString &newComment);
     QString genericIconName() const;

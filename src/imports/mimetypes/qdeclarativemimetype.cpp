@@ -65,7 +65,7 @@ QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theP
 QDeclarativeMimeType::~QDeclarativeMimeType()
 {
     //qDebug() << Q_FUNC_INFO << "name():" << name();
-    //qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
     //qDebug() << Q_FUNC_INFO << "comment():" << comment();
     //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
     //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
@@ -106,7 +106,7 @@ QVariantMap QDeclarativeMimeType::properties() const
 {
     QVariantMap result;
     ASSIGN_TO_PROPERTY(name)
-    ASSIGN_TO_PROPERTY(aliases)
+    //ASSIGN_TO_PROPERTY(aliases)
     ASSIGN_TO_PROPERTY(comment)
     ASSIGN_TO_PROPERTY(genericIconName)
     ASSIGN_TO_PROPERTY(iconName)
@@ -135,7 +135,7 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 {
     m_MimeType = QMimeType(QMimeTypePrivate());
     ASSIGN_FROM_PROPERTY(name, setName, String, toString)
-    ASSIGN_FROM_PROPERTY(aliases, setAliases, List, toList)
+    //ASSIGN_FROM_PROPERTY(aliases, setAliases, List, toList)
     ASSIGN_FROM_PROPERTY(comment, setComment, String, toString)
     ASSIGN_FROM_PROPERTY(genericIconName, setGenericIconName, String, toString)
     ASSIGN_FROM_PROPERTY(iconName, setIconName, String, toString)
@@ -168,7 +168,7 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 bool QDeclarativeMimeType::equalsProperties(const QVariantMap &other) const
 {
     EQUALS_PROPERTY(name, String, toString)
-    EQUALS_PROPERTY(aliases, List, toList)
+    //EQUALS_PROPERTY(aliases, List, toList)
     EQUALS_PROPERTY(comment, String, toString)
     EQUALS_PROPERTY(genericIconName, String, toString)
     EQUALS_PROPERTY(iconName, String, toString)
@@ -195,7 +195,7 @@ bool QDeclarativeMimeType::isValid() const
 
 static QMimeType buildMimeType (
                      const QString &name,
-                     const QStringList &aliases,
+                     //const QStringList &aliases,
                      const QString &comment,
                      const QString &genericIconName,
                      const QString &iconName,
@@ -204,7 +204,7 @@ static QMimeType buildMimeType (
 {
     QMimeTypePrivate mimeTypeData;
     mimeTypeData.name = name;
-    mimeTypeData.aliases = aliases;
+    //mimeTypeData.aliases = aliases;
     mimeTypeData.comment = comment;
     mimeTypeData.genericIconName = genericIconName;
     mimeTypeData.iconName = iconName;
@@ -223,11 +223,12 @@ QString QDeclarativeMimeType::name() const
 
 void QDeclarativeMimeType::setName(const QString &newName)
 {
-    m_MimeType = buildMimeType(newName, m_MimeType.aliases(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildMimeType(newName, /*m_MimeType.aliases(),*/ m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
 
+#if 0
 QVariantList QDeclarativeMimeType::aliases() const
 {
     QVariantList result;
@@ -258,6 +259,7 @@ void QDeclarativeMimeType::setAliases(const QVariantList &newAliases)
 }
 
 // ------------------------------------------------------------------------------------------------
+#endif
 
 QString QDeclarativeMimeType::comment() const
 {
@@ -268,7 +270,7 @@ QString QDeclarativeMimeType::comment() const
 
 void QDeclarativeMimeType::setComment(const QString &newComment)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.aliases(), newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildMimeType(m_MimeType.name(), /*m_MimeType.aliases(),*/ newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -282,7 +284,7 @@ QString QDeclarativeMimeType::genericIconName() const
 
 void QDeclarativeMimeType::setGenericIconName(const QString &newGenericIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.aliases(), m_MimeType.comment(), newGenericIconName, m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildMimeType(m_MimeType.name(), /*m_MimeType.aliases(),*/ m_MimeType.comment(), newGenericIconName, m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -296,7 +298,7 @@ QString QDeclarativeMimeType::iconName() const
 
 void QDeclarativeMimeType::setIconName(const QString &newIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.aliases(), m_MimeType.comment(), m_MimeType.genericIconName(), newIconName, m_MimeType.globPatterns());
+    m_MimeType = buildMimeType(m_MimeType.name(), /*m_MimeType.aliases(),*/ m_MimeType.comment(), m_MimeType.genericIconName(), newIconName, m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -327,7 +329,7 @@ void QDeclarativeMimeType::setGlobPatterns(const QVariantList &newGlobPatterns)
         newGlobPatternsStringList << variant.toString();
     }
 
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.aliases(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), newGlobPatternsStringList);
+    m_MimeType = buildMimeType(m_MimeType.name(), /*m_MimeType.aliases(),*/ m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), newGlobPatternsStringList);
 }
 
 // ------------------------------------------------------------------------------------------------

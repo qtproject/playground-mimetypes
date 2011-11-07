@@ -28,13 +28,13 @@ function equalMimeTypeName(lhs, rhs) {
     return equalStrings(lhs, rhs)
 }
 
-function mimeTypeAliases() {
-    return [ "picture/png" ]
-}
+//function mimeTypeAliases() {
+//    return [ "picture/png" ]
+//}
 
-function equalMimeTypeAliases(lhs, rhs) {
-    return equalArrays(lhs, rhs)
-}
+//function equalMimeTypeAliases(lhs, rhs) {
+//    return equalArrays(lhs, rhs)
+//}
 
 function mimeTypeComment() {
     return "PNG File";
