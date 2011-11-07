@@ -166,7 +166,8 @@ bool QMimeType::operator==(const QMimeType &other) const
  */
 
 /*!
-    Returns true if the MIME type is valid, otherwise returns false.
+    \fn bool QMimeType::isValid() const;
+    \brief Returns true if the MIME type is valid, otherwise returns false.
     A valid MIME type has a non-empty name().
     The invalid MIME type is the default-constructed QMimeType.
  */

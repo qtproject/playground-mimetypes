@@ -55,7 +55,6 @@ TestCase {
         genericIconName: Data.mimeTypeGenericIconName()
         iconName: Data.mimeTypeIconName()
         globPatterns: Data.mimeTypeGlobPatterns()
-        suffixes: Data.mimeTypeSuffixes()
     }
 
     MimeType {

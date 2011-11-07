@@ -39,12 +39,12 @@
 **
 ****************************************************************************/
 
-#include "qdeclarativemimetype_p.h"
+#include "qdeclarativemimetype_p.h"   // Basis
 
 #include "qmimemagicrulematcher_p.h"
-#include "qmimetype_p.h"
 
 #include <QtCore/QDebug>
+#include <qmimetype_p.h>
 
 // ------------------------------------------------------------------------------------------------
 
@@ -65,6 +65,11 @@ QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theP
 QDeclarativeMimeType::~QDeclarativeMimeType()
 {
     //qDebug() << Q_FUNC_INFO << "name():" << name();
+    //qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    //qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -72,7 +77,8 @@ QDeclarativeMimeType::~QDeclarativeMimeType()
 void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
 {
     if (other == 0) {
-        qWarning() << Q_FUNC_INFO << "other:" << other;
+        qWarning() << Q_FUNC_INFO << "other is 0!";
+        m_MimeType = QMimeType();
         return;
     }
 
@@ -84,11 +90,11 @@ void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
 bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const
 {
     if (other == 0) {
-        qWarning() << Q_FUNC_INFO << "other:" << other;
+        qWarning() << Q_FUNC_INFO << "other is 0!";
         return false;
     }
 
-    return m_MimeType == other->m_MimeType;
+    return this == other || m_MimeType == other->m_MimeType;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -100,6 +106,7 @@ QVariantMap QDeclarativeMimeType::properties() const
 {
     QVariantMap result;
     ASSIGN_TO_PROPERTY(name)
+    ASSIGN_TO_PROPERTY(aliases)
     ASSIGN_TO_PROPERTY(comment)
     ASSIGN_TO_PROPERTY(genericIconName)
     ASSIGN_TO_PROPERTY(iconName)
@@ -128,6 +135,7 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 {
     m_MimeType = QMimeType(QMimeTypePrivate());
     ASSIGN_FROM_PROPERTY(name, setName, String, toString)
+    ASSIGN_FROM_PROPERTY(aliases, setAliases, List, toList)
     ASSIGN_FROM_PROPERTY(comment, setComment, String, toString)
     ASSIGN_FROM_PROPERTY(genericIconName, setGenericIconName, String, toString)
     ASSIGN_FROM_PROPERTY(iconName, setIconName, String, toString)
@@ -160,6 +168,7 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 bool QDeclarativeMimeType::equalsProperties(const QVariantMap &other) const
 {
     EQUALS_PROPERTY(name, String, toString)
+    EQUALS_PROPERTY(aliases, List, toList)
     EQUALS_PROPERTY(comment, String, toString)
     EQUALS_PROPERTY(genericIconName, String, toString)
     EQUALS_PROPERTY(iconName, String, toString)
@@ -184,15 +193,9 @@ bool QDeclarativeMimeType::isValid() const
 
 // ------------------------------------------------------------------------------------------------
 
-QString QDeclarativeMimeType::name() const
-{
-    return m_MimeType.name();
-}
-
-// ------------------------------------------------------------------------------------------------
-
 static QMimeType buildMimeType (
                      const QString &name,
+                     const QStringList &aliases,
                      const QString &comment,
                      const QString &genericIconName,
                      const QString &iconName,
@@ -201,6 +204,7 @@ static QMimeType buildMimeType (
 {
     QMimeTypePrivate mimeTypeData;
     mimeTypeData.name = name;
+    mimeTypeData.aliases = aliases;
     mimeTypeData.comment = comment;
     mimeTypeData.genericIconName = genericIconName;
     mimeTypeData.iconName = iconName;
@@ -210,9 +214,47 @@ static QMimeType buildMimeType (
 
 // ------------------------------------------------------------------------------------------------
 
+QString QDeclarativeMimeType::name() const
+{
+    return m_MimeType.name();
+}
+
+// ------------------------------------------------------------------------------------------------
+
 void QDeclarativeMimeType::setName(const QString &newName)
 {
-    m_MimeType = buildMimeType(newName, m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildMimeType(newName, m_MimeType.aliases(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
+}
+
+// ------------------------------------------------------------------------------------------------
+
+QVariantList QDeclarativeMimeType::aliases() const
+{
+    QVariantList result;
+
+    foreach (const QString &str, m_MimeType.aliases()) {
+        result << str;
+    }
+
+    return result;
+}
+
+// ------------------------------------------------------------------------------------------------
+
+void QDeclarativeMimeType::setAliases(const QVariantList &newAliases)
+{
+    QList<QString> newAliasesStringList;
+
+    foreach (const QVariant &variant, newAliases) {
+        if (variant.type() != QVariant::String) {
+            qWarning() << Q_FUNC_INFO << "variant" << variant << "is not a string!";
+            continue;
+        }
+
+        newAliasesStringList << variant.toString();
+    }
+
+    m_MimeType = buildMimeType(m_MimeType.name(), newAliasesStringList, m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -226,7 +268,7 @@ QString QDeclarativeMimeType::comment() const
 
 void QDeclarativeMimeType::setComment(const QString &newComment)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.aliases(), newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -240,7 +282,7 @@ QString QDeclarativeMimeType::genericIconName() const
 
 void QDeclarativeMimeType::setGenericIconName(const QString &newGenericIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), newGenericIconName, m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.aliases(), m_MimeType.comment(), newGenericIconName, m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -254,7 +296,7 @@ QString QDeclarativeMimeType::iconName() const
 
 void QDeclarativeMimeType::setIconName(const QString &newIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), newIconName, m_MimeType.globPatterns());
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.aliases(), m_MimeType.comment(), m_MimeType.genericIconName(), newIconName, m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -263,8 +305,8 @@ QVariantList QDeclarativeMimeType::globPatterns() const
 {
     QVariantList result;
 
-    foreach (const QString &pattern, m_MimeType.globPatterns()) {
-        result << pattern;
+    foreach (const QString &str, m_MimeType.globPatterns()) {
+        result << str;
     }
 
     return result;
@@ -276,16 +318,16 @@ void QDeclarativeMimeType::setGlobPatterns(const QVariantList &newGlobPatterns)
 {
     QList<QString> newGlobPatternsStringList;
 
-    foreach (const QVariant &newGlobPattern, newGlobPatterns) {
-        if (newGlobPattern.type() != QVariant::String) {
-            qWarning() << Q_FUNC_INFO << "newGlobPattern" << newGlobPattern << " is not a string!";
+    foreach (const QVariant &variant, newGlobPatterns) {
+        if (variant.type() != QVariant::String) {
+            qWarning() << Q_FUNC_INFO << "variant" << variant << "is not a string!";
             continue;
         }
 
-        newGlobPatternsStringList << newGlobPattern.toString();
+        newGlobPatternsStringList << variant.toString();
     }
 
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), newGlobPatternsStringList);
+    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.aliases(), m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), newGlobPatternsStringList);
 }
 
 // ------------------------------------------------------------------------------------------------

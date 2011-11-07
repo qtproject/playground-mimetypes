@@ -39,14 +39,12 @@
 **
 ****************************************************************************/
 
-#ifndef DECLARATIVE_MIME_TYPE_P_H_INCLUDED
-#define DECLARATIVE_MIME_TYPE_P_H_INCLUDED
-
-#include "qmimetype.h"
-
-#include <QtDeclarative/qdeclarative.h>
+#ifndef QDECLARATIVEMIMETYPE_P_H_INCLUDED
+#define QDECLARATIVEMIMETYPE_P_H_INCLUDED
 
 #include <QtCore/QObject>
+#include <qmimetype.h>
+#include <QtDeclarative/qdeclarative.h>
 
 // ------------------------------------------------------------------------------------------------
 
@@ -57,6 +55,11 @@ class QDeclarativeMimeType : public QObject
     Q_PROPERTY(QString name
                READ name
                WRITE setName)
+
+    Q_PROPERTY(QVariantList aliases
+               READ aliases
+               WRITE setAliases
+               STORED false)
 
     Q_PROPERTY(QString comment
                READ comment
@@ -84,8 +87,8 @@ class QDeclarativeMimeType : public QObject
                STORED false)
 
 protected:
-    // We keep this destructor with its default value of 0 protected since only
-    // QDeclarativePrivate::QDeclarativeElement<T> needs it:
+    // We keep this destructor with its default value of 0 protected since
+    // only QDeclarativePrivate::QDeclarativeElement<T> needs it:
     QDeclarativeMimeType(QObject *theParent = 0);
 
 public:
@@ -109,6 +112,8 @@ public:
 
     QString name() const;
     void setName(const QString &newName);
+    QVariantList aliases() const;
+    void setAliases(const QVariantList &newAliases);
     QString comment() const;
     void setComment(const QString &newComment);
     QString genericIconName() const;
@@ -125,4 +130,4 @@ private:
 
 QML_DECLARE_TYPE(QDeclarativeMimeType)
 
-#endif
+#endif   // QDECLARATIVEMIMETYPE_P_H_INCLUDED

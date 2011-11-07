@@ -51,6 +51,7 @@ TestCase {
     MimeType {
         id: firstMimeType
         name: Data.mimeTypeName()
+        aliases: Data.mimeTypeAliases()
         comment: Data.mimeTypeComment()
         genericIconName: Data.mimeTypeGenericIconName()
         iconName: Data.mimeTypeIconName()
@@ -88,6 +89,7 @@ TestCase {
         compare(firstMimeType.equals(secondMimeType), false)
 
         javaScriptObject.name = Data.mimeTypeName()
+        javaScriptObject.aliases = Data.mimeTypeAliases()
         javaScriptObject.comment = Data.mimeTypeComment()
         javaScriptObject.genericIconName = Data.mimeTypeGenericIconName()
         javaScriptObject.iconName = Data.mimeTypeIconName()
@@ -117,6 +119,31 @@ TestCase {
         compare(firstMimeType.equals(secondMimeType), false)
 
         javaScriptObject.name = firstMimeType.name
+        compare(firstMimeType.equalsProperties(javaScriptObject), true)
+        secondMimeType.assignProperties(javaScriptObject);
+        compare(firstMimeType.equals(secondMimeType), true)
+    }
+
+    function test_aliases() {
+        // Verify that the Aliases is part of the equality test:
+        //compare(firstMimeType.aliases, Data.mimeTypeAliases())
+        compare(Data.equalMimeTypeAliases(firstMimeType.aliases, Data.mimeTypeAliases()), true)
+
+        secondMimeType.assign(firstMimeType)
+
+        secondMimeType.aliases = defaultMimeType.aliases   // simulate an error
+        compare(firstMimeType.equals(secondMimeType), false)
+        secondMimeType.aliases = firstMimeType.aliases
+        compare(firstMimeType.equals(secondMimeType), true)
+
+        var javaScriptObject = firstMimeType.properties()
+
+        javaScriptObject.aliases = defaultMimeType.aliases   // simulate an error
+        compare(firstMimeType.equalsProperties(javaScriptObject), false)
+        secondMimeType.assignProperties(javaScriptObject);
+        compare(firstMimeType.equals(secondMimeType), false)
+
+        javaScriptObject.aliases = firstMimeType.aliases
         compare(firstMimeType.equalsProperties(javaScriptObject), true)
         secondMimeType.assignProperties(javaScriptObject);
         compare(firstMimeType.equals(secondMimeType), true)
