@@ -236,7 +236,7 @@ QString QMimeType::comment(const QString& localeName) const
         }
     }
 
-    // Use d->name as fallback, but this is only used by filterString()
+    // Use the mimetype name as fallback
     return d->name;
 }
 
