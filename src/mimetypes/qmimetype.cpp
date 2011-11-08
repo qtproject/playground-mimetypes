@@ -67,29 +67,25 @@ void QMimeTypePrivate::addGlobPattern(const QString &pattern)
     globPatterns.append(pattern);
 }
 
-// TODO rewrite this docu!
 /*!
     \class QMimeType
 
-    \brief MIME type data used in Qt Creator
+    \brief File or data type, represented by a MIME type string.
 
-    Contains most information from standard MIME type XML database files.
+    For instance a file named "readme.txt" has the MIME type "text/plain".
+    The MIME type can be determined from the file name, or from the file
+    contents, or from both. MIME type determination can also be done on
+    buffers of data not coming from files.
 
-    In addition, the class provides a list of suffixes and a concept of the
-    'preferred suffix' (derived from glob patterns). This is used for example
-    to be able to configure the suffix used for C++-files in Qt Creator.
+    Determining the MIME type of a file can be useful to make sure your
+    application supports it. It is also useful in file-manager-like applications
+    or widgets, in order to display an appropriate icon() for the file, or even
+    the descriptive comment() in detailed views.
 
-    MIME XML looks like:
-    \code
-    <?xml version="1.0" encoding="UTF-8"?>
-    <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-    <!-- MIME types must match the desktop file associations -->
-      <mime-type type="application/vnd.nokia.qt.qmakeprofile">
-        <comment xml:lang="en">Qt qmake Profile</comment>
-        <glob pattern="*.pro" weight="50"/>
-      </mime-type>
-    </mime-info>
-    \endcode
+    To check if a file has the expected MIME type, you should use inherits()
+    rather than a simple string comparison based on the name(). This is because
+    MIME types can inherit from each other: for instance a C source file is
+    a specific type of plain text file, so text/x-csrc inherits text/plain.
 
     \sa QMimeDatabase
  */
@@ -344,7 +340,7 @@ QString QMimeType::filterString() const
     QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     QString filter;
 
-    if (!d->globPatterns.empty()) { // !Binary files
+    if (!d->globPatterns.empty()) {
         filter += comment() + QLatin1String(" (");
         for (int i = 0; i < d->globPatterns.size(); ++i) {
             if (i != 0)

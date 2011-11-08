@@ -227,10 +227,44 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
     return false;
 }
 
-// TODO write more docu
 /*!
     \class QMimeDatabase
     \brief Database of MIME types
+
+    The MIME type database is provided by the freedesktop.org shared-mime-info
+    project. If the MIME type database cannot be found on the system, Qt
+    will use its own copy of it.
+
+    Applications which want to define custom MIME types need to install an
+    XML file into the locations searched for MIME definitions.
+    These locations can be queried with
+    QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/packages"),
+    QStandardPaths::LocateDirectory);
+    On a typical Unix system, this will be /usr/share/mime/packages/, but it is also
+    possible to extend the list of directories by setting the environment variable
+    XDG_DATA_DIRS. For instance adding /opt/myapp/share to XDG_DATA_DIRS will result
+    in /opt/myapp/share/mime/packages/ being searched for MIME definitions.
+
+    Here is an example of MIME XML:
+    \code
+    <?xml version="1.0" encoding="UTF-8"?>
+    <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+      <mime-type type="application/vnd.nokia.qt.qmakeprofile">
+        <comment xml:lang="en">Qt qmake Profile</comment>
+        <glob pattern="*.pro" weight="50"/>
+      </mime-type>
+    </mime-info>
+    \endcode
+
+    For more details about the syntax of XML MIME definitions, including defining
+    "magic" in order to detect MIME types based on data as well, read the
+    Shared Mime Info specification at
+    http://standards.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html
+
+    On Unix systems, a binary cache is used for more performance. This cache is generated
+    by the command "update-mime-database path", where path would be /opt/myapp/share/mime
+    in the above example. Make sure to run this command when installing the MIME type
+    definition file.
 
     The class is protected by a QMutex and can therefore be accessed by threads.
 
