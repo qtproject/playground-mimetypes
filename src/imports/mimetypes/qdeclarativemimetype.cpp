@@ -70,6 +70,7 @@ QDeclarativeMimeType::~QDeclarativeMimeType()
     //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
     //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
     //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    //qDebug() << Q_FUNC_INFO << "suffixes():" << suffixes();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -338,10 +339,9 @@ QVariantList QDeclarativeMimeType::suffixes() const
 {
     QVariantList result;
 
-    foreach (const QString &suffix, m_MimeType.suffixes()) {
-        result << suffix;
+    foreach (const QString &str, m_MimeType.suffixes()) {
+        result << str;
     }
 
     return result;
 }
-
