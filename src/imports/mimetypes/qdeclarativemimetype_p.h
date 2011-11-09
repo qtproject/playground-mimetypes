@@ -46,6 +46,9 @@
 #include <qmimetype.h>
 #include <QtDeclarative/qdeclarative.h>
 
+QT_BEGIN_NAMESPACE class QString; QT_END_NAMESPACE
+QT_BEGIN_NAMESPACE class QStringList; QT_END_NAMESPACE
+
 // ------------------------------------------------------------------------------------------------
 
 class QDeclarativeMimeType : public QObject
@@ -98,6 +101,9 @@ public:
     // likelyhood we want to force the caller to specify its QObject so the
     // object will get destroyed in the caller's destructor:
     QDeclarativeMimeType(const QMimeType &other, QObject *theParent);
+#ifdef Q_COMPILER_RVALUE_REFS
+    QDeclarativeMimeType(QMimeType &&other, QObject *theParent);
+#endif
 
     ~QDeclarativeMimeType();
 

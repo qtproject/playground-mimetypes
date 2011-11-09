@@ -58,7 +58,32 @@ QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent) :
 QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theParent) :
         QObject(theParent),
         m_MimeType(other)
-{}
+{
+    //qDebug() << Q_FUNC_INFO << "name():" << name();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    //qDebug() << Q_FUNC_INFO << "suffixes():" << suffixes();
+}
+
+// ------------------------------------------------------------------------------------------------
+
+#ifdef Q_COMPILER_RVALUE_REFS
+QDeclarativeMimeType::QDeclarativeMimeType(QMimeType &&other, QObject *theParent) :
+        QObject(theParent),
+        m_MimeType(other)
+{
+    //qDebug() << Q_FUNC_INFO << "name():" << name();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    //qDebug() << Q_FUNC_INFO << "suffixes():" << suffixes();
+}
+#endif
 
 // ------------------------------------------------------------------------------------------------
 
