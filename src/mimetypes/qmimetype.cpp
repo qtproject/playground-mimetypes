@@ -1,4 +1,4 @@
-/**************************************************************************
+/****************************************************************************
 **
 ** This file is part of QMime
 **
@@ -16,9 +16,10 @@
 ** Public License version 2.1 requirements will be met:
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
-**************************************************************************/
+****************************************************************************/
 
-#include "qmimetype.h"
+#include "qmimetype.h"   // Basis
+
 #include "qmimetype_p.h"
 #include "qmimedatabase_p.h"
 #include "qmimeprovider_p.h"
@@ -135,6 +136,11 @@ QMimeType::QMimeType(QMimeType &&other) :
 QMimeType::QMimeType(const QMimeTypePrivate &dd) :
         d(new QMimeTypePrivate(dd))
 {}
+
+/*!
+    \fn void QMimeType::swap(QMimeType &other);
+    \brief Swaps the properties of a MIME type with the properties of another MIME type.
+ */
 
 /*!
     \fn QMimeType::~QMimeType();
