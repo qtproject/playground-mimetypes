@@ -71,10 +71,8 @@ TestCase {
     MimeType {
         id: instantiatedPngMimeType
         name: pngMimeTypeName()
-        comment: pngMimeTypeComment()
         genericIconName: pngMimeTypeGenericIconName()
         iconName: pngMimeTypeIconName()
-        suffixes: [ firstPngMimeTypeSuffixes() ]
     }
 
     MimeType {
