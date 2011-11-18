@@ -54,4 +54,26 @@ struct QMIME_EXPORT QMimeTypePrivate : public QSharedData
 
 QT_END_NAMESPACE
 
+#define QMIMETYPE_BUILDER \
+    QT_BEGIN_NAMESPACE \
+    static QMimeType buildQMimeType ( \
+                         const QString &name, \
+                         /*const QStringList &aliases,*/ \
+                         /*const QString &comment,*/ \
+                         const QString &genericIconName, \
+                         const QString &iconName, \
+                         const QStringList &globPatterns \
+                     ) \
+    { \
+        QMimeTypePrivate qMimeTypeData; \
+        qMimeTypeData.name = name; \
+        /*qMimeTypeData.aliases = aliases;*/ \
+        /*qMimeTypeData.comment = comment;*/ \
+        qMimeTypeData.genericIconName = genericIconName; \
+        qMimeTypeData.iconName = iconName; \
+        qMimeTypeData.globPatterns = globPatterns; \
+        return QMimeType(qMimeTypeData); \
+    } \
+    QT_END_NAMESPACE
+
 #endif   // QMIMETYPE_P_H_INCLUDED

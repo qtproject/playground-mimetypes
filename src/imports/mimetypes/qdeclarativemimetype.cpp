@@ -219,24 +219,7 @@ bool QDeclarativeMimeType::isValid() const
 
 // ------------------------------------------------------------------------------------------------
 
-static QMimeType buildMimeType (
-                     const QString &name,
-                     //const QStringList &aliases,
-                     //const QString &comment,
-                     const QString &genericIconName,
-                     const QString &iconName,
-                     const QStringList &globPatterns
-                 )
-{
-    QMimeTypePrivate mimeTypeData;
-    mimeTypeData.name = name;
-    //mimeTypeData.aliases = aliases;
-    //mimeTypeData.comment = comment;
-    mimeTypeData.genericIconName = genericIconName;
-    mimeTypeData.iconName = iconName;
-    mimeTypeData.globPatterns = globPatterns;
-    return QMimeType(mimeTypeData);
-}
+QMIMETYPE_BUILDER
 
 // ------------------------------------------------------------------------------------------------
 
@@ -249,7 +232,7 @@ QString QDeclarativeMimeType::name() const
 
 void QDeclarativeMimeType::setName(const QString &newName)
 {
-    m_MimeType = buildMimeType(newName, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildQMimeType(newName, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -281,7 +264,7 @@ void QDeclarativeMimeType::setAliases(const QVariantList &newAliases)
         newAliasesStringList << variant.toString();
     }
 
-    m_MimeType = buildMimeType(m_MimeType.name(), newAliasesStringList, m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildQMimeType(m_MimeType.name(), newAliasesStringList, m_MimeType.comment(), m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -295,7 +278,7 @@ QString QDeclarativeMimeType::comment() const
 
 void QDeclarativeMimeType::setComment(const QString &newComment)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), /*m_MimeType.aliases(),*/ newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildQMimeType(m_MimeType.name(), /*m_MimeType.aliases(),*/ newComment, m_MimeType.genericIconName(), m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -310,7 +293,7 @@ QString QDeclarativeMimeType::genericIconName() const
 
 void QDeclarativeMimeType::setGenericIconName(const QString &newGenericIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), newGenericIconName, m_MimeType.iconName(), m_MimeType.globPatterns());
+    m_MimeType = buildQMimeType(m_MimeType.name(), newGenericIconName, m_MimeType.iconName(), m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -324,7 +307,7 @@ QString QDeclarativeMimeType::iconName() const
 
 void QDeclarativeMimeType::setIconName(const QString &newIconName)
 {
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.genericIconName(), newIconName, m_MimeType.globPatterns());
+    m_MimeType = buildQMimeType(m_MimeType.name(), m_MimeType.genericIconName(), newIconName, m_MimeType.globPatterns());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -355,7 +338,7 @@ void QDeclarativeMimeType::setGlobPatterns(const QVariantList &newGlobPatterns)
         newGlobPatternsStringList << variant.toString();
     }
 
-    m_MimeType = buildMimeType(m_MimeType.name(), m_MimeType.genericIconName(), m_MimeType.iconName(), newGlobPatternsStringList);
+    m_MimeType = buildQMimeType(m_MimeType.name(), m_MimeType.genericIconName(), m_MimeType.iconName(), newGlobPatternsStringList);
 }
 
 // ------------------------------------------------------------------------------------------------
