@@ -76,4 +76,28 @@ QT_END_NAMESPACE
     } \
     QT_END_NAMESPACE
 
+#ifdef Q_COMPILER_RVALUE_REFS
+#define QMIMETYPE_BUILDER_FROM_RVALUE_REFS \
+    QT_BEGIN_NAMESPACE \
+    static QMimeType buildQMimeType ( \
+                         QString &&name, \
+                         /*QStringList &&aliases,*/ \
+                         /*QString &&comment,*/ \
+                         QString &&genericIconName, \
+                         QString &&iconName, \
+                         QStringList &&globPatterns \
+                     ) \
+    { \
+        QMimeTypePrivate qMimeTypeData; \
+        qMimeTypeData.name = name; \
+        /*qMimeTypeData.aliases = aliases;*/ \
+        /*qMimeTypeData.comment = comment;*/ \
+        qMimeTypeData.genericIconName = genericIconName; \
+        qMimeTypeData.iconName = iconName; \
+        qMimeTypeData.globPatterns = globPatterns; \
+        return QMimeType(qMimeTypeData); \
+    } \
+    QT_END_NAMESPACE
+#endif
+
 #endif   // QMIMETYPE_P_H_INCLUDED
