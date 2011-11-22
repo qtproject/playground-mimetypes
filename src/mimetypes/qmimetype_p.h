@@ -89,12 +89,12 @@ QT_END_NAMESPACE
                      ) \
     { \
         QMimeTypePrivate qMimeTypeData; \
-        qMimeTypeData.name = name; \
-        /*qMimeTypeData.aliases = aliases;*/ \
-        /*qMimeTypeData.comment = comment;*/ \
-        qMimeTypeData.genericIconName = genericIconName; \
-        qMimeTypeData.iconName = iconName; \
-        qMimeTypeData.globPatterns = globPatterns; \
+        qMimeTypeData.name = std::move(name); \
+        /*qMimeTypeData.aliases = std::move(aliases);*/ \
+        /*qMimeTypeData.comment = std::move(comment);*/ \
+        qMimeTypeData.genericIconName = std::move(genericIconName); \
+        qMimeTypeData.iconName = std::move(iconName); \
+        qMimeTypeData.globPatterns = std::move(globPatterns); \
         return QMimeType(qMimeTypeData); \
     } \
     QT_END_NAMESPACE
