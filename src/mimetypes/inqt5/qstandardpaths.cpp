@@ -91,7 +91,7 @@ QT_BEGIN_NAMESPACE
            configuration files should be written.
 
 
-    \sa writableLocation() standardLocations() displayName() locate() locateAll()
+    \sa writableLocation(), standardLocations(), displayName(), locate(), locateAll()
 */
 
 /*!

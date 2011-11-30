@@ -306,7 +306,7 @@ QMimeType QMimeDatabase::mimeTypeForName(const QString& nameOrAlias) const
     If \a fileInfo is a unix symbolic link, the file that it refers to
     will be used instead.
 
-    \see isDefault
+    \sa isDefault
 */
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
@@ -340,7 +340,7 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 }
 
 /*!
-    Returns a MIME type for \a file.
+    Returns a MIME type for \a fileName.
 
     This method looks at both the file name and the file contents,
     if necessary. The file extension has priority over the contents,
@@ -351,7 +351,7 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
     known pattern or data, the default MIME type (application/octet-stream)
     is returned.
 
-    The \a file can also include an absolute or relative path.
+    The \a fileName can also include an absolute or relative path.
 */
 QMimeType QMimeDatabase::findByFile(const QString &fileName) const
 {
@@ -424,7 +424,7 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
     Otherwise the matching is done based on the name only
     (except over schemes where filenames don't mean much, like HTTP)
 
-    A valid MIME type is always returned. If \a data doesn't match any
+    A valid MIME type is always returned. If \a url doesn't match any
     known MIME type data, the default MIME type (application/octet-stream)
     is returned.
 */
@@ -453,7 +453,7 @@ QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
     download some of its data in a device. This allows to do full MIME type
     matching for remote files as well.
 
-    A valid MIME type is always returned. If \a data doesn't match any
+    A valid MIME type is always returned. If \a device data doesn't match any
     known MIME type data, the default MIME type (application/octet-stream)
     is returned.
 
@@ -471,7 +471,7 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *d
 }
 
 /*!
-    Returns a MIME type for the given \a fileName and \a device data.
+    Returns a MIME type for the given \a fileName and device \a data.
 
     This overload can be useful when the file is remote, and we started to
     download some of its data. This allows to do full MIME type matching for
