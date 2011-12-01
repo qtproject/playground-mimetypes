@@ -48,6 +48,14 @@
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \qmlclass MimeType
+    \brief File or data type, represented by a MIME type string
+    \inherits QObject
+ */
+
+// ------------------------------------------------------------------------------------------------
+
 QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent) :
         QObject(theParent),
         m_MimeType()
@@ -100,6 +108,10 @@ QDeclarativeMimeType::~QDeclarativeMimeType()
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \qmlmethod MimeType::assign()
+    Assigns from another object.
+ */
 void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
 {
     if (other == 0) {
@@ -113,6 +125,10 @@ void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \qmlmethod MimeType::equals()
+    Compares with the other object for equality.
+ */
 bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const
 {
     if (other == 0) {
@@ -128,6 +144,10 @@ bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const
 #define ASSIGN_TO_PROPERTY(name) \
     result[#name] = name();
 
+/*!
+    \qmlmethod MimeType::properties()
+    Returns the properties as a JavaScript object.
+ */
 QVariantMap QDeclarativeMimeType::properties() const
 {
     QVariantMap result;
@@ -157,6 +177,10 @@ QVariantMap QDeclarativeMimeType::properties() const
         setter(other[#name].converter()); \
     }
 
+/*!
+    \qmlmethod MimeType::assignProperties()
+    Assigns all properties from a JavaScript object.
+ */
 void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 {
     m_MimeType = QMimeType(QMimeTypePrivate());
@@ -191,6 +215,10 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
         return false; \
     }
 
+/*!
+    \qmlmethod MimeType::equalsProperties()
+    Compares if the properties of the specified JavaScript object are equal.
+ */
 bool QDeclarativeMimeType::equalsProperties(const QVariantMap &other) const
 {
     EQUALS_PROPERTY(name, String, toString)
@@ -224,6 +252,13 @@ QMIMETYPE_BUILDER
 #else
 QMIMETYPE_BUILDER_FROM_RVALUE_REFS
 #endif
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \qmlproperty QString MimeType::name
+    name of the MIME type
+ */
 
 // ------------------------------------------------------------------------------------------------
 
@@ -300,6 +335,13 @@ void QDeclarativeMimeType::setComment(const QString &newComment)
 // ------------------------------------------------------------------------------------------------
 #endif
 
+/*!
+    \qmlproperty QString MimeType::genericIconName
+    file name of an icon image that represents the MIME type
+ */
+
+// ------------------------------------------------------------------------------------------------
+
 QString QDeclarativeMimeType::genericIconName() const
 {
     return m_MimeType.genericIconName();
@@ -315,6 +357,13 @@ void QDeclarativeMimeType::setGenericIconName(const QString &newGenericIconName)
     m_MimeType = buildQMimeType(m_MimeType.name(), QString(newGenericIconName), m_MimeType.iconName(), m_MimeType.globPatterns());
 #endif
 }
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \qmlproperty QString MimeType::iconName
+    file name of an icon image that represents the MIME type
+ */
 
 // ------------------------------------------------------------------------------------------------
 
@@ -368,6 +417,13 @@ void QDeclarativeMimeType::setGlobPatterns(const QVariantList &newGlobPatterns)
     m_MimeType = buildQMimeType(m_MimeType.name(), m_MimeType.genericIconName(), m_MimeType.iconName(), QStringList(newGlobPatternsStringList));
 #endif
 }
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \qmlproperty QVariantList MimeType::suffixes
+    known suffixes for the MIME type
+ */
 
 // ------------------------------------------------------------------------------------------------
 

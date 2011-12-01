@@ -179,6 +179,7 @@ bool QMimeType::isValid() const
 }
 
 /*!
+    \fn bool QMimeType::isDefault() const;
     Returns true if this MIME type is the default MIME type which
     applies to all files: application/octet-stream.
  */
@@ -339,6 +340,7 @@ QString QMimeType::preferredSuffix() const
 }
 
 /*!
+    \fn QString QMimeType::filterString() const;
     Returns a filter string usable for a file dialog.
 */
 QString QMimeType::filterString() const
@@ -360,6 +362,7 @@ QString QMimeType::filterString() const
 }
 
 /*!
+    \fn bool QMimeType::inherits(const QString &mimeTypeName) const;
     Returns true if this mimetype is \a mimeTypeName, or inherits \a mimeTypeName,
     or \a mimeTypeName is an alias for this mimetype.
  */
