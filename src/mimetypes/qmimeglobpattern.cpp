@@ -7,7 +7,7 @@
 /*!
     \internal
     \class QMimeGlobMatchResult
-    \brief Accumulates results from glob matching.
+    \brief The QMimeGlobMatchResult class accumulates results from glob matching.
 
     Handles glob weights, and preferring longer matches over shorter matches.
 */
@@ -41,7 +41,7 @@ void QMimeGlobMatchResult::addMatch(const QString &mimeType, int weight, const Q
 /*!
     \internal
     \class QMimeGlobPattern
-    \brief Glob pattern for file names for MIME type matching.
+    \brief The QMimeGlobPattern class contains the glob pattern for file names for MIME type matching.
 
     \sa QMimeType, QMimeDatabase, QMimeMagicRuleMatcher, QMimeMagicRule
 */

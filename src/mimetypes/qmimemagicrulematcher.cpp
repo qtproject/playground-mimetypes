@@ -31,7 +31,7 @@ QT_BEGIN_NAMESPACE
     \internal
     \class QMimeMagicRuleMatcher
 
-    \brief A Magic matcher that checks a number of rules based on operator "or".
+    \brief The QMimeMagicRuleMatcher class checks a number of rules based on operator "or".
 
     It is used for rules parsed from XML files.
 
