@@ -13,8 +13,8 @@ project = projectname
 # <rootdir>/examples.
 # Paths are relative to the  location of this file.
 exampledirs += ../examples
-headerdirs += ../src ../../MT-MW-qmine/src
-sourcedirs += ../src ../../MT-MW-qmine/src
+headerdirs += ../src
+sourcedirs += src ../src
 imagedirs += images
 Cpp.ignoretokens += QMIME_EXPORT
 
