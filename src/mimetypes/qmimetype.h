@@ -75,7 +75,7 @@ public:
     QStringList aliases() const;
 #endif
 
-    QString comment(const QString &locale = QString()) const;
+    QString comment(const QString &localeName = QString()) const;
 
     QString genericIconName() const;
 

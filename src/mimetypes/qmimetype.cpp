@@ -210,11 +210,11 @@ QStringList QMimeType::aliases() const
 #endif
 
 /*!
-    \fn QString QMimeType::comment() const;
+    \fn QString QMimeType::comment(const QString& localeName) const;
     \brief Returns the description of the MIME type to be displayed on user interfaces.
 
     The system language (QLocale::system().name()) is used to select the appropriate translation.
-    Another language can be specified by setting the \a localName argument.
+    Another language can be specified by setting the \a localeName argument.
  */
 QString QMimeType::comment(const QString& localeName) const
 {
