@@ -1,3 +1,5 @@
+include(doc/doc.pri)
+
 TEMPLATE = subdirs
 
 module_src.subdir = src
