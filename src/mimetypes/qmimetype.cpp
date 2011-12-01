@@ -71,7 +71,7 @@ void QMimeTypePrivate::addGlobPattern(const QString &pattern)
 /*!
     \class QMimeType
 
-    \brief File or data type, represented by a MIME type string.
+    \brief The QMimeType class describes types of file or data, represented by a MIME type string.
 
     For instance a file named "readme.txt" has the MIME type "text/plain".
     The MIME type can be determined from the file name, or from the file

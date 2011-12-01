@@ -229,7 +229,7 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
 
 /*!
     \class QMimeDatabase
-    \brief Database of MIME types
+    \brief The QMimeDatabase class maintains a database of MIME types.
 
     The MIME type database is provided by the freedesktop.org shared-mime-info
     project. If the MIME type database cannot be found on the system, Qt

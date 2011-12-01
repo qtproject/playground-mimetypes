@@ -60,7 +60,7 @@ const char *const matchMaskAttributeC = "mask";
 
 /*!
     \class MimeTypeParser
-    \brief MIME type parser that builds a MIME database hierarchy by adding to QMimeDatabasePrivate
+    \brief The MimeTypeParser class parses MIME types, and builds a MIME database hierarchy by adding to QMimeDatabasePrivate.
 
     Populates MimeDataBase
 
@@ -71,7 +71,7 @@ const char *const matchMaskAttributeC = "mask";
 
 /*!
     \class BaseMimeTypeParser
-    \brief Generic parser for a sequence of <mime-type>.
+    \brief The BaseMimeTypeParser class parses for a sequence of <mime-type> in a generic way.
 
     Calls abstract handler function process for QMimeType it finds.
 
