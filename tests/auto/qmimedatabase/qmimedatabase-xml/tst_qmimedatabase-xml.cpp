@@ -1,4 +1,4 @@
-#include <../tst_qmimedatabase.h>
+#include "../tst_qmimedatabase.h"
 
 tst_qmimedatabase::tst_qmimedatabase()
 {

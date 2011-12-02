@@ -44,8 +44,8 @@
 #include <qmimemagicrulematcher_p.h>
 #include <qmimetype_p.h>
 
-#include <QMimeType>
-#include <QMimeDatabase>
+#include <qmimetype.h>
+#include <qmimedatabase.h>
 
 #include <QtTest/QtTest>
 

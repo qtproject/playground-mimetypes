@@ -14,7 +14,7 @@
 #endif
 #endif
 
-#include <QMimeDatabase>
+#include <qmimedatabase.h>
 
 tst_qmimedatabase::~tst_qmimedatabase()
 {

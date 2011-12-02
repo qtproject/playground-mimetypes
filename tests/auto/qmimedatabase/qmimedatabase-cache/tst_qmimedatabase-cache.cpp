@@ -1,4 +1,4 @@
-#include <../tst_qmimedatabase.h>
+#include "../tst_qmimedatabase.h"
 #include <QDir>
 #include <QFile>
 #include <QtTest>
