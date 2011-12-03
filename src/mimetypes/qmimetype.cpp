@@ -97,7 +97,14 @@ void QMimeTypePrivate::addGlobPattern(const QString &pattern)
  */
 QMimeType::QMimeType() :
         d(new QMimeTypePrivate())
-{}
+{
+    //qDebug() << Q_FUNC_INFO << "name():" << name();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+}
 
 /*!
     \fn QMimeType::QMimeType(const QMimeType &other);
@@ -106,7 +113,14 @@ QMimeType::QMimeType() :
  */
 QMimeType::QMimeType(const QMimeType &other) :
         d(other.d)
-{}
+{
+    //qDebug() << Q_FUNC_INFO << "name():" << name();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+}
 
 #if !defined(Q_COMPILER_RVALUE_REFS) || TEST_COMPILER_RVALUE_REFS == 0
 /*!
@@ -130,12 +144,26 @@ QMimeType &QMimeType::operator=(const QMimeType &other)
  */
 QMimeType::QMimeType(QMimeType &&other) :
         d(std::move(other.d))
-{}
+{
+    //qDebug() << Q_FUNC_INFO << "name():" << name();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+}
 #endif
 
 QMimeType::QMimeType(const QMimeTypePrivate &dd) :
         d(new QMimeTypePrivate(dd))
-{}
+{
+    //qDebug() << Q_FUNC_INFO << "name():" << name();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+}
 
 /*!
     \fn void QMimeType::swap(QMimeType &other);
@@ -147,7 +175,14 @@ QMimeType::QMimeType(const QMimeTypePrivate &dd) :
     \brief Releases the d.
  */
 QMimeType::~QMimeType()
-{}
+{
+    //qDebug() << Q_FUNC_INFO << "name():" << name();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+}
 
 /*!
     \fn bool QMimeType::operator==(const QMimeType &other) const;

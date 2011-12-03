@@ -50,7 +50,7 @@
 
 /*!
     \qmlclass MimeType
-    \brief File or data type, represented by a MIME type string
+    \brief The QML MimeType element describes types of file or data, represented by a MIME type string.
     \inherits QObject
  */
 
@@ -59,7 +59,15 @@
 QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent) :
         QObject(theParent),
         m_MimeType()
-{}
+{
+    //qDebug() << Q_FUNC_INFO << "name():" << name();
+    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
+    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
+    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
+    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
+    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    //qDebug() << Q_FUNC_INFO << "suffixes():" << suffixes();
+}
 
 // ------------------------------------------------------------------------------------------------
 
