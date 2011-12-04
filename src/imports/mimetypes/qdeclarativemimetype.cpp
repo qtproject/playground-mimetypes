@@ -48,6 +48,16 @@
 
 // ------------------------------------------------------------------------------------------------
 
+extern bool isQMimeTypeDebuggingActivated;
+
+#ifndef QT_NO_DEBUG_OUTPUT
+#define DBG() if (isQMimeTypeDebuggingActivated) qDebug() << Q_FUNC_INFO
+#else
+#define DBG() if (0) qDebug() << Q_FUNC_INFO
+#endif
+
+// ------------------------------------------------------------------------------------------------
+
 /*!
     \qmlclass MimeType
     \brief The QML MimeType element describes types of file or data, represented by a MIME type string.
@@ -60,13 +70,13 @@ QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent) :
         QObject(theParent),
         m_MimeType()
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
-    //qDebug() << Q_FUNC_INFO << "suffixes():" << suffixes();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -75,13 +85,13 @@ QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theP
         QObject(theParent),
         m_MimeType(other)
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
-    //qDebug() << Q_FUNC_INFO << "suffixes():" << suffixes();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -91,13 +101,13 @@ QDeclarativeMimeType::QDeclarativeMimeType(QMimeType &&other, QObject *theParent
         QObject(theParent),
         m_MimeType(other)
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
-    //qDebug() << Q_FUNC_INFO << "suffixes():" << suffixes();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
 }
 #endif
 
@@ -105,13 +115,13 @@ QDeclarativeMimeType::QDeclarativeMimeType(QMimeType &&other, QObject *theParent
 
 QDeclarativeMimeType::~QDeclarativeMimeType()
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
-    //qDebug() << Q_FUNC_INFO << "suffixes():" << suffixes();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -445,3 +455,7 @@ QVariantList QDeclarativeMimeType::suffixes() const
 
     return result;
 }
+
+// ------------------------------------------------------------------------------------------------
+
+#undef DBG

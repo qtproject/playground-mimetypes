@@ -31,6 +31,14 @@
 
 QT_BEGIN_NAMESPACE
 
+bool isQMimeTypeDebuggingActivated (false);
+
+#ifndef QT_NO_DEBUG_OUTPUT
+#define DBG() if (isQMimeTypeDebuggingActivated) qDebug() << Q_FUNC_INFO
+#else
+#define DBG() if (0) qDebug() << Q_FUNC_INFO
+#endif
+
 QMimeTypePrivate::QMimeTypePrivate()
 {}
 
@@ -98,12 +106,12 @@ void QMimeTypePrivate::addGlobPattern(const QString &pattern)
 QMimeType::QMimeType() :
         d(new QMimeTypePrivate())
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
 }
 
 /*!
@@ -114,12 +122,12 @@ QMimeType::QMimeType() :
 QMimeType::QMimeType(const QMimeType &other) :
         d(other.d)
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
 }
 
 #if !defined(Q_COMPILER_RVALUE_REFS) || TEST_COMPILER_RVALUE_REFS == 0
@@ -145,24 +153,24 @@ QMimeType &QMimeType::operator=(const QMimeType &other)
 QMimeType::QMimeType(QMimeType &&other) :
         d(std::move(other.d))
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
 }
 #endif
 
 QMimeType::QMimeType(const QMimeTypePrivate &dd) :
         d(new QMimeTypePrivate(dd))
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
 }
 
 /*!
@@ -176,12 +184,12 @@ QMimeType::QMimeType(const QMimeTypePrivate &dd) :
  */
 QMimeType::~QMimeType()
 {
-    //qDebug() << Q_FUNC_INFO << "name():" << name();
-    ////qDebug() << Q_FUNC_INFO << "aliases():" << aliases();
-    ////qDebug() << Q_FUNC_INFO << "comment():" << comment();
-    //qDebug() << Q_FUNC_INFO << "genericIconName():" << genericIconName();
-    //qDebug() << Q_FUNC_INFO << "iconName():" << iconName();
-    //qDebug() << Q_FUNC_INFO << "globPatterns():" << globPatterns();
+    DBG() << "name():" << name();
+    //DBG() << "aliases():" << aliases();
+    //DBG() << "comment():" << comment();
+    DBG() << "genericIconName():" << genericIconName();
+    DBG() << "iconName():" << iconName();
+    DBG() << "globPatterns():" << globPatterns();
 }
 
 /*!
@@ -408,5 +416,6 @@ bool QMimeType::inherits(const QString &mimeTypeName) const
     return QMimeDatabasePrivate::instance()->inherits(d->name, mimeTypeName);
 }
 
+#undef DBG
 
 QT_END_NAMESPACE
