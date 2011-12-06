@@ -108,15 +108,15 @@ QVariantList QDeclarativeMimeDatabase::mimeTypeNames() const
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod MimeDatabase::mimeTypeForName()
+    \qmlmethod MimeType MimeDatabase::mimeTypeForName(string nameOrAlias)
     \brief Returns a MIME type for \a nameOrAlias or an invalid one if none found.
  */
 QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
-                                                    const QString &mimeTypeName
+                                                    const QString &nameOrAlias
                                                 )
 {
     return new QDeclarativeMimeType (
-                   m_MimeDatabase.mimeTypeForName(mimeTypeName),
+                   m_MimeDatabase.mimeTypeForName(nameOrAlias),
                    this   // <- The new object will be released later
                           //    when this registry is released.
                );
@@ -125,7 +125,7 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod MimeDatabase::findByName()
+    \qmlmethod MimeType MimeDatabase::findByName(string fileName)
     \brief Returns a MIME type for the file \a fileName.
 
     A valid MIME type is always returned. If the file name doesn't match any
@@ -133,8 +133,7 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
     is returned.
 
     This function does not try to open the file. To also use the content
-    when determining the MIME type, use QMimeDatabase::findByFile or
-    QMimeDatabase::findByNameAndData instead.
+    when determining the MIME type, use findByFile().
 */
 QDeclarativeMimeType *QDeclarativeMimeDatabase::findByName (
                                                     const QString &fileName
@@ -150,7 +149,7 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::findByName (
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod MimeDatabase::findByFile()
+    \qmlmethod MimeType MimeDatabase::findByFile(string fileName)
     \brief Returns a MIME type for \a fileName.
 
     This method looks at both the file name and the file contents,

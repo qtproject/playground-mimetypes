@@ -28,6 +28,8 @@
 #include "qmimetype_p.h"
 #include "qmimeglobpattern_p.h"
 
+// ------------------------------------------------------------------------------------------------
+
 QT_BEGIN_NAMESPACE
 
 class QMimeDatabase;
@@ -40,7 +42,7 @@ struct QMimeDatabasePrivate
     QMimeDatabasePrivate();
     ~QMimeDatabasePrivate();
 
-    static QMimeDatabasePrivate* instance();
+    static QMimeDatabasePrivate *instance();
 
     QMimeProviderBase *provider();
     void setProvider(QMimeProviderBase *theProvider);

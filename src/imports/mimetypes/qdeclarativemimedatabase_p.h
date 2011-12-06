@@ -70,27 +70,19 @@ public:
 
     QMimeDatabase &mimeDatabase();
 
-    // --------------------------------------------------------------------------------------------
-
     QVariantList mimeTypeNames() const;
 
     Q_INVOKABLE QDeclarativeMimeType *mimeTypeForName (
-                                          const QString &mimeTypeName
+                                          const QString &nameOrAlias
                                       );
-
-    // --------------------------------------------------------------------------------------------
 
     Q_INVOKABLE QDeclarativeMimeType *findByName (
                                           const QString &fileName
                                       );
 
-    // --------------------------------------------------------------------------------------------
-
     Q_INVOKABLE QDeclarativeMimeType *findByFile (
                                           const QString &fileName
                                       );
-
-    // --------------------------------------------------------------------------------------------
 
 private:
     QMimeDatabase m_MimeDatabase;

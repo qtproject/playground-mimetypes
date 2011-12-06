@@ -126,7 +126,7 @@ QDeclarativeMimeType::~QDeclarativeMimeType()
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod MimeType::assign()
+    \qmlmethod void MimeType::assign(MimeType other)
     Assigns from another object.
  */
 void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
@@ -143,7 +143,7 @@ void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod MimeType::equals()
+    \qmlmethod void MimeType::equals(MimeType other)
     Compares with the other object for equality.
  */
 bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const
@@ -162,7 +162,7 @@ bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const
     result[#name] = name();
 
 /*!
-    \qmlmethod MimeType::properties()
+    \qmlmethod object MimeType::properties()
     Returns the properties as a JavaScript object.
  */
 QVariantMap QDeclarativeMimeType::properties() const
@@ -195,7 +195,7 @@ QVariantMap QDeclarativeMimeType::properties() const
     }
 
 /*!
-    \qmlmethod MimeType::assignProperties()
+    \qmlmethod void MimeType::assignProperties(object other)
     Assigns all properties from a JavaScript object.
  */
 void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
@@ -233,7 +233,7 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
     }
 
 /*!
-    \qmlmethod MimeType::equalsProperties()
+    \qmlmethod bool MimeType::equalsProperties(object other)
     Compares if the properties of the specified JavaScript object are equal.
  */
 bool QDeclarativeMimeType::equalsProperties(const QVariantMap &other) const

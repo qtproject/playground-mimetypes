@@ -318,6 +318,7 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
 QMimeDatabase::QMimeDatabase() :
         d(staticQMimeDatabase())
 {
+    DBG();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -328,6 +329,8 @@ QMimeDatabase::QMimeDatabase() :
  */
 QMimeDatabase::~QMimeDatabase()
 {
+    DBG();
+
     d = 0;
 }
 
@@ -430,8 +433,8 @@ QMimeType QMimeDatabase::findByFile(const QString &fileName) const
     is returned.
 
     This function does not try to open the file. To also use the content
-    when determining the MIME type, use QMimeDatabase::findByFile or
-    QMimeDatabase::findByNameAndData instead.
+    when determining the MIME type, use findByFile() or
+    findByNameAndData() instead.
 */
 QMimeType QMimeDatabase::findByName(const QString &fileName) const
 {
