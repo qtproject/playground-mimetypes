@@ -1,4 +1,4 @@
-/**************************************************************************
+/****************************************************************************
 **
 ** This file is part of QMime
 **
@@ -16,10 +16,10 @@
 ** Public License version 2.1 requirements will be met:
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
-**************************************************************************/
+****************************************************************************/
 
-#ifndef QMIMEDATABASE_H
-#define QMIMEDATABASE_H
+#ifndef QMIMEDATABASE_H_INCLUDED
+#define QMIMEDATABASE_H_INCLUDED
 
 #include "qmime_global.h"
 
@@ -71,5 +71,5 @@ private:
 };
 
 QT_END_NAMESPACE
-
-#endif // QMIMEDATABASE_H
+  
+#endif   // QMIMEDATABASE_H_INCLUDED

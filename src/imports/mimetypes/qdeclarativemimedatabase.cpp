@@ -39,7 +39,7 @@
 **
 ****************************************************************************/
 
-#include "qdeclarativemimedatabase_p.h"
+#include "qdeclarativemimedatabase_p.h"   // Basis
 
 #include "qdeclarativemimetype_p.h"
 
@@ -47,16 +47,35 @@
 
 // ------------------------------------------------------------------------------------------------
 
+extern bool isQMimeDatabaseDebuggingActivated;
+
+#ifndef QT_NO_DEBUG_OUTPUT
+#define DBG() if (isQMimeDatabaseDebuggingActivated) qDebug() << Q_FUNC_INFO
+#else
+#define DBG() if (0) qDebug() << Q_FUNC_INFO
+#endif
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \qmlclass MimeDatabase QDeclarativeMimeDatabase
+    \brief The QML MimeDatabase element maintains a database of MIME types.
+ */
+
+// ------------------------------------------------------------------------------------------------
+
 QDeclarativeMimeDatabase::QDeclarativeMimeDatabase(QObject *theParent) :
         QObject(theParent),
         m_MimeDatabase()
-{}
+{
+    DBG() << "mimeTypeNames():" << mimeTypeNames();
+}
 
 // ------------------------------------------------------------------------------------------------
 
 QDeclarativeMimeDatabase::~QDeclarativeMimeDatabase()
 {
-    //qDebug() << Q_FUNC_INFO;
+    DBG() << "mimeTypeNames():" << mimeTypeNames();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -65,6 +84,13 @@ QMimeDatabase &QDeclarativeMimeDatabase::mimeDatabase()
 {
     return m_MimeDatabase;
 }
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \qmlproperty QVariantList MimeDatabase::mimeTypeNames
+    list of registered MIME types
+ */
 
 // ------------------------------------------------------------------------------------------------
 
@@ -81,6 +107,10 @@ QVariantList QDeclarativeMimeDatabase::mimeTypeNames() const
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \qmlmethod MimeDatabase::mimeTypeForName()
+    \brief Returns a MIME type for \a nameOrAlias or an invalid one if none found.
+ */
 QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
                                                     const QString &mimeTypeName
                                                 )
@@ -94,6 +124,18 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \qmlmethod MimeDatabase::findByName()
+    \brief Returns a MIME type for the file \a fileName.
+
+    A valid MIME type is always returned. If the file name doesn't match any
+    known pattern, the default MIME type (application/octet-stream)
+    is returned.
+
+    This function does not try to open the file. To also use the content
+    when determining the MIME type, use QMimeDatabase::findByFile or
+    QMimeDatabase::findByNameAndData instead.
+*/
 QDeclarativeMimeType *QDeclarativeMimeDatabase::findByName (
                                                     const QString &fileName
                                                 )
@@ -107,6 +149,21 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::findByName (
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \qmlmethod MimeDatabase::findByFile()
+    \brief Returns a MIME type for \a fileName.
+
+    This method looks at both the file name and the file contents,
+    if necessary. The file extension has priority over the contents,
+    but the contents will be used if the file extension is unknown, or
+    matches multiple MIME types.
+
+    A valid MIME type is always returned. If the file doesn't match any
+    known pattern or data, the default MIME type (application/octet-stream)
+    is returned.
+
+    The \a fileName can also include an absolute or relative path.
+*/
 QDeclarativeMimeType *QDeclarativeMimeDatabase::findByFile (
                                                     const QString &fileName
                                                 )
@@ -117,3 +174,7 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::findByFile (
                           //    when this registry is released.
                );
 }
+
+// ------------------------------------------------------------------------------------------------
+
+#undef DBG

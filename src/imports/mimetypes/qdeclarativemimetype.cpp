@@ -59,9 +59,8 @@ extern bool isQMimeTypeDebuggingActivated;
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlclass MimeType
+    \qmlclass MimeType QDeclarativeMimeType
     \brief The QML MimeType element describes types of file or data, represented by a MIME type string.
-    \inherits QObject
  */
 
 // ------------------------------------------------------------------------------------------------

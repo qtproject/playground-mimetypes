@@ -39,10 +39,10 @@
 **
 ****************************************************************************/
 
-#ifndef QT_DECLARATIVE_MIME_TYPE_REGISTRY_P_H_INCLUDED
-#define QT_DECLARATIVE_MIME_TYPE_REGISTRY_P_H_INCLUDED
+#ifndef QDECLARATIVEMIMEDATABASE_P_H_INCLUDED
+#define QDECLARATIVEMIMEDATABASE_P_H_INCLUDED
 
-#include "qmimedatabase.h"
+#include <qmimedatabase.h>
 
 #include <QtDeclarative/qdeclarative.h>
 
@@ -61,8 +61,8 @@ class QDeclarativeMimeDatabase : public QObject
                STORED false)
 
 protected:
-    // We keep this destructor with its default value of 0 protected since only
-    // QDeclarativePrivate::QDeclarativeElement<T> needs it:
+    // We keep this destructor with its default value of 0 protected since
+    // only QDeclarativePrivate::QDeclarativeElement<T> needs it:
     QDeclarativeMimeDatabase(QObject *theParent = 0);
 
 public:
@@ -98,4 +98,4 @@ private:
 
 QML_DECLARE_TYPE(QDeclarativeMimeDatabase)
 
-#endif   // QT_DECLARATIVE_MIME_TYPE_REGISTRY_P_H_INCLUDED
+#endif   // QDECLARATIVEMIMEDATABASE_P_H_INCLUDED

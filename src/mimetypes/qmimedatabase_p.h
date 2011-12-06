@@ -1,4 +1,4 @@
-/**************************************************************************
+/****************************************************************************
 **
 ** This file is part of QMime
 **
@@ -16,10 +16,10 @@
 ** Public License version 2.1 requirements will be met:
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
-**************************************************************************/
+****************************************************************************/
 
-#ifndef QMIMEDATABASE_P_H
-#define QMIMEDATABASE_P_H
+#ifndef QMIMEDATABASE_P_H_INCLUDED
+#define QMIMEDATABASE_P_H_INCLUDED
 
 #include <QtCore/QMultiHash>
 #include <QtCore/QMutex>
@@ -68,4 +68,4 @@ struct QMimeDatabasePrivate
 
 QT_END_NAMESPACE
 
-#endif // QMIMEDATABASE_P_H
+#endif   // QMIMEDATABASE_P_H_INCLUDED

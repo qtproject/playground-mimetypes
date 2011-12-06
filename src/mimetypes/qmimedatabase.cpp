@@ -1,4 +1,4 @@
-/**************************************************************************
+/****************************************************************************
 **
 ** This file is part of QMime
 **
@@ -16,9 +16,10 @@
 ** Public License version 2.1 requirements will be met:
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
-**************************************************************************/
+****************************************************************************/
 
-#include "qmimedatabase.h"
+#include "qmimedatabase.h"   // Basis
+
 #include "qmimedatabase_p.h"
 
 #include <QtCore/QFile>
@@ -38,23 +39,43 @@
 
 QT_BEGIN_NAMESPACE
 
-Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticMimeDataBase)
+// ------------------------------------------------------------------------------------------------
+
+bool isQMimeDatabaseDebuggingActivated (false);
+
+#ifndef QT_NO_DEBUG_OUTPUT
+#define DBG() if (isQMimeDatabaseDebuggingActivated) qDebug() << Q_FUNC_INFO
+#else
+#define DBG() if (0) qDebug() << Q_FUNC_INFO
+#endif
+
+// ------------------------------------------------------------------------------------------------
+
+Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticQMimeDatabase)
+
+// ------------------------------------------------------------------------------------------------
 
 QMimeDatabasePrivate *QMimeDatabasePrivate::instance()
 {
-    return staticMimeDataBase();
+    return staticQMimeDatabase();
 }
+
+// ------------------------------------------------------------------------------------------------
 
 QMimeDatabasePrivate::QMimeDatabasePrivate()
     : m_provider(0), m_defaultMimeType(QLatin1String("application/octet-stream"))
 {
 }
 
+// ------------------------------------------------------------------------------------------------
+
 QMimeDatabasePrivate::~QMimeDatabasePrivate()
 {
     delete m_provider;
     m_provider = 0;
 }
+
+// ------------------------------------------------------------------------------------------------
 
 QMimeProviderBase *QMimeDatabasePrivate::provider()
 {
@@ -70,11 +91,15 @@ QMimeProviderBase *QMimeDatabasePrivate::provider()
     return m_provider;
 }
 
+// ------------------------------------------------------------------------------------------------
+
 void QMimeDatabasePrivate::setProvider(QMimeProviderBase *theProvider)
 {
     delete m_provider;
     m_provider = theProvider;
 }
+
+// ------------------------------------------------------------------------------------------------
 
 // Returns a MIME type or an invalid one if none found
 QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
@@ -90,6 +115,8 @@ QStringList QMimeDatabasePrivate::findByName(const QString &fileName, QString *f
     const QStringList matchingMimeTypes = provider()->findByName(QFileInfo(fileName).fileName(), foundSuffix);
     return matchingMimeTypes;
 }
+
+// ------------------------------------------------------------------------------------------------
 
 static inline bool isTextFile(const QByteArray &data)
 {
@@ -109,6 +136,8 @@ static inline bool isTextFile(const QByteArray &data)
 
     return true;
 }
+
+// ------------------------------------------------------------------------------------------------
 
 QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, int *accuracyPtr)
 {
@@ -130,6 +159,8 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, int *accuracy
 
     return mimeTypeForName(defaultMimeType());
 }
+
+// ------------------------------------------------------------------------------------------------
 
 QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, int *accuracyPtr)
 {
@@ -189,6 +220,8 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
     return mimeTypeForName(defaultMimeType());
 }
 
+// ------------------------------------------------------------------------------------------------
+
 #if 0
 QStringList QMimeDatabasePrivate::filterStrings() const
 {
@@ -204,11 +237,14 @@ QStringList QMimeDatabasePrivate::filterStrings() const
 }
 #endif
 
+// ------------------------------------------------------------------------------------------------
+
 QList<QMimeType> QMimeDatabasePrivate::allMimeTypes()
 {
     return provider()->allMimeTypes();
 }
 
+// ------------------------------------------------------------------------------------------------
 
 bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
 {
@@ -226,6 +262,8 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
     }
     return false;
 }
+
+// ------------------------------------------------------------------------------------------------
 
 /*!
     \class QMimeDatabase
@@ -269,21 +307,36 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
     The class is protected by a QMutex and can therefore be accessed by threads.
 
     \sa QMimeType
-*/
+ */
 
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \fn QMimeDatabase::QMimeDatabase();
+    \brief Initializes the MIME database.
+ */
 QMimeDatabase::QMimeDatabase() :
-    d(staticMimeDataBase())
+        d(staticQMimeDatabase())
 {
 }
 
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \fn QMimeDatabase::~QMimeDatabase();
+    \brief Resets the d pointer.
+ */
 QMimeDatabase::~QMimeDatabase()
 {
     d = 0;
 }
 
+// ------------------------------------------------------------------------------------------------
+
 /*!
-    Returns a MIME type for \a nameOrAlias or an invalid one if none found.
-*/
+    \fn QMimeType QMimeDatabase::mimeTypeForName(const QString& nameOrAlias) const;
+    \brief Returns a MIME type for \a nameOrAlias or an invalid one if none found.
+ */
 QMimeType QMimeDatabase::mimeTypeForName(const QString& nameOrAlias) const
 {
     QMutexLocker locker(&d->mutex);
@@ -291,8 +344,11 @@ QMimeType QMimeDatabase::mimeTypeForName(const QString& nameOrAlias) const
     return d->mimeTypeForName(nameOrAlias);
 }
 
+// ------------------------------------------------------------------------------------------------
+
 /*!
-    Returns a MIME type for \a fileInfo.
+    \fn QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const;
+    \brief Returns a MIME type for \a fileInfo.
 
     This method looks at both the file name and the file contents,
     if necessary. The file extension has priority over the contents,
@@ -310,7 +366,7 @@ QMimeType QMimeDatabase::mimeTypeForName(const QString& nameOrAlias) const
 */
 QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 {
-    //qDebug() << Q_FUNC_INFO << "fileInfo" << fileInfo.absoluteFilePath();
+    DBG() << "fileInfo" << fileInfo.absoluteFilePath();
 
     QMutexLocker locker(&d->mutex);
 
@@ -339,8 +395,11 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
     return d->findByNameAndData(fileInfo.absoluteFilePath(), &file, &priority);
 }
 
+// ------------------------------------------------------------------------------------------------
+
 /*!
-    Returns a MIME type for \a fileName.
+    \fn QMimeType QMimeDatabase::findByFile(const QString &fileName) const;
+    \brief Returns a MIME type for \a fileName.
 
     This method looks at both the file name and the file contents,
     if necessary. The file extension has priority over the contents,
@@ -360,8 +419,11 @@ QMimeType QMimeDatabase::findByFile(const QString &fileName) const
     return findByFile(fileInfo);
 }
 
+// ------------------------------------------------------------------------------------------------
+
 /*!
-    Returns a MIME type for the file \a fileName.
+    \fn QMimeType QMimeDatabase::findByName(const QString &fileName) const;
+    \brief Returns a MIME type for the file \a fileName.
 
     A valid MIME type is always returned. If the file name doesn't match any
     known pattern, the default MIME type (application/octet-stream)
@@ -388,6 +450,8 @@ QMimeType QMimeDatabase::findByName(const QString &fileName) const
     }
 }
 
+// ------------------------------------------------------------------------------------------------
+
 /*!
     Returns the suffix for the file \a fileName, as known by the MIME database.
 
@@ -401,6 +465,8 @@ QString QMimeDatabase::suffixForFileName(const QString &fileName) const
     d->findByName(fileName, &foundSuffix);
     return foundSuffix;
 }
+
+// ------------------------------------------------------------------------------------------------
 
 /*!
     Returns a MIME type for \a data.
@@ -416,6 +482,8 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
     int accuracy = 0;
     return d->findByData(data, &accuracy);
 }
+
+// ------------------------------------------------------------------------------------------------
 
 /*!
     Returns a MIME type for \a url.
@@ -446,6 +514,8 @@ QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
     return findByName(url.path());
 }
 
+// ------------------------------------------------------------------------------------------------
+
 /*!
     Returns a MIME type for the given \a fileName and \a device data.
 
@@ -464,11 +534,13 @@ QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
 */
 QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *device) const
 {
-    //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
+    DBG() << "fileName" << fileName;
 
     int accuracy = 0;
     return d->findByNameAndData(fileName, device, &accuracy);
 }
+
+// ------------------------------------------------------------------------------------------------
 
 /*!
     Returns a MIME type for the given \a fileName and device \a data.
@@ -488,12 +560,14 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *d
 */
 QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, const QByteArray &data) const
 {
-    //qDebug() << Q_FUNC_INFO << "fileName" << fileName;
+    DBG() << "fileName" << fileName;
 
     QBuffer buffer(const_cast<QByteArray *>(&data));
     int accuracy = 0;
     return d->findByNameAndData(fileName, &buffer, &accuracy);
 }
+
+// ------------------------------------------------------------------------------------------------
 
 /*!
     Returns the list of all available MIME types.
@@ -509,6 +583,8 @@ QList<QMimeType> QMimeDatabase::allMimeTypes() const
     return d->allMimeTypes();
 }
 
+// ------------------------------------------------------------------------------------------------
+
 // TODO: needed?
 #if 0
 QStringList QMimeDatabase::filterStrings() const
@@ -517,6 +593,8 @@ QStringList QMimeDatabase::filterStrings() const
 
     return d->filterStrings();
 }
+
+// ------------------------------------------------------------------------------------------------
 
 /*!
     Returns a string with all the possible file filters, for use with file dialogs
@@ -544,5 +622,11 @@ QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
     return filters.join(QLatin1String(";;"));
 }
 #endif
+
+// ------------------------------------------------------------------------------------------------
+
+#undef DBG
+
+// ------------------------------------------------------------------------------------------------
 
 QT_END_NAMESPACE
