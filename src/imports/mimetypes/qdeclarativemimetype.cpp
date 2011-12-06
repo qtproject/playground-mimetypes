@@ -143,7 +143,7 @@ void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod void MimeType::equals(MimeType other)
+    \qmlmethod bool MimeType::equals(MimeType other)
     Compares with the other object for equality.
  */
 bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const
