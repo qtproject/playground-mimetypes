@@ -87,6 +87,10 @@ class QDeclarativeMimeType : public QObject
                READ suffixes
                STORED false)
 
+    Q_PROPERTY(QString preferredSuffix
+               READ preferredSuffix
+               STORED false)
+
     Q_PROPERTY(bool isValid
                READ isValid
                STORED false)
@@ -133,6 +137,7 @@ public:
     QVariantList globPatterns() const;
     void setGlobPatterns(const QVariantList &newGlobPatterns);
     QVariantList suffixes() const;
+    QString preferredSuffix() const;
 
 private:
     QMimeType m_MimeType;

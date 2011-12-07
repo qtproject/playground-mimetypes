@@ -61,6 +61,10 @@ void QMimeTypePrivate::clear()
     globPatterns.clear();
 }
 
+/*!
+    \fn bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const;
+    \brief Returns if the \a other object has the same value.
+ */
 bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
 {
     return name == other.name &&
@@ -112,6 +116,8 @@ QMimeType::QMimeType() :
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
+    DBG() << "preferredSuffix():" << preferredSuffix();
 }
 
 /*!
@@ -128,6 +134,8 @@ QMimeType::QMimeType(const QMimeType &other) :
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
+    DBG() << "preferredSuffix():" << preferredSuffix();
 }
 
 #if !defined(Q_COMPILER_RVALUE_REFS) || TEST_COMPILER_RVALUE_REFS == 0
@@ -159,9 +167,16 @@ QMimeType::QMimeType(QMimeType &&other) :
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
+    DBG() << "preferredSuffix():" << preferredSuffix();
 }
 #endif
 
+/*!
+    \fn QMimeType::QMimeType(const QMimeTypePrivate &dd);
+    \brief Assigns the data of a private MIME type object.
+    \a dd The private MIME typeobject the data of which is assigned
+ */
 QMimeType::QMimeType(const QMimeTypePrivate &dd) :
         d(new QMimeTypePrivate(dd))
 {
@@ -171,16 +186,19 @@ QMimeType::QMimeType(const QMimeTypePrivate &dd) :
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
+    DBG() << "preferredSuffix():" << preferredSuffix();
 }
 
 /*!
     \fn void QMimeType::swap(QMimeType &other);
     \brief Swaps the properties of a MIME type with the properties of another MIME type.
+    \a other The other value MIME type the data of which is to be swapped with.
  */
 
 /*!
     \fn QMimeType::~QMimeType();
-    \brief Releases the d.
+    \brief Releases the d pointer.
  */
 QMimeType::~QMimeType()
 {
@@ -190,6 +208,8 @@ QMimeType::~QMimeType()
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
+    DBG() << "suffixes():" << suffixes();
+    DBG() << "preferredSuffix():" << preferredSuffix();
 }
 
 /*!
@@ -313,6 +333,10 @@ QString QMimeType::iconName() const
     return d->iconName;
 }
 
+/*!
+    \fn QStringList QMimeType::globPatterns() const;
+    \brief Returns the list of glob matching patterns.
+ */
 QStringList QMimeType::globPatterns() const
 {
     QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);

@@ -64,6 +64,18 @@ extern bool isQMimeDatabaseDebuggingActivated;
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \class QDeclarativeMimeDatabase
+    \brief The QDeclarativeMimeDatabase class is the QML wrapper for the class QMimeDatabase which maintains a database of MIME types.
+    \inherits QObject
+ */
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \fn QDeclarativeMimeDatabase::QDeclarativeMimeDatabase(QObject *theParent);
+    \brief Performs default initialization of the contained MimeDatabase, and attaches the object to the specified parent for destruction.
+ */
 QDeclarativeMimeDatabase::QDeclarativeMimeDatabase(QObject *theParent) :
         QObject(theParent),
         m_MimeDatabase()
@@ -73,6 +85,10 @@ QDeclarativeMimeDatabase::QDeclarativeMimeDatabase(QObject *theParent) :
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \fn QDeclarativeMimeDatabase::~QDeclarativeMimeDatabase();
+    \brief Destroys the the contained MimeDatabase.
+ */
 QDeclarativeMimeDatabase::~QDeclarativeMimeDatabase()
 {
     DBG() << "mimeTypeNames():" << mimeTypeNames();
@@ -80,6 +96,10 @@ QDeclarativeMimeDatabase::~QDeclarativeMimeDatabase()
 
 // ------------------------------------------------------------------------------------------------
 
+/*!
+    \fn QMimeDatabase &QDeclarativeMimeDatabase::mimeDatabase()
+    \brief Returns the contained MimeDatabase.
+ */
 QMimeDatabase &QDeclarativeMimeDatabase::mimeDatabase()
 {
     return m_MimeDatabase;
@@ -111,6 +131,16 @@ QVariantList QDeclarativeMimeDatabase::mimeTypeNames() const
     \qmlmethod MimeType MimeDatabase::mimeTypeForName(string nameOrAlias)
     \brief Returns a MIME type for \a nameOrAlias or an invalid one if none found.
  */
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \property QDeclarativeMimeDatabase::mimeTypeNames
+    \brief the list of registered MIME types
+ */
+
+// ------------------------------------------------------------------------------------------------
+
 QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
                                                     const QString &nameOrAlias
                                                 )
