@@ -50,7 +50,6 @@ public:
         return *this;
     }
 #endif
-
     void swap(QMimeType &other)
     {
         qSwap(d, other.d);
@@ -70,23 +69,15 @@ public:
     bool isDefault() const;
 
     QString name() const;
-
 #if 0
     QStringList aliases() const;
 #endif
-
     QString comment(const QString &localeName = QString()) const;
-
     QString genericIconName() const;
-
     QString iconName() const;
-
     QStringList globPatterns() const;
-
     QStringList parentMimeTypes() const;
-
     QStringList allParentMimeTypes() const;
-
     QStringList suffixes() const;
     QString preferredSuffix() const;
 
@@ -97,7 +88,7 @@ public:
 protected:
     friend class BaseMimeTypeParser;
     friend class MimeTypeMapEntry;
-    friend class QMimeDatabasePrivate;
+    friend struct QMimeDatabasePrivate;
     friend class QMimeXMLProvider;
     friend class QMimeBinaryProvider;
     friend class QMimeTypePrivate;

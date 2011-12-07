@@ -34,7 +34,7 @@ class QFileInfo;
 class QIODevice;
 class QUrl;
 
-class QMimeDatabasePrivate;
+struct QMimeDatabasePrivate;
 class QMIME_EXPORT QMimeDatabase
 {
     Q_DISABLE_COPY(QMimeDatabase)
