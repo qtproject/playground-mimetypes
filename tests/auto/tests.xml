@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<testdefinition version="0.1">
+    <suite domain="functional" name="autotests">
+        <set description="Automated tests for the QtMimeTypes library" name="QtMimeTypes-tests" type="functional">
+            <case name="qmimetype">
+                <description>Test for QMimeType</description>
+                <step>cd /usr/lib/QtMimeTypes-tests/qmimetype; ./tst_qmimetype</step>
+            </case>
+            <case name="qmimedatabase-cache">
+                <description>Test for QMimeDatabase (Cache)</description>
+                <step>cd /usr/lib/QtMimeTypes-tests/qmimedatabase-cache; ./tst_qmimedatabase-cache</step>
+            </case>
+            <case name="qmimedatabase-xml">
+                <description>Test for QMimeDatabase (XML)</description>
+                <step>cd /usr/lib/QtMimeTypes-tests/qmimedatabase-xml; ./tst_qmimedatabase-xml</step>
+            </case>
+            <case name="qdeclarativemimetype">
+                <description>Test for QML wrapper of QMimeType</description>
+                <step>cd /usr/lib/QtMimeTypes-tests/qdeclarativemimetype; ./tst_qdeclarativemimetype</step>
+            </case>
+            <case name="qdeclarativemimedatabase">
+                <description>Test for QML wrapper of QMimeDatabase</description>
+                <step>cd /usr/lib/QtMimeTypes-tests/qdeclarativemimedatabase; ./tst_qdeclarativemimedatabase</step>
+            </case>
+        </set>
+    </suite>
+</testdefinition>
