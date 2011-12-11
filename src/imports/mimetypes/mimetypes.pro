@@ -28,4 +28,13 @@ HEADERS += qdeclarativemimetype_p.h \
 qmldir.files += $$PWD/qmldir
 
 
-INSTALLS += qmldir target
+unix:!symbian {
+    maemo5 {
+        target.path = /opt/usr/lib/qt5/imports/QtMimeTypes
+        qmldir.path = /opt/usr/lib/qt5/imports/QtMimeTypes
+    } else {
+        target.path = /usr/lib/qt5/imports/QtMimeTypes
+        qmldir.path = /usr/lib/qt5/imports/QtMimeTypes
+    }
+    INSTALLS += qmldir target
+}
