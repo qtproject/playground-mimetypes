@@ -19,3 +19,12 @@ HEADERS += ../tst_qmimedatabase.h
 DEFINES += SRCDIR='"\\"$$PWD/../\\""'
 
 QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
+
+unix:!symbian {
+    maemo5 {
+        target.path = /opt/usr/lib/QtMimeTypes-tests/qmimedatabase-xml
+    } else {
+        target.path = /usr/lib/QtMimeTypes-tests/qmimedatabase-xml
+    }
+    INSTALLS += target
+}
