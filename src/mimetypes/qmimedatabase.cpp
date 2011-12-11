@@ -382,7 +382,7 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
     // Cannot access statBuf.st_mode from the filesystem engine, so we have to stat again.
     const QByteArray nativeFilePath = QFile::encodeName(file.fileName());
     QT_STATBUF statBuffer;
-    if (QT_LSTAT(nativeFilePath, &statBuffer) == 0) {
+    if (QT_LSTAT(nativeFilePath.constData(), &statBuffer) == 0) {
         if (S_ISCHR(statBuffer.st_mode))
             return d->mimeTypeForName(QLatin1String("inode/chardevice"));
         if (S_ISBLK(statBuffer.st_mode))

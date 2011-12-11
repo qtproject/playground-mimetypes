@@ -27,12 +27,12 @@ int main(int argc, char *argv[])
         const QByteArray data = qstdin.readAll();
         //mime = QMimeType::findByContent(data, &accuracy);
         mime = db.findByData(data);
-    } else if (option == "-c") {
+    } else if (option == QLatin1String("-c")) {
         QFile file(fileName);
         if (file.open(QIODevice::ReadOnly)) {
             mime = db.findByData(file.read(32000));
         }
-    } else if (option == "-f") {
+    } else if (option == QLatin1String("-f")) {
         mime = db.findByName(fileName);
     } else {
         mime = db.findByFile(fileName);

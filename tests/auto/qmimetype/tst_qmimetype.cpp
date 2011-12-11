@@ -58,28 +58,25 @@ void tst_qmimetype::initTestCase()
 
 // ------------------------------------------------------------------------------------------------
 
-static const QString &pngMimeTypeName()
+static QString pngMimeTypeName()
 {
-    static const QString result ("image/png");
-    return result;
+    return QString::fromLatin1("image/png");
 }
 
 // ------------------------------------------------------------------------------------------------
 
 #if 0
-static const QString &pngMimeTypeDisplayName()
+static QString pngMimeTypeDisplayName()
 {
-    static const QString result ("PNG File");
-    return result;
+    return QString::fromLatin1("PNG File");
 }
 #endif
 
 // ------------------------------------------------------------------------------------------------
 
-static const QString &pngMimeTypeIconUrl()
+static QString pngMimeTypeIconUrl()
 {
-    static const QString result ("/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png");
-    return result;
+    return QString::fromLatin1("/usr/share/icons/oxygen/64x64/mimetypes/image-x-generic.png");
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -87,7 +84,7 @@ static const QString &pngMimeTypeIconUrl()
 static QStringList buildPngMimeTypeFilenameExtensions()
 {
     QStringList result;
-    result << "*.png";
+    result << QString::fromLatin1("*.png");
     return result;
 }
 
@@ -206,7 +203,7 @@ void tst_qmimetype::test_suffixes()
 
     // Verify that the FilenameExtensions are part of the equality test:
     QCOMPARE(instantiatedPngMimeType.globPatterns(), pngMimeTypeGlobPatterns());
-    QCOMPARE(instantiatedPngMimeType.suffixes(), QStringList() << "png");
+    QCOMPARE(instantiatedPngMimeType.suffixes(), QStringList() << QString::fromLatin1("png"));
 
     QVERIFY(instantiatedPngMimeType != otherPngMimeType);
     QVERIFY(!(instantiatedPngMimeType == otherPngMimeType));

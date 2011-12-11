@@ -387,7 +387,7 @@ QList<QMimeType> QMimeBinaryProvider::allMimeTypes()
             while (!file.atEnd()) {
                 QByteArray line = file.readLine();
                 line.chop(1);
-                mimetypes.insert(QString::fromLatin1(line));
+                mimetypes.insert(QString::fromLatin1(line.constData(), line.size()));
             }
         }
     }

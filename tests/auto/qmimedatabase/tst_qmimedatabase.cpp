@@ -27,40 +27,40 @@ void tst_qmimedatabase::initTestCase()
 void tst_qmimedatabase::test_mimeTypeForName()
 {
     QMimeDatabase db;
-    QMimeType s0 = db.mimeTypeForName("application/x-zerosize");
+    QMimeType s0 = db.mimeTypeForName(QString::fromLatin1("application/x-zerosize"));
     QVERIFY(s0.isValid());
     QCOMPARE(s0.name(), QString::fromLatin1("application/x-zerosize"));
     QCOMPARE(s0.comment(), QString::fromLatin1("empty document"));
     QCOMPARE(s0.comment(QLatin1String("fr")), QString::fromLatin1("document vide"));
     QCOMPARE(s0.comment(QLatin1String("zz")), QString::fromLatin1("empty document")); // no such language
 
-    QMimeType s0Again = db.mimeTypeForName("application/x-zerosize");
+    QMimeType s0Again = db.mimeTypeForName(QString::fromLatin1("application/x-zerosize"));
     QCOMPARE(s0Again.name(), s0.name());
 
-    QMimeType s1 = db.mimeTypeForName("text/plain");
+    QMimeType s1 = db.mimeTypeForName(QString::fromLatin1("text/plain"));
     QVERIFY(s1.isValid());
     QCOMPARE(s1.name(), QString::fromLatin1("text/plain"));
     //qDebug("Comment is %s", qPrintable(s1.comment()));
 
-    QMimeType krita = db.mimeTypeForName("application/x-krita");
+    QMimeType krita = db.mimeTypeForName(QString::fromLatin1("application/x-krita"));
     QVERIFY(krita.isValid());
 
     // Test <comment> parsing with application/rdf+xml which has the english comment after the other ones
-    QMimeType rdf = db.mimeTypeForName("application/rdf+xml");
+    QMimeType rdf = db.mimeTypeForName(QString::fromLatin1("application/rdf+xml"));
     QVERIFY(rdf.isValid());
     QCOMPARE(rdf.comment(), QString::fromLatin1("RDF file"));
 
-    QMimeType bzip2 = db.mimeTypeForName("application/x-bzip2");
+    QMimeType bzip2 = db.mimeTypeForName(QString::fromLatin1("application/x-bzip2"));
     QVERIFY(bzip2.isValid());
     QCOMPARE(bzip2.comment(), QString::fromLatin1("Bzip archive"));
 
-    QMimeType defaultMime = db.mimeTypeForName("application/octet-stream");
+    QMimeType defaultMime = db.mimeTypeForName(QString::fromLatin1("application/octet-stream"));
     QVERIFY(defaultMime.isValid());
     QVERIFY(defaultMime.isDefault());
 
     // TODO move to test_findByFile
 #ifdef Q_OS_LINUX
-    QString exePath = QStandardPaths::findExecutable("ls");
+    QString exePath = QStandardPaths::findExecutable(QLatin1String("ls"));
     if (exePath.isEmpty())
         qWarning() << "ls not found";
     else {
@@ -123,94 +123,94 @@ void tst_qmimedatabase::test_inheritance()
     QMimeDatabase db;
 
     // All file-like mimetypes inherit from octet-stream
-    const QMimeType wordperfect = db.mimeTypeForName("application/vnd.wordperfect");
+    const QMimeType wordperfect = db.mimeTypeForName(QString::fromLatin1("application/vnd.wordperfect"));
     QVERIFY(wordperfect.isValid());
-    QCOMPARE(wordperfect.parentMimeTypes().join(","), QString("application/octet-stream"));
-    QVERIFY(wordperfect.inherits("application/octet-stream"));
+    QCOMPARE(wordperfect.parentMimeTypes().join(QString::fromLatin1(",")), QString::fromLatin1("application/octet-stream"));
+    QVERIFY(wordperfect.inherits(QLatin1String("application/octet-stream")));
 
-    QVERIFY(db.mimeTypeForName("image/svg+xml-compressed").inherits("application/x-gzip"));
+    QVERIFY(db.mimeTypeForName(QString::fromLatin1("image/svg+xml-compressed")).inherits(QLatin1String("application/x-gzip")));
 
     // Check that msword derives from ole-storage
-    const QMimeType msword = db.mimeTypeForName("application/msword");
+    const QMimeType msword = db.mimeTypeForName(QString::fromLatin1("application/msword"));
     QVERIFY(msword.isValid());
-    const QMimeType olestorage = db.mimeTypeForName("application/x-ole-storage");
+    const QMimeType olestorage = db.mimeTypeForName(QString::fromLatin1("application/x-ole-storage"));
     QVERIFY(olestorage.isValid());
     QVERIFY(msword.inherits(olestorage.name()));
-    QVERIFY(msword.inherits("application/octet-stream"));
+    QVERIFY(msword.inherits(QLatin1String("application/octet-stream")));
 
-    const QMimeType directory = db.mimeTypeForName("inode/directory");
+    const QMimeType directory = db.mimeTypeForName(QString::fromLatin1("inode/directory"));
     QVERIFY(directory.isValid());
     QCOMPARE(directory.parentMimeTypes().count(), 0);
-    QVERIFY(!directory.inherits("application/octet-stream"));
+    QVERIFY(!directory.inherits(QLatin1String("application/octet-stream")));
 
     // Check that text/x-patch knows that it inherits from text/plain (it says so explicitly)
-    const QMimeType plain = db.mimeTypeForName("text/plain");
-    const QMimeType derived = db.mimeTypeForName("text/x-patch");
+    const QMimeType plain = db.mimeTypeForName(QString::fromLatin1("text/plain"));
+    const QMimeType derived = db.mimeTypeForName(QString::fromLatin1("text/x-patch"));
     QVERIFY(derived.isValid());
-    QCOMPARE(derived.parentMimeTypes().join(","), plain.name());
-    QVERIFY(derived.inherits("text/plain"));
-    QVERIFY(derived.inherits("application/octet-stream"));
+    QCOMPARE(derived.parentMimeTypes().join(QString::fromLatin1(",")), plain.name());
+    QVERIFY(derived.inherits(QLatin1String("text/plain")));
+    QVERIFY(derived.inherits(QLatin1String("application/octet-stream")));
 
     // Check that application/x-shellscript inherits from application/x-executable
     // (Otherwise KRun cannot start shellscripts...)
     // This is a test for multiple inheritance...
-    const QMimeType shellscript = db.mimeTypeForName("application/x-shellscript");
+    const QMimeType shellscript = db.mimeTypeForName(QString::fromLatin1("application/x-shellscript"));
     QVERIFY(shellscript.isValid());
-    QVERIFY(shellscript.inherits("text/plain"));
-    QVERIFY(shellscript.inherits("application/x-executable"));
+    QVERIFY(shellscript.inherits(QLatin1String("text/plain")));
+    QVERIFY(shellscript.inherits(QLatin1String("application/x-executable")));
     const QStringList shellParents = shellscript.parentMimeTypes();
-    QVERIFY(shellParents.contains("text/plain"));
-    QVERIFY(shellParents.contains("application/x-executable"));
+    QVERIFY(shellParents.contains(QLatin1String("text/plain")));
+    QVERIFY(shellParents.contains(QLatin1String("application/x-executable")));
     QCOMPARE(shellParents.count(), 2); // only the above two
     const QStringList allShellParents = shellscript.allParentMimeTypes();
-    QVERIFY(allShellParents.contains("text/plain"));
-    QVERIFY(allShellParents.contains("application/x-executable"));
-    QVERIFY(allShellParents.contains("application/octet-stream"));
+    QVERIFY(allShellParents.contains(QLatin1String("text/plain")));
+    QVERIFY(allShellParents.contains(QLatin1String("application/x-executable")));
+    QVERIFY(allShellParents.contains(QLatin1String("application/octet-stream")));
     // Must be least-specific last, i.e. breadth first.
-    QCOMPARE(allShellParents.last(), QString("application/octet-stream"));
+    QCOMPARE(allShellParents.last(), QString::fromLatin1("application/octet-stream"));
 
     // Check that text/x-mrml knows that it inherits from text/plain (implicitly)
-    const QMimeType mrml = db.mimeTypeForName("text/x-mrml");
+    const QMimeType mrml = db.mimeTypeForName(QString::fromLatin1("text/x-mrml"));
     QVERIFY(mrml.isValid());
-    QVERIFY(mrml.inherits("text/plain"));
-    QVERIFY(mrml.inherits("application/octet-stream"));
+    QVERIFY(mrml.inherits(QLatin1String("text/plain")));
+    QVERIFY(mrml.inherits(QLatin1String("application/octet-stream")));
 
     // Check that msword-template inherits msword
-    const QMimeType mswordTemplate = db.mimeTypeForName("application/msword-template");
+    const QMimeType mswordTemplate = db.mimeTypeForName(QString::fromLatin1("application/msword-template"));
     QVERIFY(mswordTemplate.isValid());
-    QVERIFY(mswordTemplate.inherits("application/msword"));
+    QVERIFY(mswordTemplate.inherits(QLatin1String("application/msword")));
 }
 
 void tst_qmimedatabase::test_aliases()
 {
     QMimeDatabase db;
 
-    const QMimeType canonical = db.mimeTypeForName("application/xml");
+    const QMimeType canonical = db.mimeTypeForName(QString::fromLatin1("application/xml"));
     QVERIFY(canonical.isValid());
 
-    QMimeType resolvedAlias = db.mimeTypeForName("text/xml");
+    QMimeType resolvedAlias = db.mimeTypeForName(QString::fromLatin1("text/xml"));
     QVERIFY(resolvedAlias.isValid());
-    QCOMPARE(resolvedAlias.name(), QString("application/xml"));
+    QCOMPARE(resolvedAlias.name(), QString::fromLatin1("application/xml"));
 
-    QVERIFY(resolvedAlias.inherits("application/xml"));
-    QVERIFY(canonical.inherits("text/xml"));
+    QVERIFY(resolvedAlias.inherits(QLatin1String("application/xml")));
+    QVERIFY(canonical.inherits(QLatin1String("text/xml")));
 
     // Test for kde bug 197346: does nspluginscan see that audio/mp3 already exists?
-    bool mustWriteMimeType = !db.mimeTypeForName("audio/mp3").isValid();
+    bool mustWriteMimeType = !db.mimeTypeForName(QString::fromLatin1("audio/mp3")).isValid();
     QVERIFY(!mustWriteMimeType);
 }
 
 void tst_qmimedatabase::test_icons()
 {
     QMimeDatabase db;
-    QMimeType directory = db.findByName("/");
-    QCOMPARE(directory.name(), QString("inode/directory"));
-    QCOMPARE(directory.iconName(), QString("inode-directory"));
+    QMimeType directory = db.findByName(QString::fromLatin1("/"));
+    QCOMPARE(directory.name(), QString::fromLatin1("inode/directory"));
+    QCOMPARE(directory.iconName(), QString::fromLatin1("inode-directory"));
 
-    QMimeType pub = db.findByName("foo.epub");
-    QCOMPARE(pub.name(), QString("application/epub+zip"));
-    QCOMPARE(pub.iconName(), QString("application-epub+zip"));
-    QCOMPARE(pub.genericIconName(), QString("x-office-document"));
+    QMimeType pub = db.findByName(QString::fromLatin1("foo.epub"));
+    QCOMPARE(pub.name(), QString::fromLatin1("application/epub+zip"));
+    QCOMPARE(pub.iconName(), QString::fromLatin1("application-epub+zip"));
+    QCOMPARE(pub.genericIconName(), QString::fromLatin1("x-office-document"));
 }
 
 // In here we do the tests that need some content in a temporary file.
@@ -261,16 +261,16 @@ void tst_qmimedatabase::test_findByFileWithContent()
     }
 
     // Test what happens with an incorrect path
-    mime = db.findByFile("file:///etc/passwd" /* incorrect code, use a path instead */);
+    mime = db.findByFile(QString::fromLatin1("file:///etc/passwd" /* incorrect code, use a path instead */));
     QVERIFY(mime.isDefault());
 }
 
 void tst_qmimedatabase::test_findByUrl()
 {
     QMimeDatabase db;
-    QVERIFY(db.findByUrl(QUrl("http://foo/bar.png")).isDefault()); // HTTP can't know before downloading
-    QCOMPARE(db.findByUrl(QUrl("ftp://foo/bar.png")).name(), QString::fromLatin1("image/png"));
-    QCOMPARE(db.findByUrl(QUrl("ftp://foo/bar")).name(), QString::fromLatin1("application/octet-stream")); // unknown extension
+    QVERIFY(db.findByUrl(QUrl::fromEncoded("http://foo/bar.png")).isDefault()); // HTTP can't know before downloading
+    QCOMPARE(db.findByUrl(QUrl::fromEncoded("ftp://foo/bar.png")).name(), QString::fromLatin1("image/png"));
+    QCOMPARE(db.findByUrl(QUrl::fromEncoded("ftp://foo/bar")).name(), QString::fromLatin1("application/octet-stream")); // unknown extension
 }
 
 void tst_qmimedatabase::test_findByContent_data()
@@ -298,17 +298,17 @@ void tst_qmimedatabase::test_findByNameAndContent_data()
     QTest::addColumn<QByteArray>("data");
     QTest::addColumn<QString>("expectedMimeTypeName");
 
-    QTest::newRow("plain text, no extension") << QString("textfile") << QByteArray("Hello world") << "text/plain";
-    QTest::newRow("plain text, unknown extension") << QString("textfile.foo") << QByteArray("Hello world") << "text/plain";
+    QTest::newRow("plain text, no extension") << QString::fromLatin1("textfile") << QByteArray("Hello world") << "text/plain";
+    QTest::newRow("plain text, unknown extension") << QString::fromLatin1("textfile.foo") << QByteArray("Hello world") << "text/plain";
     // Needs kde/mimetypes.xml
-    //QTest::newRow("plain text, doc extension") << QString("textfile.doc") << QByteArray("Hello world") << "text/plain";
+    //QTest::newRow("plain text, doc extension") << QString::fromLatin1("textfile.doc") << QByteArray("Hello world") << "text/plain";
 
     // If you get powerpoint instead, then you're hit by https://bugs.freedesktop.org/show_bug.cgi?id=435,
     // upgrade to shared-mime-info >= 0.22
     const QByteArray oleData("\320\317\021\340\241\261\032\341"); // same as \xD0\xCF\x11\xE0 \xA1\xB1\x1A\xE1
-    QTest::newRow("msword file, unknown extension") << QString("mswordfile") << oleData << "application/x-ole-storage";
-    QTest::newRow("excel file, found by extension") << QString("excelfile.xls") << oleData << "application/vnd.ms-excel";
-    QTest::newRow("text.xls, found by extension, user is in control") << QString("text.xls") << oleData << "application/vnd.ms-excel";
+    QTest::newRow("msword file, unknown extension") << QString::fromLatin1("mswordfile") << oleData << "application/x-ole-storage";
+    QTest::newRow("excel file, found by extension") << QString::fromLatin1("excelfile.xls") << oleData << "application/vnd.ms-excel";
+    QTest::newRow("text.xls, found by extension, user is in control") << QString::fromLatin1("text.xls") << oleData << "application/vnd.ms-excel";
 }
 
 void tst_qmimedatabase::test_findByNameAndContent()
@@ -333,7 +333,7 @@ void tst_qmimedatabase::test_allMimeTypes()
     foreach (const QMimeType& mime, lst) {
         const QString name = mime.name();
         QVERIFY(!name.isEmpty());
-        QCOMPARE(name.count('/'), 1);
+        QCOMPARE(name.count(QLatin1Char('/')), 1);
         const QMimeType lookedupMime = db.mimeTypeForName(name);
         QVERIFY(lookedupMime.isValid());
         QCOMPARE(lookedupMime.name(), name); // if this fails, you have an alias defined as a real mimetype too!
@@ -344,13 +344,13 @@ void tst_qmimedatabase::test_inheritsPerformance()
 {
     // Check performance of inherits().
     // This benchmark (which started in 2009 in kmimetypetest.cpp) uses 40 mimetypes.
-    QStringList mimeTypes; mimeTypes << "image/jpeg" << "image/png" << "image/tiff" << "text/plain" << "text/html";
+    QStringList mimeTypes; mimeTypes << QLatin1String("image/jpeg") << QLatin1String("image/png") << QLatin1String("image/tiff") << QLatin1String("text/plain") << QLatin1String("text/html");
     mimeTypes += mimeTypes;
     mimeTypes += mimeTypes;
     mimeTypes += mimeTypes;
     QCOMPARE(mimeTypes.count(), 40);
     QMimeDatabase db;
-    QMimeType mime = db.mimeTypeForName("text/x-chdr");
+    QMimeType mime = db.mimeTypeForName(QString::fromLatin1("text/x-chdr"));
     QVERIFY(mime.isValid());
     QBENCHMARK {
         QString match;
@@ -361,7 +361,7 @@ void tst_qmimedatabase::test_inheritsPerformance()
                 // performance here
             }
         }
-        QCOMPARE(match, QString("text/plain"));
+        QCOMPARE(match, QString::fromLatin1("text/plain"));
     }
     // Numbers from 2011, in release mode:
     // KDE 4.7 numbers: 0.21 msec / 494,000 ticks / 568,345 instr. loads per iteration
@@ -399,21 +399,21 @@ void tst_qmimedatabase::test_suffixes()
     QMimeType mime = db.mimeTypeForName(mimeType);
     QVERIFY(mime.isValid());
     // Sort both lists; order is unreliable since shared-mime-info uses hashes internally.
-    QStringList expectedPatterns = patterns.split(';');
+    QStringList expectedPatterns = patterns.split(QLatin1Char(';'));
     expectedPatterns.sort();
     QStringList mimePatterns = mime.globPatterns();
     mimePatterns.sort();
-    QCOMPARE(mimePatterns.join(";"), expectedPatterns.join(";"));
+    QCOMPARE(mimePatterns.join(QLatin1String(";")), expectedPatterns.join(QLatin1String(";")));
     QCOMPARE(mime.preferredSuffix(), preferredSuffix);
 }
 
 void tst_qmimedatabase::test_knownSuffix()
 {
     QMimeDatabase db;
-    QCOMPARE(db.suffixForFileName("foo.tar"), QString("tar"));
-    QCOMPARE(db.suffixForFileName("foo.bz2"), QString("bz2"));
-    QCOMPARE(db.suffixForFileName("foo.bar.bz2"), QString("bz2"));
-    QCOMPARE(db.suffixForFileName("foo.tar.bz2"), QString("tar.bz2"));
+    QCOMPARE(db.suffixForFileName(QString::fromLatin1("foo.tar")), QString::fromLatin1("tar"));
+    QCOMPARE(db.suffixForFileName(QString::fromLatin1("foo.bz2")), QString::fromLatin1("bz2"));
+    QCOMPARE(db.suffixForFileName(QString::fromLatin1("foo.bar.bz2")), QString::fromLatin1("bz2"));
+    QCOMPARE(db.suffixForFileName(QString::fromLatin1("foo.tar.bz2")), QString::fromLatin1("tar.bz2"));
 }
 
 void tst_qmimedatabase::findByName_data()
@@ -445,7 +445,7 @@ void tst_qmimedatabase::findByName_data()
         if (list.size() >= 3)
             xFail = list.at(2);
 
-        QTest::newRow(filePath.toLatin1().constData()) << prefix + filePath << mimeTypeType << xFail;
+        QTest::newRow(filePath.toLatin1().constData()) << QString(prefix + filePath) << mimeTypeType << xFail;
     }
 }
 
@@ -487,11 +487,11 @@ void tst_qmimedatabase::findByName()
         // matches the file's extension.
         // TODO: a better file format in testfiles/list!
         const QMimeType foundMimeType = database.mimeTypeForName(resultMimeTypeName);
-        QVERIFY2(resultMimeType == foundMimeType, qPrintable(resultMimeType.name() + " vs. " + foundMimeType.name()));
+        QVERIFY2(resultMimeType == foundMimeType, qPrintable(resultMimeType.name() + QString::fromLatin1(" vs. ") + foundMimeType.name()));
         if (foundMimeType.isValid()) {
             const QString extension = QFileInfo(filePath).suffix();
             //qDebug() << Q_FUNC_INFO << "globPatterns:" << foundMimeType.globPatterns() << "- extension:" << QString() + "*." + extension;
-            if (foundMimeType.globPatterns().contains("*." + extension))
+            if (foundMimeType.globPatterns().contains(QString::fromLatin1("*.") + extension))
                 return;
         }
     }
@@ -577,5 +577,5 @@ QTEST_GUILESS_MAIN(tst_qmimedatabase)
 #else
 // If tests with icons were activated in Qt4 we'd use QTEST_MAIN:
 //QTEST_MAIN(tst_qmimedatabase)
-QTEST_GUILESS_MAIN(tst_qmimedatabase)
+QTEST_MAIN(tst_qmimedatabase)
 #endif
