@@ -1,3 +1,5 @@
+include(../../mimetypes-nolibs.pri)
+
 TARGET = QtMimeTypes
 TEMPLATE = lib
 
@@ -5,10 +7,8 @@ win32: DESTDIR = ./
 
 DEFINES += QMIME_LIBRARY
 
-INCLUDEPATH *= $$PWD/../../include/QtMimeTypes
 DEPENDPATH  *= $$PWD
 
-INCLUDEPATH += $$PWD/inqt5
 CONFIG += depend_includepath
 
 QT     = core
@@ -16,32 +16,27 @@ QT     = core
 DEFINES += QT_NO_CAST_FROM_ASCII
 
 QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
-mac|darwin: {
-    QMAKE_CXXFLAGS += -ansi
-} else:false {
-    QMAKE_CXXFLAGS += -ansi -Wc++0x-compat
-} else {
-    QMAKE_CXXFLAGS += -std=c++0x
-}
 
 SOURCES += qmimedatabase.cpp \
-    qmimetype.cpp \
-    qmimemagicrulematcher.cpp \
-    mimetypeparser.cpp \
-    qmimemagicrule.cpp \
-    qmimeglobpattern.cpp \
-    qmimeprovider.cpp
+           qmimetype.cpp \
+           qmimemagicrulematcher.cpp \
+           mimetypeparser.cpp \
+           qmimemagicrule.cpp \
+           qmimeglobpattern.cpp \
+           qmimeprovider.cpp
 
-HEADERS += qmime_global.h \
-    qmimedatabase.h \
-    qmimetype.h \
-    qmimemagicrulematcher_p.h \
-    qmimetype_p.h \
-    mimetypeparser_p.h \
-    qmimedatabase_p.h \
-    qmimemagicrule_p.h \
-    qmimeglobpattern_p.h \
-    qmimeprovider_p.h
+the_includes.files += qmime_global.h \
+                      qmimedatabase.h \
+                      qmimetype.h \
+
+HEADERS += $$the_includes.files \
+           qmimemagicrulematcher_p.h \
+           qmimetype_p.h \
+           mimetypeparser_p.h \
+           qmimedatabase_p.h \
+           qmimemagicrule_p.h \
+           qmimeglobpattern_p.h \
+           qmimeprovider_p.h
 
 SOURCES += inqt5/qstandardpaths.cpp
 win32: SOURCES += inqt5/qstandardpaths_win.cpp
@@ -69,8 +64,10 @@ symbian {
 unix:!symbian {
     maemo5 {
         target.path = /opt/usr/lib
+        the_includes.path = /opt/usr/include/qt5/QtMimeTypes
     } else {
         target.path = /usr/lib
+        the_includes.path = /usr/include/qt5/QtMimeTypes
     }
-    INSTALLS += target
+    INSTALLS += target the_includes
 }
