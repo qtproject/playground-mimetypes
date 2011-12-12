@@ -195,9 +195,10 @@ QMimeType::QMimeType(const QMimeTypePrivate &dd) :
     \brief Swaps the properties of a MIME type with the properties of another MIME type.
     \a other The other value MIME type the data of which is to be swapped with.
 
-    The swap() method helps with the implementatoin of assignment
+    The swap() method helps with the implementation of assignment
     operators in an exception-safe way. For more information consult
-    http://en.wikibooks.org/wiki/More_C++_Idioms/Copy-and-swap.
+    \l {http://en.wikibooks.org/wiki/More_C++_Idioms/Copy-and-swap}
+    {More C++ Idioms - Copy-and-swap}.
  */
 
 /*!
