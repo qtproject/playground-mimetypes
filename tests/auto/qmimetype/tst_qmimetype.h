@@ -58,4 +58,4 @@ private slots:
     void test_suffixes();
 };
 
-#endif // TST_QMIMETYPE_H_INCLUDED
+#endif   // TST_QMIMETYPE_H_INCLUDED
