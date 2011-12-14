@@ -1,4 +1,12 @@
+/****************************************************************************
+**
+** TODO Provide Licensing information
+**
+****************************************************************************/
+
 #include "tst_qmimedatabase.h"
+
+#include <qmimedatabase.h>
 
 #include "qstandardpaths.h"
 
@@ -13,8 +21,6 @@
 #include <QtGui/QIcon>
 #endif
 #endif
-
-#include <qmimedatabase.h>
 
 tst_qmimedatabase::~tst_qmimedatabase()
 {

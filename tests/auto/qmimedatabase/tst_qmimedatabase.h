@@ -1,7 +1,13 @@
-#ifndef TST_QMIMEDATABASE_H
-#define TST_QMIMEDATABASE_H
+/****************************************************************************
+**
+** TODO Provide Licensing information
+**
+****************************************************************************/
 
-#include <QObject>
+#ifndef TST_QMIMEDATABASE_H_INCLUDED
+#define TST_QMIMEDATABASE_H_INCLUDED
+
+#include <QtCore/QObject>
 
 class tst_qmimedatabase : public QObject
 {
@@ -11,7 +17,7 @@ public:
     tst_qmimedatabase();
     ~tst_qmimedatabase();
 
-private Q_SLOTS:
+private slots:
     void initTestCase();
 
     void test_mimeTypeForName();
@@ -45,4 +51,4 @@ private Q_SLOTS:
     void findByFile();
 };
 
-#endif // TST_QMIMEDATABASE_H
+#endif   // TST_QMIMEDATABASE_H_INCLUDED
