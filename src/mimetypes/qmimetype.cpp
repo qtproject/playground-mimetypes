@@ -67,12 +67,22 @@ void QMimeTypePrivate::clear()
  */
 bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
 {
-    return name == other.name &&
+    DBG();
+    if (name == other.name &&
             //comment == other.comment &&
             localeComments == other.localeComments &&
             genericIconName == other.genericIconName &&
             iconName == other.iconName &&
-            globPatterns == other.globPatterns;
+            globPatterns == other.globPatterns) {
+        return true;
+    }
+    DBG() << name << other.name << (name == other.name);
+    //DBG() << comment << other.comment << (comment == other.comment);
+    DBG() << localeComments << other.localeComments << (localeComments == other.localeComments);
+    DBG() << genericIconName << other.genericIconName << (genericIconName == other.genericIconName);
+    DBG() << iconName << other.iconName << (iconName == other.iconName);
+    DBG() << globPatterns << other.globPatterns << (globPatterns == other.globPatterns);
+    return false;
 }
 
 void QMimeTypePrivate::addGlobPattern(const QString &pattern)
