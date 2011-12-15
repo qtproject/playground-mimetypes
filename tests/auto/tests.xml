@@ -16,11 +16,11 @@
             </case>
             <case name="qdeclarativemimetype">
                 <description>Test for QML wrapper of QMimeType</description>
-                <step>cd /usr/lib/QtMimeTypes-tests/qdeclarativemimetype; ./tst_qdeclarativemimetype</step>
+                <step>cd /usr/lib/QtMimeTypes-tests/qdeclarativemimetype; ./tst_qdeclarativemimetype -platform Minimal</step>
             </case>
             <case name="qdeclarativemimedatabase">
                 <description>Test for QML wrapper of QMimeDatabase</description>
-                <step>cd /usr/lib/QtMimeTypes-tests/qdeclarativemimedatabase; ./tst_qdeclarativemimedatabase</step>
+                <step expected_result="1">cd /usr/lib/QtMimeTypes-tests/qdeclarativemimedatabase; ./tst_qdeclarativemimedatabase -platform Minimal</step>
             </case>
         </set>
     </suite>
