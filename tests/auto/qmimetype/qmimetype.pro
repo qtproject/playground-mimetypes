@@ -18,7 +18,20 @@ HEADERS += tst_qmimetype.h
 
 QMAKE_EXTRA_TARGETS += check
 check.depends = $$TARGET
-check.commands = ./$$TARGET -xunitxml -o unitTestResults.xml
+check.commands = ./$$TARGET -xunitxml -o $${TARGET}.xml
+
+exists($${TARGET}.xml): {
+    tests_results.files += $${TARGET}.xml
+
+    unix:!symbian {
+        maemo5 {
+            tests_results.path = /opt/usr/share/QtMimeTypes-unittests
+        } else {
+            tests_results.path = /usr/share/QtMimeTypes-unittests
+        }
+        INSTALLS += tests_results
+    }
+}
 
 unix:!symbian {
     maemo5 {
