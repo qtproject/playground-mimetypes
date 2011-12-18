@@ -302,7 +302,9 @@ QString QMimeType::comment(const QString& localeName) const
     if (!localeName.isEmpty())
         languageList << localeName;
     languageList << QLocale::system().name();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     languageList << QLocale::system().uiLanguages();
+#endif
     Q_FOREACH(const QString& lang, languageList) {
         const QString comm = d->localeComments.value(lang);
         if (!comm.isEmpty())

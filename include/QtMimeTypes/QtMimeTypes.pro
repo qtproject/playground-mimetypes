@@ -1,4 +1,9 @@
-TEMPLATE = aux
+equals(QT_VERSION, 4.7.4): {
+    TEMPLATE = subdirs
+}
+else {
+    TEMPLATE = aux
+}
 
 the_includes.files += QMimeDatabase \
                       QMimeType \
