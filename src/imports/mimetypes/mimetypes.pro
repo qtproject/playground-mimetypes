@@ -25,7 +25,7 @@ HEADERS += qdeclarativemimetype_p.h \
            qdeclarativemimedatabase_p.h
 
 
-qmldir.files += $$PWD/qmldir
+qmldir.files += $$PWD/qmldir plugins.qmltypes
 
 
 unix:!symbian {
