@@ -75,7 +75,7 @@ extern bool isQMimeTypeDebuggingActivated;
 
 /*!
     \fn QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent);
-    \brief Performs default initialization of the contained MimeType, and attaches the object to the specified parent for destruction.
+    \brief Performs default initialization of the contained MimeType, and attaches the object to the specified \a theParent for destruction.
  */
 QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent) :
         QObject(theParent),
@@ -95,7 +95,7 @@ QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent) :
 
 /*!
     \fn QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theParent);
-    \brief Copies the specified MimeType \a other, and attaches the object to the specified parent for destruction.
+    \brief Copies the specified MimeType \a other, and attaches the object to the specified \a theParent for destruction.
  */
 QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theParent) :
         QObject(theParent),
@@ -116,7 +116,7 @@ QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theP
 #ifdef Q_COMPILER_RVALUE_REFS
 /*!
     \fn QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theParent);
-    \brief Moves the specified MimeType \a other, and attaches the object to the specified parent for destruction.
+    \brief Moves the specified MimeType \a other, and attaches the object to the specified \a theParent for destruction.
  */
 QDeclarativeMimeType::QDeclarativeMimeType(QMimeType &&other, QObject *theParent) :
         QObject(theParent),

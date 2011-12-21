@@ -74,7 +74,7 @@ extern bool isQMimeDatabaseDebuggingActivated;
 
 /*!
     \fn QDeclarativeMimeDatabase::QDeclarativeMimeDatabase(QObject *theParent);
-    \brief Performs default initialization of the contained MimeDatabase, and attaches the object to the specified parent for destruction.
+    \brief Performs default initialization of the contained MimeDatabase, and attaches the object to the specified \a theParent for destruction.
  */
 QDeclarativeMimeDatabase::QDeclarativeMimeDatabase(QObject *theParent) :
         QObject(theParent),

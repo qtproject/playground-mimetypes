@@ -491,7 +491,7 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
 /*!
     Returns a MIME type for the data in \a device.
 
-    A valid MIME type is always returned. If \a data doesn't match any
+    A valid MIME type is always returned. If the data in \a device doesn't match any
     known MIME type data, the default MIME type (application/octet-stream)
     is returned.
 */
