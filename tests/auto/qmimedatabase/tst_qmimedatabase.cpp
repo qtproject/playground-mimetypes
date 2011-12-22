@@ -280,6 +280,11 @@ void tst_qmimedatabase::test_findByFileWithContent()
     // Test what happens with an incorrect path
     mime = db.findByFile(QString::fromLatin1("file:///etc/passwd" /* incorrect code, use a path instead */));
     QVERIFY(mime.isDefault());
+
+    // findByData when the device cannot be opened (e.g. a directory)
+    QFile dir("/");
+    mime = db.findByData(&dir);
+    QVERIFY(mime.isDefault());
 }
 
 void tst_qmimedatabase::test_findByUrl()
@@ -298,6 +303,7 @@ void tst_qmimedatabase::test_findByContent_data()
     QTest::newRow("tnef data, needs smi >= 0.20") << QByteArray("\x78\x9f\x3e\x22") << "application/vnd.ms-tnef";
     QTest::newRow("PDF magic") << QByteArray("%PDF-") << "application/pdf";
     QTest::newRow("PHP, High-priority rule") << QByteArray("<?php") << "application/x-php";
+    QTest::newRow("unknown") << QByteArray("\001abc?}") << "application/octet-stream";
 }
 
 void tst_qmimedatabase::test_findByContent()
@@ -307,6 +313,8 @@ void tst_qmimedatabase::test_findByContent()
 
     QMimeDatabase db;
     QCOMPARE(db.findByData(data).name(), expectedMimeTypeName);
+    QBuffer buffer(&data);
+    QCOMPARE(db.findByData(&buffer).name(), expectedMimeTypeName);
 }
 
 void tst_qmimedatabase::test_findByNameAndContent_data()
