@@ -93,7 +93,6 @@ void tst_qmimedatabase::test_findByName_data()
 {
     QTest::addColumn<QString>("fileName");
     QTest::addColumn<QString>("expectedMimeType");
-    // Maybe we could also add a expectedAccuracy column...
 
     QTest::newRow("text") << "textfile.txt" << "text/plain";
     QTest::newRow("case-insensitive search") << "textfile.TxT" << "text/plain";
@@ -133,6 +132,38 @@ void tst_qmimedatabase::test_findByName()
     QMimeType mime = db.findByName(fileName);
     QVERIFY(mime.isValid());
     QCOMPARE(mime.name(), expectedMimeType);
+
+    QList<QMimeType> mimes = db.findMimeTypesByFileName(fileName);
+    if (expectedMimeType == "application/octet-stream") {
+        QVERIFY(mimes.isEmpty());
+    } else {
+        QVERIFY(!mimes.isEmpty());
+        QCOMPARE(mimes.count(), 1);
+        QCOMPARE(mimes.first().name(), expectedMimeType);
+    }
+}
+
+void tst_qmimedatabase::test_findMultipleByName_data()
+{
+    QTest::addColumn<QString>("fileName");
+    QTest::addColumn<QStringList>("expectedMimeTypes");
+
+    QTest::newRow("txt, 1 hit") << "foo.txt" << (QStringList() << "text/plain");
+    QTest::newRow("txtfoobar, 0 hit") << "foo.foobar" << QStringList();
+    QTest::newRow("m, 2 hits") << "foo.m" << (QStringList() << "text/x-matlab" << "text/x-objcsrc");
+    QTest::newRow("sub, 3 hits") << "foo.sub" << (QStringList() << "text/x-microdvd" << "text/x-mpsub" << "text/x-subviewer");
+}
+
+void tst_qmimedatabase::test_findMultipleByName()
+{
+    QFETCH(QString, fileName);
+    QFETCH(QStringList, expectedMimeTypes);
+    QMimeDatabase db;
+    QList<QMimeType> mimes = db.findMimeTypesByFileName(fileName);
+    QStringList mimeNames;
+    foreach (const QMimeType& mime, mimes)
+        mimeNames.append(mime.name());
+    QCOMPARE(mimeNames, expectedMimeTypes);
 }
 
 void tst_qmimedatabase::test_inheritance()

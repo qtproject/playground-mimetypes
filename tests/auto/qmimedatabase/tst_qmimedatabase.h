@@ -23,6 +23,8 @@ private slots:
     void test_mimeTypeForName();
     void test_findByName_data();
     void test_findByName();
+    void test_findMultipleByName_data();
+    void test_findMultipleByName();
     void test_inheritance();
     void test_aliases();
     void test_icons();
