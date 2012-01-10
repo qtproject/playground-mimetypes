@@ -5,6 +5,8 @@ TEMPLATE = app
 TARGET = tst_qdeclarativemimedatabase
 
 #CONFIG += warn_on qmltestcase
+CONFIG -= app_bundle
+
 QT += qmltest
 
 CONFIG += depend_includepath

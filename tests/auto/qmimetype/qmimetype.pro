@@ -4,6 +4,8 @@ TEMPLATE = app
 
 TARGET   = tst_qmimetype
 CONFIG   += qtestlib
+CONFIG   -= app_bundle
+
 DEPENDPATH += .
 
 QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
