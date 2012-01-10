@@ -98,7 +98,7 @@ static QString getFullPath(const FSRef &ref)
     return QString();
 }
 
-static QString macLocation(StandardLocation type, short domain)
+static QString macLocation(QStandardPaths::StandardLocation type, short domain)
 {
     // http://developer.apple.com/documentation/Carbon/Reference/Folder_Manager/Reference/reference.html
     FSRef ref;
@@ -108,7 +108,7 @@ static QString macLocation(StandardLocation type, short domain)
 
    QString path = getFullPath(ref);
 
-   if (type == DataLocation || type == CacheLocation) {
+   if (type == QStandardPaths::DataLocation || type == QStandardPaths::CacheLocation) {
        if (!QCoreApplication::organizationName().isEmpty())
            path += QLatin1Char('/') + QCoreApplication::organizationName();
        if (!QCoreApplication::applicationName().isEmpty())
