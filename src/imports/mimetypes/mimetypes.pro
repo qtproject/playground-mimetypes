@@ -12,6 +12,8 @@ QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror           -Wshadow -Wno-long-long -Wn
 
 CONFIG += depend_includepath
 
+QT += declarative
+
 
 SOURCES += mimetypes.cpp
 
