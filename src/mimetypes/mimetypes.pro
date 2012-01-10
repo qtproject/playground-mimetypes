@@ -43,6 +43,7 @@ win32: SOURCES += inqt5/qstandardpaths_win.cpp
 unix: {
     macx-*: {
         SOURCES += inqt5/qstandardpaths_mac.cpp
+        LIBS += -framework Carbon
     } else {
         SOURCES += inqt5/qstandardpaths_unix.cpp
     }
