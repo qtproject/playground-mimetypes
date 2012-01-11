@@ -1,7 +1,6 @@
-equals(QT_VERSION, 4.7.4): {
+contains($$list($$[QT_VERSION]),4.[6-9].*) {
     TEMPLATE = subdirs
-}
-else {
+} else {
     TEMPLATE = aux
 }
 
