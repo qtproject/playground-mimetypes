@@ -1,4 +1,5 @@
-include(../../../mimetypes.pri)
+include(../../../mimetypes-nolibs.pri)
+LIBS += -L$$OUT_PWD/../../../src/mimetypes -lQtMimeTypes
 
 CONFIG   += qt plugin
 TEMPLATE = lib
