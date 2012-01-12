@@ -107,12 +107,12 @@ QMimeType QMimeDatabasePrivate::mimeTypeForName(const QString &nameOrAlias)
     return provider()->mimeTypeForName(provider()->resolveAlias(nameOrAlias));
 }
 
-QStringList QMimeDatabasePrivate::findByName(const QString &fileName, QString *foundSuffix)
+QStringList QMimeDatabasePrivate::findByFileName(const QString &fileName, QString *foundSuffix)
 {
     if (fileName.endsWith(QLatin1Char('/')))
         return QStringList() << QLatin1String("inode/directory");
 
-    const QStringList matchingMimeTypes = provider()->findByName(QFileInfo(fileName).fileName(), foundSuffix);
+    const QStringList matchingMimeTypes = provider()->findByFileName(QFileInfo(fileName).fileName(), foundSuffix);
     return matchingMimeTypes;
 }
 
@@ -162,7 +162,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, int *accuracy
 
 // ------------------------------------------------------------------------------------------------
 
-QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODevice *device, int *accuracyPtr)
+QMimeType QMimeDatabasePrivate::findByFileNameAndData(const QString &fileName, QIODevice *device, int *accuracyPtr)
 {
     // First, glob patterns are evaluated. If there is a match with max weight,
     // this one is selected and we are done. Otherwise, the file contents are
@@ -172,7 +172,7 @@ QMimeType QMimeDatabasePrivate::findByNameAndData(const QString &fileName, QIODe
     *accuracyPtr = 0;
 
     // Pass 1) Try to match on the file name
-    QStringList candidatesByName = findByName(fileName);
+    QStringList candidatesByName = findByFileName(fileName);
     if (candidatesByName.count() == 1) {
         *accuracyPtr = 100;
         const QMimeType mime = mimeTypeForName(candidatesByName.at(0));
@@ -395,7 +395,7 @@ QMimeType QMimeDatabase::findByFile(const QFileInfo &fileInfo) const
 #endif
 
     int priority = 0;
-    return d->findByNameAndData(fileInfo.absoluteFilePath(), &file, &priority);
+    return d->findByFileNameAndData(fileInfo.absoluteFilePath(), &file, &priority);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -425,7 +425,7 @@ QMimeType QMimeDatabase::findByFile(const QString &fileName) const
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \fn QMimeType QMimeDatabase::findByName(const QString &fileName) const;
+    \fn QMimeType QMimeDatabase::findByFileName(const QString &fileName) const;
     \brief Returns a MIME type for the file name \a fileName.
 
     A valid MIME type is always returned. If the file name doesn't match any
@@ -435,15 +435,15 @@ QMimeType QMimeDatabase::findByFile(const QString &fileName) const
 
     This function does not try to open the file. To also use the content
     when determining the MIME type, use findByFile() or
-    findByNameAndData() instead.
+    findByFileNameAndData() instead.
 
     \sa findMimeTypesByFileName
 */
-QMimeType QMimeDatabase::findByName(const QString &fileName) const
+QMimeType QMimeDatabase::findByFileName(const QString &fileName) const
 {
     QMutexLocker locker(&d->mutex);
 
-    QStringList matches = d->findByName(fileName);
+    QStringList matches = d->findByFileName(fileName);
     const int matchCount = matches.count();
     if (matchCount == 0)
         return d->mimeTypeForName(d->defaultMimeType());
@@ -467,15 +467,15 @@ QMimeType QMimeDatabase::findByName(const QString &fileName) const
 
     This function does not try to open the file. To also use the content
     when determining the MIME type, use findByFile() or
-    findByNameAndData() instead.
+    findByFileNameAndData() instead.
 
-    \sa findByName
+    \sa findByFileName
 */
 QList<QMimeType> QMimeDatabase::findMimeTypesByFileName(const QString &fileName) const
 {
     QMutexLocker locker(&d->mutex);
 
-    QStringList matches = d->findByName(fileName);
+    QStringList matches = d->findByFileName(fileName);
     QList<QMimeType> mimes;
     matches.sort(); // Make it deterministic
     foreach (const QString& mime, matches) {
@@ -495,7 +495,7 @@ QString QMimeDatabase::suffixForFileName(const QString &fileName) const
 {
     QMutexLocker locker(&d->mutex);
     QString foundSuffix;
-    d->findByName(fileName, &foundSuffix);
+    d->findByFileName(fileName, &foundSuffix);
     return foundSuffix;
 }
 
@@ -567,7 +567,7 @@ QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
     if (scheme.startsWith(QLatin1String("http")))
         return mimeTypeForName(d->defaultMimeType());
 
-    return findByName(url.path());
+    return findByFileName(url.path());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -588,12 +588,12 @@ QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
     but the contents will be used if the file extension is unknown, or
     matches multiple MIME types.
 */
-QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *device) const
+QMimeType QMimeDatabase::findByFileNameAndData(const QString &fileName, QIODevice *device) const
 {
     DBG() << "fileName" << fileName;
 
     int accuracy = 0;
-    return d->findByNameAndData(fileName, device, &accuracy);
+    return d->findByFileNameAndData(fileName, device, &accuracy);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -614,13 +614,13 @@ QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, QIODevice *d
     but the contents will be used if the file extension is unknown, or
     matches multiple MIME types.
 */
-QMimeType QMimeDatabase::findByNameAndData(const QString &fileName, const QByteArray &data) const
+QMimeType QMimeDatabase::findByFileNameAndData(const QString &fileName, const QByteArray &data) const
 {
     DBG() << "fileName" << fileName;
 
     QBuffer buffer(const_cast<QByteArray *>(&data));
     int accuracy = 0;
-    return d->findByNameAndData(fileName, &buffer, &accuracy);
+    return d->findByFileNameAndData(fileName, &buffer, &accuracy);
 }
 
 // ------------------------------------------------------------------------------------------------

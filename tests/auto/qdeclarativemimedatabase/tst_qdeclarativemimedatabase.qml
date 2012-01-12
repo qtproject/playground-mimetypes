@@ -140,14 +140,14 @@ TestCase {
         return false;
     }
 
-    function test_findByName() {
+    function test_findByFileName() {
         var ok = 0
 
         for (var listIx = 0; listIx < list().length; ++listIx) {
             //print(listValue(listIx).filePath)
 
-            var resultMimeTypeName = database.findByName(listValue(listIx).filePath).name
-            //print("findByName(" + listValue(listIx).filePath + ") returned", resultMimeTypeName)
+            var resultMimeTypeName = database.findByFileName(listValue(listIx).filePath).name
+            //print("findByFileName(" + listValue(listIx).filePath + ") returned", resultMimeTypeName)
 
             // Results are ambiguous when multiple MIME types have the same glob
             // -> accept the current result if the found MIME type actually

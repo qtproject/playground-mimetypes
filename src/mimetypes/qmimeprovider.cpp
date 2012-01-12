@@ -261,7 +261,7 @@ QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
     return mimeTypeForNameUnchecked(name);
 }
 
-QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *foundSuffix)
+QStringList QMimeBinaryProvider::findByFileName(const QString &fileName, QString *foundSuffix)
 {
     checkCache();
     const QString lowerFileName = fileName.toLower();
@@ -655,7 +655,7 @@ QMimeType QMimeXMLProvider::mimeTypeForName(const QString &name)
     return m_nameMimeTypeMap.value(name);
 }
 
-QStringList QMimeXMLProvider::findByName(const QString &fileName, QString *foundSuffix)
+QStringList QMimeXMLProvider::findByFileName(const QString &fileName, QString *foundSuffix)
 {
     ensureLoaded();
 

@@ -76,7 +76,7 @@ public:
                                           const QString &nameOrAlias
                                       );
 
-    Q_INVOKABLE QDeclarativeMimeType *findByName (
+    Q_INVOKABLE QDeclarativeMimeType *findByFileName (
                                           const QString &fileName
                                       );
 

@@ -34,7 +34,7 @@ public:
 
     virtual bool isValid() = 0;
     virtual QMimeType mimeTypeForName(const QString &name) = 0;
-    virtual QStringList findByName(const QString &fileName, QString *foundSuffix) = 0;
+    virtual QStringList findByFileName(const QString &fileName, QString *foundSuffix) = 0;
     virtual QStringList parents(const QString &mime) = 0;
     virtual QString resolveAlias(const QString &name) = 0;
     virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr) = 0;
@@ -60,7 +60,7 @@ public:
 
     virtual bool isValid();
     virtual QMimeType mimeTypeForName(const QString &name);
-    virtual QStringList findByName(const QString &fileName, QString *foundSuffix);
+    virtual QStringList findByFileName(const QString &fileName, QString *foundSuffix);
     virtual QStringList parents(const QString &mime);
     virtual QString resolveAlias(const QString &name);
     virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr);
@@ -101,7 +101,7 @@ public:
 
     virtual bool isValid();
     virtual QMimeType mimeTypeForName(const QString &name);
-    virtual QStringList findByName(const QString &fileName, QString *foundSuffix);
+    virtual QStringList findByFileName(const QString &fileName, QString *foundSuffix);
     virtual QStringList parents(const QString &mime);
     virtual QString resolveAlias(const QString &name);
     virtual QMimeType findByMagic(const QByteArray &data, int *accuracyPtr);

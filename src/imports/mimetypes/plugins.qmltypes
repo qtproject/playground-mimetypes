@@ -15,7 +15,7 @@ Module {
             Parameter { name: "nameOrAlias"; type: "string" }
         }
         Method {
-            name: "findByName"
+            name: "findByFileName"
             type: "QDeclarativeMimeType*"
             Parameter { name: "fileName"; type: "string" }
         }

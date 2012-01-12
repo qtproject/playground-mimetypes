@@ -45,7 +45,7 @@ public:
 
     QMimeType mimeTypeForName(const QString &nameOrAlias) const;
 
-    QMimeType findByName(const QString &fileName) const;
+    QMimeType findByFileName(const QString &fileName) const;
     QList<QMimeType> findMimeTypesByFileName(const QString &fileName) const;
 
     QMimeType findByData(const QByteArray &data) const;
@@ -54,8 +54,8 @@ public:
     QMimeType findByFile(const QString &fileName) const;
     QMimeType findByFile(const QFileInfo &fileInfo) const;
     QMimeType findByUrl(const QUrl &url) const;
-    QMimeType findByNameAndData(const QString &fileName, QIODevice *device) const;
-    QMimeType findByNameAndData(const QString &fileName, const QByteArray &data) const;
+    QMimeType findByFileNameAndData(const QString &fileName, QIODevice *device) const;
+    QMimeType findByFileNameAndData(const QString &fileName, const QByteArray &data) const;
 
     QString suffixForFileName(const QString &fileName) const;
 

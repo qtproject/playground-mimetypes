@@ -122,7 +122,7 @@ void tst_qmimedatabase::test_mimeTypeForName()
 
 }
 
-void tst_qmimedatabase::test_findByName_data()
+void tst_qmimedatabase::test_findByFileName_data()
 {
     QTest::addColumn<QString>("fileName");
     QTest::addColumn<QString>("expectedMimeType");
@@ -157,12 +157,12 @@ void tst_qmimedatabase::test_findByName_data()
     QTest::newRow("doesn't exist but has known extension") << "IDontExist.txt" << "text/plain";
 }
 
-void tst_qmimedatabase::test_findByName()
+void tst_qmimedatabase::test_findByFileName()
 {
     QFETCH(QString, fileName);
     QFETCH(QString, expectedMimeType);
     QMimeDatabase db;
-    QMimeType mime = db.findByName(fileName);
+    QMimeType mime = db.findByFileName(fileName);
     QVERIFY(mime.isValid());
     QCOMPARE(mime.name(), expectedMimeType);
 
@@ -284,11 +284,11 @@ void tst_qmimedatabase::test_aliases()
 void tst_qmimedatabase::test_icons()
 {
     QMimeDatabase db;
-    QMimeType directory = db.findByName(QString::fromLatin1("/"));
+    QMimeType directory = db.findByFileName(QString::fromLatin1("/"));
     QCOMPARE(directory.name(), QString::fromLatin1("inode/directory"));
     QCOMPARE(directory.iconName(), QString::fromLatin1("inode-directory"));
 
-    QMimeType pub = db.findByName(QString::fromLatin1("foo.epub"));
+    QMimeType pub = db.findByFileName(QString::fromLatin1("foo.epub"));
     QCOMPARE(pub.name(), QString::fromLatin1("application/epub+zip"));
     QCOMPARE(pub.iconName(), QString::fromLatin1("application-epub+zip"));
     QCOMPARE(pub.genericIconName(), QString::fromLatin1("x-office-document"));
@@ -314,7 +314,7 @@ void tst_qmimedatabase::test_findByFileWithContent()
     mime = db.findByData(&file); // QIODevice ctor
     QCOMPARE(mime.name(), QString::fromLatin1("application/pdf"));
     // by name only, we cannot find the mimetype
-    mime = db.findByName(tempFileName);
+    mime = db.findByFileName(tempFileName);
     QVERIFY(mime.isValid());
     QVERIFY(mime.isDefault());
 
@@ -328,7 +328,7 @@ void tst_qmimedatabase::test_findByFileWithContent()
         mime = db.findByFile(txtTempFileName);
         QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
         // fast mode finds the same
-        mime = db.findByName(txtTempFileName);
+        mime = db.findByFileName(txtTempFileName);
         QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
     }
 
@@ -384,7 +384,7 @@ void tst_qmimedatabase::test_findByContent()
     QCOMPARE(db.findByData(&buffer).name(), expectedMimeTypeName);
 }
 
-void tst_qmimedatabase::test_findByNameAndContent_data()
+void tst_qmimedatabase::test_findByFileNameAndContent_data()
 {
     QTest::addColumn<QString>("name");
     QTest::addColumn<QByteArray>("data");
@@ -403,14 +403,14 @@ void tst_qmimedatabase::test_findByNameAndContent_data()
     QTest::newRow("text.xls, found by extension, user is in control") << QString::fromLatin1("text.xls") << oleData << "application/vnd.ms-excel";
 }
 
-void tst_qmimedatabase::test_findByNameAndContent()
+void tst_qmimedatabase::test_findByFileNameAndContent()
 {
     QFETCH(QString, name);
     QFETCH(QByteArray, data);
     QFETCH(QString, expectedMimeTypeName);
 
     QMimeDatabase db;
-    QCOMPARE(db.findByNameAndData(name, data).name(), expectedMimeTypeName);
+    QCOMPARE(db.findByFileNameAndData(name, data).name(), expectedMimeTypeName);
 }
 
 void tst_qmimedatabase::test_allMimeTypes()
@@ -508,7 +508,7 @@ void tst_qmimedatabase::test_knownSuffix()
     QCOMPARE(db.suffixForFileName(QString::fromLatin1("foo.tar.bz2")), QString::fromLatin1("tar.bz2"));
 }
 
-void tst_qmimedatabase::findByName_data()
+void tst_qmimedatabase::findByFileName_data()
 {
     QTest::addColumn<QString>("filePath");
     QTest::addColumn<QString>("mimeTypeName");
@@ -541,7 +541,7 @@ void tst_qmimedatabase::findByName_data()
     }
 }
 
-void tst_qmimedatabase::findByName()
+void tst_qmimedatabase::findByFileName()
 {
     QFETCH(QString, filePath);
     QFETCH(QString, mimeTypeName);
@@ -551,7 +551,7 @@ void tst_qmimedatabase::findByName()
 
     //qDebug() << Q_FUNC_INFO << filePath;
 
-    const QMimeType resultMimeType(database.findByName(filePath));
+    const QMimeType resultMimeType(database.findByFileName(filePath));
     if (resultMimeType.isValid()) {
         //qDebug() << Q_FUNC_INFO << "MIME type" << resultMimeType.name() << "has generic icon name" << resultMimeType.genericIconName() << "and icon name" << resultMimeType.iconName();
 
@@ -569,7 +569,7 @@ void tst_qmimedatabase::findByName()
 #endif
     }
     const QString resultMimeTypeName = resultMimeType.name();
-    //qDebug() << Q_FUNC_INFO << "findByName() returned" << resultMimeTypeName;
+    //qDebug() << Q_FUNC_INFO << "findByFileName() returned" << resultMimeTypeName;
 
     const bool failed = resultMimeTypeName != mimeTypeName;
     const bool shouldFail = (xFail.length() >= 1 && xFail.at(0) == QLatin1Char('x'));
@@ -597,7 +597,7 @@ void tst_qmimedatabase::findByName()
 
 void tst_qmimedatabase::findByData_data()
 {
-    findByName_data();
+    findByFileName_data();
 }
 
 void tst_qmimedatabase::findByData()
@@ -622,7 +622,7 @@ void tst_qmimedatabase::findByData()
 
 void tst_qmimedatabase::findByFile_data()
 {
-    findByName_data();
+    findByFileName_data();
 }
 
 void tst_qmimedatabase::findByFile()

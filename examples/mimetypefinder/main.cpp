@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
             mime = db.findByData(file.read(32000));
         }
     } else if (option == QLatin1String("-f")) {
-        mime = db.findByName(fileName);
+        mime = db.findByFileName(fileName);
     } else {
         mime = db.findByFile(fileName);
     }

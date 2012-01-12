@@ -22,8 +22,8 @@ private slots:
     void cleanupTestCase();
 
     void test_mimeTypeForName();
-    void test_findByName_data();
-    void test_findByName();
+    void test_findByFileName_data();
+    void test_findByFileName();
     void test_findMultipleByName_data();
     void test_findMultipleByName();
     void test_inheritance();
@@ -33,8 +33,8 @@ private slots:
     void test_findByUrl();
     void test_findByContent_data();
     void test_findByContent();
-    void test_findByNameAndContent_data();
-    void test_findByNameAndContent();
+    void test_findByFileNameAndContent_data();
+    void test_findByFileNameAndContent();
     void test_allMimeTypes();
     void test_inheritsPerformance();
     void test_suffixes_data();
@@ -44,8 +44,8 @@ private slots:
 
     // shared-mime-info test suite
 
-    void findByName_data();
-    void findByName();
+    void findByFileName_data();
+    void findByFileName();
 
     void findByData_data();
     void findByData();

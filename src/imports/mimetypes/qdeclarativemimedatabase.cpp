@@ -155,7 +155,7 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod MimeType MimeDatabase::findByName(string fileName)
+    \qmlmethod MimeType MimeDatabase::findByFileName(string fileName)
     \brief Returns a MIME type for the file \a fileName.
 
     A valid MIME type is always returned. If the file name doesn't match any
@@ -165,12 +165,12 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
     This function does not try to open the file. To also use the content
     when determining the MIME type, use findByFile().
 */
-QDeclarativeMimeType *QDeclarativeMimeDatabase::findByName (
+QDeclarativeMimeType *QDeclarativeMimeDatabase::findByFileName (
                                                     const QString &fileName
                                                 )
 {
     return new QDeclarativeMimeType (
-                   m_MimeDatabase.findByName(fileName),
+                   m_MimeDatabase.findByFileName(fileName),
                    this   // <- The new object will be released later
                           //    when this registry is released.
                );
