@@ -188,3 +188,10 @@ QStringList QMimeAllGlobPatterns::matchingGlobs(const QString &fileName, QString
         *foundSuffix = result.m_foundSuffix;
     return result.m_matchingMimeTypes;
 }
+
+void QMimeAllGlobPatterns::clear()
+{
+    m_fastPatterns.clear();
+    m_highWeightGlobs.clear();
+    m_lowWeightGlobs.clear();
+}

@@ -29,6 +29,7 @@
 #include <QFile>
 #include <QByteArrayMatcher>
 #include <QDebug>
+#include <QDateTime>
 #include <qendian.h>
 
 static QString fallbackParent(const QString& mimeTypeName)
@@ -50,6 +51,17 @@ static QString fallbackParent(const QString& mimeTypeName)
 QMimeProviderBase::QMimeProviderBase(QMimeDatabasePrivate *db)
     : m_db(db)
 {
+}
+
+QMIME_EXPORT int qmime_secondsBetweenChecks = 5; // exported for the unit test
+
+bool QMimeProviderBase::shouldCheck()
+{
+    const QDateTime now = QDateTime::currentDateTime();
+    if (m_lastCheck.isValid() && m_lastCheck.secsTo(now) < qmime_secondsBetweenChecks)
+        return false;
+    m_lastCheck = now;
+    return true;
 }
 
 QMimeBinaryProvider::QMimeBinaryProvider(QMimeDatabasePrivate *db)
@@ -76,14 +88,27 @@ struct QMimeBinaryProvider::CacheFile
     inline const char* getCharStar(int offset) const {
         return reinterpret_cast<const char *>(data + offset);
     }
+    bool load();
+    bool reload();
 
     QFile *file;
     uchar *data;
+    QDateTime m_mtime;
     bool m_valid;
 };
 
 QMimeBinaryProvider::CacheFile::CacheFile(QFile *f)
     : file(f), m_valid(false)
+{
+    load();
+}
+
+QMimeBinaryProvider::CacheFile::~CacheFile()
+{
+    delete file;
+}
+
+bool QMimeBinaryProvider::CacheFile::load()
 {
     data = file->map(0, file->size());
     if (data) {
@@ -91,11 +116,31 @@ QMimeBinaryProvider::CacheFile::CacheFile(QFile *f)
         const int minor = getUint16(2);
         m_valid = (major == 1 && minor >= 1 && minor <= 2);
     }
+    m_mtime = QFileInfo(*file).lastModified();
+    return m_valid;
 }
 
-QMimeBinaryProvider::CacheFile::~CacheFile()
+bool QMimeBinaryProvider::CacheFile::reload()
 {
-    delete file;
+    //qDebug() << "reload!" << file->fileName();
+    m_valid = false;
+    if (file->isOpen()) {
+        file->close();
+        if (!file->open(QIODevice::ReadOnly)) {
+            return false;
+        }
+    }
+    data = 0;
+    return load();
+}
+
+QMimeBinaryProvider::CacheFile* QMimeBinaryProvider::CacheFileList::findCacheFile(const QString& fileName) const
+{
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if ((*it)->file->fileName() == fileName)
+            return *it;
+    }
+    return 0;
 }
 
 QMimeBinaryProvider::~QMimeBinaryProvider()
@@ -122,22 +167,8 @@ bool QMimeBinaryProvider::isValid()
         return false;
     }
 
-    const QStringList cacheFilenames = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/mime.cache"));
-    qDeleteAll(m_cacheFiles);
-    m_cacheFiles.clear();
-
-    // Verify version
-    foreach (const QString& cacheFilename, cacheFilenames) {
-        QFile *file = new QFile(cacheFilename);
-        if (file->open(QIODevice::ReadOnly)) {
-            CacheFile *cacheFile = new CacheFile(file);
-            if (cacheFile->isValid())
-                m_cacheFiles.append(cacheFile);
-            else
-                delete cacheFile;
-        } else
-            delete file;
-    }
+    Q_ASSERT(m_cacheFiles.isEmpty()); // this method is only ever called once
+    checkCache();
 
     if (m_cacheFiles.count() > 1)
         return true;
@@ -154,6 +185,61 @@ bool QMimeBinaryProvider::isValid()
 #endif
 }
 
+bool QMimeBinaryProvider::CacheFileList::checkCacheChanged()
+{
+    bool somethingChanged = false;
+    QMutableListIterator<CacheFile *> it(*this);
+    while (it.hasNext()) {
+        CacheFile* cacheFile = it.next();
+        QFileInfo fileInfo(*cacheFile->file);
+        if (!fileInfo.exists()) { // This can't happen by just running update-mime-database. But the user could use rm -rf :-)
+            delete cacheFile;
+            it.remove();
+            somethingChanged = true;
+        } else if (fileInfo.lastModified() > cacheFile->m_mtime) {
+            if (!cacheFile->reload()) {
+                delete cacheFile;
+                it.remove();
+            }
+            somethingChanged = true;
+        }
+    }
+    return somethingChanged;
+}
+
+void QMimeBinaryProvider::checkCache()
+{
+    if (!shouldCheck())
+        return;
+
+    // First iterate over existing known cache files and check for uptodate
+    if (m_cacheFiles.checkCacheChanged())
+        m_mimetypeListLoaded = false;
+
+    // Then check if new cache files appeared
+    const QStringList cacheFileNames = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/mime.cache"));
+    if (cacheFileNames != m_cacheFileNames) {
+        foreach (const QString& cacheFileName, cacheFileNames) {
+            CacheFile* cacheFile = m_cacheFiles.findCacheFile(cacheFileName);
+            if (!cacheFile) {
+                //qDebug() << "new file:" << cacheFileName;
+                QFile *file = new QFile(cacheFileName);
+                if (file->open(QIODevice::ReadOnly)) {
+                    cacheFile = new CacheFile(file);
+                    if (cacheFile->isValid()) { // verify version
+                        m_cacheFiles.append(cacheFile);
+                    }
+                    else
+                        delete cacheFile;
+                } else
+                    delete file;
+            }
+        }
+        m_cacheFileNames = cacheFileNames;
+        m_mimetypeListLoaded = false;
+    }
+}
+
 static QMimeType mimeTypeForNameUnchecked(const QString &name)
 {
     QMimeTypePrivate data;
@@ -167,6 +253,7 @@ static QMimeType mimeTypeForNameUnchecked(const QString &name)
 
 QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 {
+    checkCache();
     if (!m_mimetypeListLoaded)
         loadMimeTypeList();
     if (!m_mimetypeNames.contains(name))
@@ -176,6 +263,7 @@ QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 
 QStringList QMimeBinaryProvider::findByName(const QString &fileName, QString *foundSuffix)
 {
+    checkCache();
     const QString lowerFileName = fileName.toLower();
     QMimeGlobMatchResult result;
     // TODO this parses in the order (local, global). Check that it handles "NOGLOBS" correctly.
@@ -290,6 +378,7 @@ bool QMimeBinaryProvider::matchMagicRule(QMimeBinaryProvider::CacheFile *cacheFi
 
 QMimeType QMimeBinaryProvider::findByMagic(const QByteArray &data, int *accuracyPtr)
 {
+    checkCache();
     foreach (CacheFile *cacheFile, m_cacheFiles) {
         const int magicListOffset = cacheFile->getUint32(PosMagicListOffset);
         const int numMatches = cacheFile->getUint32(magicListOffset);
@@ -315,6 +404,7 @@ QMimeType QMimeBinaryProvider::findByMagic(const QByteArray &data, int *accuracy
 
 QStringList QMimeBinaryProvider::parents(const QString &mime)
 {
+    checkCache();
     const QByteArray mimeStr = mime.toLatin1();
     QStringList result;
     foreach (CacheFile *cacheFile, m_cacheFiles) {
@@ -355,6 +445,7 @@ QStringList QMimeBinaryProvider::parents(const QString &mime)
 
 QString QMimeBinaryProvider::resolveAlias(const QString &name)
 {
+    checkCache();
     const QByteArray input = name.toLatin1();
     foreach (CacheFile *cacheFile, m_cacheFiles) {
         const int aliasListOffset = cacheFile->getUint32(PosAliasListOffset);
@@ -521,6 +612,7 @@ QString QMimeBinaryProvider::iconForMime(CacheFile *cacheFile, int posListOffset
 
 void QMimeBinaryProvider::loadIcon(QMimeTypePrivate &data)
 {
+    checkCache();
     const QByteArray inputMime = data.name.toLatin1();
     foreach (CacheFile *cacheFile, m_cacheFiles) {
         const QString icon = iconForMime(cacheFile, PosIconsListOffset, inputMime);
@@ -533,6 +625,7 @@ void QMimeBinaryProvider::loadIcon(QMimeTypePrivate &data)
 
 void QMimeBinaryProvider::loadGenericIcon(QMimeTypePrivate &data)
 {
+    checkCache();
     const QByteArray inputMime = data.name.toLatin1();
     foreach (CacheFile *cacheFile, m_cacheFiles) {
         const QString icon = iconForMime(cacheFile, PosGenericIconsListOffset, inputMime);
@@ -590,11 +683,12 @@ QMimeType QMimeXMLProvider::findByMagic(const QByteArray &data, int *accuracyPtr
 
 void QMimeXMLProvider::ensureLoaded()
 {
-    if (!m_loaded) {
+    if (!m_loaded || shouldCheck()) {
         bool fdoXmlFound = false;
         QStringList allFiles;
 
         const QStringList packageDirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QLatin1String("mime/packages"), QStandardPaths::LocateDirectory);
+        //qDebug() << "packageDirs=" << packageDirs;
         foreach (const QString &packageDir, packageDirs) {
             QDir dir(packageDir);
             const QStringList files = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
@@ -608,10 +702,21 @@ void QMimeXMLProvider::ensureLoaded()
         }
 
         if (!fdoXmlFound) {
-            // TODO: putting the xml file in the resource is a hack for now
-            // We should instead install the file as part of installing Qt
-            load(QLatin1String(":/qmime/freedesktop.org.xml"));
+            // We could instead install the file as part of installing Qt?
+            allFiles.prepend(QLatin1String(":/qmime/freedesktop.org.xml"));
         }
+
+        if (m_allFiles == allFiles)
+            return;
+        m_allFiles = allFiles;
+
+        m_nameMimeTypeMap.clear();
+        m_aliases.clear();
+        m_parents.clear();
+        m_mimeTypeGlobs.clear();
+        m_magicMatchers.clear();
+
+        //qDebug() << "Loading" << m_allFiles;
 
         foreach (const QString& file, allFiles)
             load(file);
@@ -655,6 +760,7 @@ void QMimeXMLProvider::addMimeType(const QMimeType &mt)
 
 QStringList QMimeXMLProvider::parents(const QString &mime)
 {
+    ensureLoaded();
     QStringList result = m_parents.value(mime);
     if (result.isEmpty()) {
         const QString parent = fallbackParent(mime);
@@ -671,6 +777,7 @@ void QMimeXMLProvider::addParent(const QString &child, const QString &parent)
 
 QString QMimeXMLProvider::resolveAlias(const QString &name)
 {
+    ensureLoaded();
     return m_aliases.value(name, name);
 }
 
@@ -681,6 +788,7 @@ void QMimeXMLProvider::addAlias(const QString &alias, const QString &name)
 
 QList<QMimeType> QMimeXMLProvider::allMimeTypes()
 {
+    ensureLoaded();
     return m_nameMimeTypeMap.values();
 }
 

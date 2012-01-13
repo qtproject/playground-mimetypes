@@ -19,6 +19,7 @@ public:
 
 private slots:
     void initTestCase();
+    void cleanupTestCase();
 
     void test_mimeTypeForName();
     void test_findByName_data();
@@ -51,6 +52,14 @@ private slots:
 
     void findByFile_data();
     void findByFile();
+
+    //
+
+    void installNewGlobalMimeType();
+    void installNewLocalMimeType();
+
+private:
+    QString m_dataHome;
 };
 
 #endif   // TST_QMIMEDATABASE_H_INCLUDED

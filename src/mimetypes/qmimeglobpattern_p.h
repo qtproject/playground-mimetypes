@@ -95,6 +95,7 @@ public:
     void addGlob(const QMimeGlobPattern &glob);
     void removeMimeType(const QString &mimeType);
     QStringList matchingGlobs(const QString &fileName, QString *foundSuffix) const;
+    void clear();
 
     PatternsMap m_fastPatterns; // example: "doc" -> "application/msword", "text/plain"
     QMimeGlobPatternList m_highWeightGlobs;

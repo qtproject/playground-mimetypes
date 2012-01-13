@@ -36,6 +36,39 @@ tst_qmimedatabase::~tst_qmimedatabase()
 
 void tst_qmimedatabase::initTestCase()
 {
+    // Create a "global" and a "local" XDG data dir, right here.
+    // The local dir will be empty initially, while the global dir will contain a copy of freedesktop.org.xml
+
+    QDir here = QDir::currentPath();
+
+    qputenv("XDG_DATA_DIRS", QFile::encodeName(here.absolutePath()));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QDir(here.absolutePath() + "/mime").removeRecursively();
+#endif
+    here.mkpath(QString::fromLatin1("mime/packages"));
+
+    QFile xml(QFile::decodeName(SRCDIR "../../../src/mimetypes/mime/packages/freedesktop.org.xml"));
+    const QString mimeDir = here.absolutePath() + QLatin1String("/mime");
+    xml.copy(mimeDir + QLatin1String("/packages/freedesktop.org.xml"));
+
+    m_dataHome = here.absolutePath() + QLatin1String("/../datahome");
+    qputenv("XDG_DATA_HOME", QFile::encodeName(m_dataHome));
+    //qDebug() << "XDG_DATA_HOME=" << m_dataHome;
+
+    // Make sure we start clean
+    cleanupTestCase();
+}
+
+void tst_qmimedatabase::cleanupTestCase()
+{
+    QDir here = QDir::currentPath();
+    here.remove(QString::fromLatin1("mime/packages/yast2-metapackage-handler-mimetypes.xml"));
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QDir(m_dataHome).removeRecursively();
+#else
+    QFile::remove(m_dataHome + QLatin1String("/mime/packages/yast2-metapackage-handler-mimetypes.xml"));
+#endif
 }
 
 void tst_qmimedatabase::test_mimeTypeForName()
@@ -630,11 +663,116 @@ void tst_qmimedatabase::test_fromThreads()
 #endif
 }
 
+static void runUpdateMimeDatabase(const QString &path) // TODO make it a QMimeDatabase method?
+{
+    const QString umd = QStandardPaths::findExecutable(QString::fromLatin1("update-mime-database"));
+    if (umd.isEmpty())
+        QSKIP("shared-mime-info not found, skipping mime.cache test", SkipAll);
+
+    QProcess proc;
+    proc.setProcessChannelMode(QProcess::MergedChannels); // silence output
+    proc.start(umd, QStringList() << path);
+    proc.waitForFinished();
+    //qDebug() << "runUpdateMimeDatabase" << path;
+}
+
+static void waitAndRunUpdateMimeDatabase(const QString &path)
+{
+    QFileInfo mimeCacheInfo(path + QString::fromLatin1("/mime.cache"));
+    if (mimeCacheInfo.exists()) {
+        // Wait until the begining of the next second
+        while (mimeCacheInfo.lastModified().secsTo(QDateTime::currentDateTime()) == 0) {
+            QTest::qSleep(200);
+        }
+    }
+    runUpdateMimeDatabase(path);
+}
+
+static void checkHasMimeType(const QString &mimeType)
+{
+    QMimeDatabase db;
+    QVERIFY(db.mimeTypeForName(mimeType).isValid());
+
+    bool found = false;
+    foreach (const QMimeType& mt, db.allMimeTypes()) {
+        if (mt.name() == mimeType) {
+            found = true;
+            break;
+        }
+    }
+    QVERIFY(found);
+}
+
+extern QMIME_EXPORT int qmime_secondsBetweenChecks; // see qmimeprovider.cpp
+
+void tst_qmimedatabase::installNewGlobalMimeType()
+{
+    qmime_secondsBetweenChecks = 0;
+
+    QMimeDatabase db;
+    QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
+
+    const QString fileName = QLatin1String("yast2-metapackage-handler-mimetypes.xml");
+    const QString srcFile = QFile::decodeName(SRCDIR) + fileName;
+
+    QDir here = QDir::currentPath();
+    const QString mimeDir = here.absolutePath() + QLatin1String("/mime");
+    const QString destDir = mimeDir + QLatin1String("/packages/");
+    const QString destFile = destDir + fileName;
+    QFile::remove(destFile);
+    //qDebug() << destFile;
+    QVERIFY(QFile::copy(srcFile, destFile));
+    waitAndRunUpdateMimeDatabase(mimeDir);
+
+    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("text/x-suse-ymu"));
+    QVERIFY(db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
+    checkHasMimeType("text/x-suse-ymp");
+
+    // Now test removing it again
+    QFile::remove(destFile);
+    waitAndRunUpdateMimeDatabase(mimeDir);
+    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
+}
+
+void tst_qmimedatabase::installNewLocalMimeType()
+{
+    qmime_secondsBetweenChecks = 0;
+
+    QMimeDatabase db;
+    QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
+
+    const QString fileName = QLatin1String("yast2-metapackage-handler-mimetypes.xml");
+    const QString srcFile = QFile::decodeName(SRCDIR) + fileName;
+    const QString mimeDir = m_dataHome + QLatin1String("/mime");
+    const QString destDir = mimeDir + QLatin1String("/packages/");
+    QDir().mkpath(destDir);
+    const QString destFile = destDir + fileName;
+    QFile::remove(destFile);
+    QVERIFY(QFile::copy(srcFile, destFile));
+    runUpdateMimeDatabase(mimeDir);
+
+    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("text/x-suse-ymu"));
+    QVERIFY(db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
+    checkHasMimeType("text/x-suse-ymp");
+
+    // Now test removing it again (note, this leaves a mostly-empty mime.cache file)
+    QFile::remove(destFile);
+    waitAndRunUpdateMimeDatabase(mimeDir);
+    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
+
+    // And now the user goes wild and uses rm -rf
+    QFile::remove(mimeDir + QString::fromLatin1("/mime.cache"));
+    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
+}
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 //QTEST_MAIN(tst_qmimedatabase)
 QTEST_GUILESS_MAIN(tst_qmimedatabase)
 #else
 // If tests with icons were activated in Qt4 we'd use QTEST_MAIN:
 //QTEST_MAIN(tst_qmimedatabase)
-QTEST_MAIN(tst_qmimedatabase)
+    QTEST_MAIN(tst_qmimedatabase)
 #endif

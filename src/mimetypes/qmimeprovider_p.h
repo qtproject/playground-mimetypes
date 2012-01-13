@@ -21,6 +21,7 @@
 #ifndef QMIMEPROVIDER_P_H
 #define QMIMEPROVIDER_P_H
 
+#include <QDateTime>
 #include "qmimedatabase_p.h"
 #include <QtCore/QSet>
 class QMimeMagicRuleMatcher;
@@ -43,6 +44,9 @@ public:
     virtual void loadGenericIcon(QMimeTypePrivate &) {}
 
     QMimeDatabasePrivate* m_db;
+protected:
+    bool shouldCheck();
+    QDateTime m_lastCheck;
 };
 
 /*
@@ -73,8 +77,16 @@ private:
     bool matchMagicRule(CacheFile *cacheFile, int numMatchlets, int firstOffset, const QByteArray &data);
     QString iconForMime(CacheFile *cacheFile, int posListOffset, const QByteArray& inputMime);
     void loadMimeTypeList();
+    void checkCache();
 
-    QList<CacheFile *> m_cacheFiles;
+    class CacheFileList : public QList<CacheFile *>
+    {
+    public:
+        CacheFile* findCacheFile(const QString& fileName) const;
+        bool checkCacheChanged();
+    };
+    CacheFileList m_cacheFiles;
+    QStringList m_cacheFileNames;
     QSet<QString> m_mimetypeNames;
     bool m_mimetypeListLoaded;
 };
@@ -121,6 +133,7 @@ private:
     QMimeAllGlobPatterns m_mimeTypeGlobs;
 
     QList<QMimeMagicRuleMatcher> m_magicMatchers;
+    QStringList m_allFiles;
 };
 
 #endif // QMIMEPROVIDER_P_H
