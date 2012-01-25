@@ -724,14 +724,14 @@ void tst_qmimedatabase::installNewGlobalMimeType()
     QVERIFY(QFile::copy(srcFile, destFile));
     waitAndRunUpdateMimeDatabase(mimeDir);
 
-    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("text/x-suse-ymu"));
+    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("text/x-suse-ymu"));
     QVERIFY(db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
     checkHasMimeType("text/x-suse-ymp");
 
     // Now test removing it again
     QFile::remove(destFile);
     waitAndRunUpdateMimeDatabase(mimeDir);
-    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
 }
 
@@ -752,19 +752,19 @@ void tst_qmimedatabase::installNewLocalMimeType()
     QVERIFY(QFile::copy(srcFile, destFile));
     runUpdateMimeDatabase(mimeDir);
 
-    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("text/x-suse-ymu"));
+    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("text/x-suse-ymu"));
     QVERIFY(db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
     checkHasMimeType("text/x-suse-ymp");
 
     // Now test removing it again (note, this leaves a mostly-empty mime.cache file)
     QFile::remove(destFile);
     waitAndRunUpdateMimeDatabase(mimeDir);
-    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
 
     // And now the user goes wild and uses rm -rf
     QFile::remove(mimeDir + QString::fromLatin1("/mime.cache"));
-    QCOMPARE(db.findByName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
 }
 
