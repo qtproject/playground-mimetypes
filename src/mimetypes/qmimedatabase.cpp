@@ -44,9 +44,9 @@ QT_BEGIN_NAMESPACE
 bool isQMimeDatabaseDebuggingActivated (false);
 
 #ifndef QT_NO_DEBUG_OUTPUT
-#define DBG() if (isQMimeDatabaseDebuggingActivated) qDebug() << Q_FUNC_INFO
+#define DBG() if (isQMimeDatabaseDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #else
-#define DBG() if (0) qDebug() << Q_FUNC_INFO
+#define DBG() if (0) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #endif
 
 // ------------------------------------------------------------------------------------------------

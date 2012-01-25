@@ -51,9 +51,9 @@
 extern bool isQMimeTypeDebuggingActivated;
 
 #ifndef QT_NO_DEBUG_OUTPUT
-#define DBG() if (isQMimeTypeDebuggingActivated) qDebug() << Q_FUNC_INFO
+#define DBG() if (isQMimeTypeDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #else
-#define DBG() if (0) qDebug() << Q_FUNC_INFO
+#define DBG() if (0) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #endif
 
 // ------------------------------------------------------------------------------------------------
@@ -236,12 +236,12 @@ QVariantMap QDeclarativeMimeType::properties() const
 #define ASSIGN_FROM_PROPERTY(name, setter, variantType, converter) \
     if (!other.contains(#name)) { \
         if (false) { \
-            qDebug() << Q_FUNC_INFO << "Variant does not contain" << #name; \
+            qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO << "Variant does not contain" << #name; \
         } \
     } \
     else if (other[#name].type() != QVariant::variantType) { \
         if (false) { \
-            qDebug() << Q_FUNC_INFO << "Variant for" << #name << "has wrong type" << other[#name].type() << "with" << other[#name]; \
+            qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO << "Variant for" << #name << "has wrong type" << other[#name].type() << "with" << other[#name]; \
         } \
     } \
     else { \
@@ -275,20 +275,20 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 #define EQUALS_PROPERTY(name, variantType, converter) \
     if (!other.contains(#name)) { \
         if (false) { \
-            qDebug() << Q_FUNC_INFO << "Variant does not contain" << #name << name(); \
+            qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO << "Variant does not contain" << #name << name(); \
         } \
         return false; \
     } \
     \
     if (other[#name].type() != QVariant::variantType) { \
         if (false) { \
-            qDebug() << Q_FUNC_INFO << "Variant for" << #name << "has wrong type" << other[#name].type() << "for" << name() << "with" << other[#name]; \
+            qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO << "Variant for" << #name << "has wrong type" << other[#name].type() << "for" << name() << "with" << other[#name]; \
         } \
         return false; \
     } \
     if (name() != other[#name].converter()) { \
         if (false) { \
-            qDebug() << Q_FUNC_INFO << "Values for" << #name << "differ:" << name() << other[#name]; \
+            qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO << "Values for" << #name << "differ:" << name() << other[#name]; \
         } \
         return false; \
     }

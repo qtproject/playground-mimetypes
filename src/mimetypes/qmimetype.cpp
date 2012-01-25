@@ -34,9 +34,9 @@ QT_BEGIN_NAMESPACE
 bool isQMimeTypeDebuggingActivated (false);
 
 #ifndef QT_NO_DEBUG_OUTPUT
-#define DBG() if (isQMimeTypeDebuggingActivated) qDebug() << Q_FUNC_INFO
+#define DBG() if (isQMimeTypeDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #else
-#define DBG() if (0) qDebug() << Q_FUNC_INFO
+#define DBG() if (0) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #endif
 
 QMimeTypePrivate::QMimeTypePrivate()
