@@ -313,7 +313,7 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
 
 /*!
     \fn QMimeDatabase::QMimeDatabase();
-    \brief Initializes the MIME database.
+    \brief Constructs this QMimeDatabase object.
  */
 QMimeDatabase::QMimeDatabase() :
         d(staticQMimeDatabase())
@@ -325,7 +325,7 @@ QMimeDatabase::QMimeDatabase() :
 
 /*!
     \fn QMimeDatabase::~QMimeDatabase();
-    \brief Resets the d pointer.
+    \brief Destroys the QMimeDatabase object, and resets the d pointer.
  */
 QMimeDatabase::~QMimeDatabase()
 {

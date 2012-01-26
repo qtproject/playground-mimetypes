@@ -31,6 +31,8 @@ QT_BEGIN_NAMESPACE struct QMimeTypePrivate; QT_END_NAMESPACE
 QT_BEGIN_NAMESPACE class QFileinfo; QT_END_NAMESPACE
 QT_BEGIN_NAMESPACE class QStringList; QT_END_NAMESPACE
 
+// ------------------------------------------------------------------------------------------------
+
 QT_BEGIN_NAMESPACE
 
 class QMIME_EXPORT QMimeType

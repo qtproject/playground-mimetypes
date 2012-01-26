@@ -27,6 +27,8 @@
 
 #include <QtCore/QStringList>
 
+// ------------------------------------------------------------------------------------------------
+
 QT_BEGIN_NAMESPACE
 
 class QByteArray;

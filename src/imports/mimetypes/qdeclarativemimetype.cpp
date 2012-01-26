@@ -61,19 +61,55 @@ extern bool isQMimeTypeDebuggingActivated;
 /*!
     \qmlclass MimeType QDeclarativeMimeType
     \brief The QML MimeType element describes types of file or data, represented by a MIME type string.
+
+    For instance a file named "readme.txt" has the MIME type "text/plain".
+    The MIME type can be determined from the file name, or from the file
+    contents, or from both. MIME type determination can also be done on
+    buffers of data not coming from files.
+
+    Determining the MIME type of a file can be useful to make sure your
+    application supports it. It is also useful in file-manager-like applications
+    or widgets, in order to display an appropriate icon() for the file, or even
+    the descriptive comment() in detailed views.
+
+    To check if a file has the expected MIME type, you should use inherits()
+    rather than a simple string comparison based on the name(). This is because
+    MIME types can inherit from each other: for instance a C source file is
+    a specific type of plain text file, so text/x-csrc inherits text/plain.
+
+    \sa QMimeDatabase
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \class QDeclarativeMimeType
     \brief The QDeclarativeMimeType class is the QML wrapper for the class QMimeType which describes types of file or data, represented by a MIME type string.
     \inherits QObject
+
+    For instance a file named "readme.txt" has the MIME type "text/plain".
+    The MIME type can be determined from the file name, or from the file
+    contents, or from both. MIME type determination can also be done on
+    buffers of data not coming from files.
+
+    Determining the MIME type of a file can be useful to make sure your
+    application supports it. It is also useful in file-manager-like applications
+    or widgets, in order to display an appropriate icon() for the file, or even
+    the descriptive comment() in detailed views.
+
+    To check if a file has the expected MIME type, you should use inherits()
+    rather than a simple string comparison based on the name(). This is because
+    MIME types can inherit from each other: for instance a C source file is
+    a specific type of plain text file, so text/x-csrc inherits text/plain.
+
+    \sa QMimeDatabase
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \fn QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent);
     \brief Performs default initialization of the contained MimeType, and attaches the object to the specified \a theParent for destruction.
  */
@@ -94,6 +130,7 @@ QDeclarativeMimeType::QDeclarativeMimeType(QObject *theParent) :
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \fn QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theParent);
     \brief Copies the specified MimeType \a other, and attaches the object to the specified \a theParent for destruction.
  */
@@ -115,8 +152,9 @@ QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theP
 
 #ifdef Q_COMPILER_RVALUE_REFS
 /*!
-    \fn QDeclarativeMimeType::QDeclarativeMimeType(const QMimeType &other, QObject *theParent);
-    \brief Moves the specified MimeType \a other, and attaches the object to the specified \a theParent for destruction.
+    \internal
+    \fn QDeclarativeMimeType::QDeclarativeMimeType(QMimeType &&other, QObject *theParent);
+    \brief Constructs this QDeclarativeMimeType object by moving the data of the QMimeType rvalue reference \a other, and attaches the object to the specified \a theParent for destruction.
  */
 QDeclarativeMimeType::QDeclarativeMimeType(QMimeType &&other, QObject *theParent) :
         QObject(theParent),
@@ -136,8 +174,9 @@ QDeclarativeMimeType::QDeclarativeMimeType(QMimeType &&other, QObject *theParent
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \fn QDeclarativeMimeType::~QDeclarativeMimeType();
-    \brief Destroys the the contained MimeType.
+    \brief Destroys the contained MimeType.
  */
 QDeclarativeMimeType::~QDeclarativeMimeType()
 {
@@ -155,14 +194,14 @@ QDeclarativeMimeType::~QDeclarativeMimeType()
 
 /*!
     \qmlmethod void MimeType::assign(MimeType other)
-    Assigns from another object.
+    Assigns the data of \a other to this MimeType object.
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
     \fn void QDeclarativeMimeType::assign(QDeclarativeMimeType *other);
-    \brief Assigns from the object \a other.
+    \brief Assigns the data of \a other to this QDeclarativeMimeType object.
  */
 void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
 {
@@ -178,15 +217,17 @@ void QDeclarativeMimeType::assign(QDeclarativeMimeType *other)
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \qmlmethod bool MimeType::equals(MimeType other)
-    Compares with the other object for equality.
+    Returns true if \a other equals this MimeType object, otherwise returns false.
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \fn bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const;
-    \brief Returns if the \a other object has the same value.
+    \brief Returns true if \a other equals this QDeclarativeMimeType object, otherwise returns false.
  */
 bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const
 {
@@ -205,10 +246,13 @@ bool QDeclarativeMimeType::equals(QDeclarativeMimeType *other) const
     Returns the properties as a JavaScript object.
  */
 
+// ------------------------------------------------------------------------------------------------
+
 #define ASSIGN_TO_PROPERTY(name) \
     result[#name] = name();
 
 /*!
+    \internal
     \fn QVariantMap QDeclarativeMimeType::properties() const;
     \brief Returns the properties as a JavaScript object.
  */
@@ -228,7 +272,7 @@ QVariantMap QDeclarativeMimeType::properties() const
 
 /*!
     \qmlmethod void MimeType::assignProperties(object other)
-    Assigns all properties from a JavaScript object.
+    Assigns the data of the JavaScript object \a other to this MimeType object.
  */
 
 // ------------------------------------------------------------------------------------------------
@@ -249,8 +293,9 @@ QVariantMap QDeclarativeMimeType::properties() const
     }
 
 /*!
+    \internal
     \fn void QDeclarativeMimeType::assignProperties(const QVariantMap &other);
-    \brief Assigns all properties from the JavaScript object \a other.
+    \brief Assigns the data of the QVariantMap \a other to this QDeclarativeMimeType object.
  */
 void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 {
@@ -267,7 +312,7 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
 
 /*!
     \qmlmethod bool MimeType::equalsProperties(object other)
-    Compares if the properties of the specified JavaScript object are equal.
+    Returns true if the properties of the JavaScript object \a other equal the properties of this MimeType object, otherwise returns false.
  */
 
 // ------------------------------------------------------------------------------------------------
@@ -294,8 +339,9 @@ void QDeclarativeMimeType::assignProperties(const QVariantMap &other)
     }
 
 /*!
+    \internal
     \fn bool QDeclarativeMimeType::equalsProperties(const QVariantMap &other) const;
-    \brief Returns if the properties of the specified JavaScript object \a other are equal.
+    \brief Returns true if the properties of the JavaScript object \a other equal the properties of this QDeclarativeMimeType object, otherwise returns false.
  */
 bool QDeclarativeMimeType::equalsProperties(const QVariantMap &other) const
 {
@@ -312,6 +358,7 @@ bool QDeclarativeMimeType::equalsProperties(const QVariantMap &other) const
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \fn QMimeType QDeclarativeMimeType::mimeType() const;
     \brief Returns the contained MimeType.
  */
@@ -323,8 +370,16 @@ QMimeType QDeclarativeMimeType::mimeType() const
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \qmlproperty bool MimeType::isValid
+    Holds the indication if the object contains valid data.
+ */
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \internal
     \property QDeclarativeMimeType::isValid
-    \brief the indication if the object contains valid data.
+    Holds the indication if the object contains valid data.
  */
 
 // ------------------------------------------------------------------------------------------------
@@ -332,6 +387,35 @@ QMimeType QDeclarativeMimeType::mimeType() const
 bool QDeclarativeMimeType::isValid() const
 {
     return m_MimeType.isValid();
+}
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \qmlproperty bool MimeType::isDebuggingActivated
+    Holds the indication if debugging for the class is activated.
+ */
+
+// ------------------------------------------------------------------------------------------------
+
+/*!
+    \internal
+    \property QDeclarativeMimeType::isDebuggingActivated
+    Holds the indication if debugging for the class is activated.
+ */
+
+// ------------------------------------------------------------------------------------------------
+
+bool QDeclarativeMimeType::isDebuggingActivated() const
+{
+    return isQMimeTypeDebuggingActivated;
+}
+
+// ------------------------------------------------------------------------------------------------
+
+void QDeclarativeMimeType::setIsDebuggingActivated(const bool newIsDebuggingActivated)
+{
+    isQMimeTypeDebuggingActivated = newIsDebuggingActivated;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -345,15 +429,16 @@ QMIMETYPE_BUILDER_FROM_RVALUE_REFS
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlproperty QString MimeType::name
-    name of the MIME type
+    \qmlproperty string MimeType::name
+    Holds the name of the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \property QDeclarativeMimeType::name
-    \brief the name of the MIME type
+    Holds the name of the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
@@ -432,15 +517,16 @@ void QDeclarativeMimeType::setComment(const QString &newComment)
 #endif
 
 /*!
-    \qmlproperty QString MimeType::genericIconName
-    file name of an icon image that represents the MIME type
+    \qmlproperty string MimeType::genericIconName
+    Holds the file name of an icon image that represents the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \property QDeclarativeMimeType::genericIconName
-    \brief the file name of an icon image that represents the MIME type
+    Holds the file name of an icon image that represents the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
@@ -464,15 +550,16 @@ void QDeclarativeMimeType::setGenericIconName(const QString &newGenericIconName)
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlproperty QString MimeType::iconName
-    file name of an icon image that represents the MIME type
+    \qmlproperty string MimeType::iconName
+    Holds the file name of an icon image that represents the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \property QDeclarativeMimeType::iconName
-    \brief the file name of an icon image that represents the MIME type
+    Holds the file name of an icon image that represents the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
@@ -496,15 +583,16 @@ void QDeclarativeMimeType::setIconName(const QString &newIconName)
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlproperty QVariantList MimeType::globPatterns
-    list of glob matching patterns
+    \qmlproperty list<string> MimeType::globPatterns
+    Holds the list of glob matching patterns.
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \property QDeclarativeMimeType::globPatterns
-    \brief the list of glob matching patterns
+    Holds the list of glob matching patterns.
  */
 
 // ------------------------------------------------------------------------------------------------
@@ -545,15 +633,16 @@ void QDeclarativeMimeType::setGlobPatterns(const QVariantList &newGlobPatterns)
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlproperty QVariantList MimeType::suffixes
-    known suffixes for the MIME type
+    \qmlproperty list<string> MimeType::suffixes
+    Holds the known suffixes for the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \property QDeclarativeMimeType::suffixes
-    \brief the known suffixes for the MIME type
+    Holds the known suffixes for the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
@@ -572,15 +661,16 @@ QVariantList QDeclarativeMimeType::suffixes() const
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlproperty QString MimeType::preferredSuffix
-    preferred suffix for the MIME type
+    \qmlproperty string MimeType::preferredSuffix
+    Holds the preferred suffix for the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------
 
 /*!
+    \internal
     \property QDeclarativeMimeType::preferredSuffix
-    \brief the preferred suffix for the MIME type
+    Holds the preferred suffix for the MIME type.
  */
 
 // ------------------------------------------------------------------------------------------------

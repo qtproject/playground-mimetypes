@@ -95,6 +95,10 @@ class QDeclarativeMimeType : public QObject
                READ isValid
                STORED false)
 
+    Q_PROPERTY(bool isDebuggingActivated
+               READ isDebuggingActivated
+               WRITE setIsDebuggingActivated)
+
 protected:
     // We keep this destructor with its default value of 0 protected since
     // only QDeclarativePrivate::QDeclarativeElement<T> needs it:
@@ -121,6 +125,9 @@ public:
     QMimeType mimeType() const;
 
     bool isValid() const;
+
+    bool isDebuggingActivated() const;
+    void setIsDebuggingActivated(bool newIsDebuggingActivated);
 
     QString name() const;
     void setName(const QString &newName);

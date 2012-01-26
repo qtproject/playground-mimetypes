@@ -26,6 +26,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QStringList>
 
+// ------------------------------------------------------------------------------------------------
+
 QT_BEGIN_NAMESPACE
 
 struct QMIME_EXPORT QMimeTypePrivate : public QSharedData
@@ -53,6 +55,8 @@ struct QMIME_EXPORT QMimeTypePrivate : public QSharedData
 };
 
 QT_END_NAMESPACE
+
+// ------------------------------------------------------------------------------------------------
 
 #define QMIMETYPE_BUILDER \
     QT_BEGIN_NAMESPACE \

@@ -42,11 +42,9 @@
 #ifndef QDECLARATIVEMIMEDATABASE_P_H_INCLUDED
 #define QDECLARATIVEMIMEDATABASE_P_H_INCLUDED
 
-#include <qmimedatabase.h>
-
-#include <QtDeclarative/qdeclarative.h>
-
 #include <QtCore/QObject>
+#include <qmimedatabase.h>
+#include <QtDeclarative/qdeclarative.h>
 
 class QDeclarativeMimeType;
 
@@ -60,6 +58,10 @@ class QDeclarativeMimeDatabase : public QObject
                READ mimeTypeNames
                STORED false)
 
+    Q_PROPERTY(bool isDebuggingActivated
+               READ isDebuggingActivated
+               WRITE setIsDebuggingActivated)
+
 protected:
     // We keep this destructor with its default value of 0 protected since
     // only QDeclarativePrivate::QDeclarativeElement<T> needs it:
@@ -69,6 +71,9 @@ public:
     ~QDeclarativeMimeDatabase();
 
     QMimeDatabase &mimeDatabase();
+
+    bool isDebuggingActivated() const;
+    void setIsDebuggingActivated(bool newIsDebuggingActivated);
 
     QVariantList mimeTypeNames() const;
 
