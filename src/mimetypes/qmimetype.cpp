@@ -332,6 +332,7 @@ QString QMimeType::comment(const QString& localeName) const
     or archives) that can use a common icon.
     The freedesktop.org Icon Naming Specification lists a set of such icon names.
 
+    The icon name can be given to QIcon::fromTheme() in order to load the icon.
  */
 QString QMimeType::genericIconName() const
 {
@@ -354,6 +355,8 @@ QString QMimeType::genericIconName() const
 /*!
     \fn QString QMimeType::iconName() const;
     \brief Returns the file name of an icon image that represents the MIME type.
+
+    The icon name can be given to QIcon::fromTheme() in order to load the icon.
  */
 QString QMimeType::iconName() const
 {
@@ -378,6 +381,18 @@ QStringList QMimeType::globPatterns() const
     return d->globPatterns;
 }
 
+/*!
+    A type is a subclass of another type if any instance of the first type is
+    also an instance of the second. For example, all image/svg+xml files are also
+    text/xml, text/plain and application/octet-stream files. Subclassing is about
+    the format, rather than the category of the data (for example, there is no
+    'generic spreadsheet' class that all spreadsheets inherit from).
+    Conversely, the parent mimetype of image/svg+xml is text/xml.
+
+    A mimetype can have multiple parents. For instance application/x-perl
+    has two parents: application/x-executable and text/plain. This makes
+    it possible to both execute perl scripts, and to open them in text editors.
+*/
 QStringList QMimeType::parentMimeTypes() const
 {
     return QMimeDatabasePrivate::instance()->provider()->parents(d->name);
@@ -398,14 +413,20 @@ static void collectParentMimeTypes(const QString& mime, QStringList& allParents)
     }
 }
 
+/*!
+    Return all the parent mimetypes of this mimetype, direct and indirect.
+    This includes the parent(s) of its parent(s), etc.
+
+    For instance, for image/svg+xml the list would be:
+    application/xml, text/plain, application/octet-stream.
+
+    Note that application/octet-stream is the ultimate parent for all types
+    of files (but not directories).
+*/
 QStringList QMimeType::allParentMimeTypes() const
 {
     QStringList allParents;
-    const QString canonical = d->name;
-    if (!canonical.isEmpty())
-        allParents.append(canonical);
     collectParentMimeTypes(d->name, allParents);
-
     return allParents;
 }
 
@@ -465,7 +486,8 @@ QString QMimeType::filterString() const
 
 /*!
     \fn bool QMimeType::inherits(const QString &mimeTypeName) const;
-    Returns true if this mimetype is \a mimeTypeName, or inherits \a mimeTypeName,
+    Returns true if this mimetype is \a mimeTypeName,
+    or inherits \a mimeTypeName (see parentMimeTypes()),
     or \a mimeTypeName is an alias for this mimetype.
  */
 bool QMimeType::inherits(const QString &mimeTypeName) const

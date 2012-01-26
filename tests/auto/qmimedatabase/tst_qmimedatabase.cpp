@@ -250,6 +250,9 @@ void tst_qmimedatabase::test_inheritance()
     // Must be least-specific last, i.e. breadth first.
     QCOMPARE(allShellParents.last(), QString::fromLatin1("application/octet-stream"));
 
+    const QStringList allSvgParents = db.mimeTypeForName(QString::fromLatin1("image/svg+xml")).allParentMimeTypes();
+    QCOMPARE(allSvgParents, QStringList() << QLatin1String("application/xml") << QLatin1String("text/plain") << QLatin1String("application/octet-stream"));
+
     // Check that text/x-mrml knows that it inherits from text/plain (implicitly)
     const QMimeType mrml = db.mimeTypeForName(QString::fromLatin1("text/x-mrml"));
     QVERIFY(mrml.isValid());
