@@ -325,11 +325,29 @@ QString QMimeType::comment(const QString& localeName) const
 
 /*!
     \fn QString QMimeType::genericIconName() const;
-    \brief Returns the file name of an icon image that represents the MIME type.
+    \brief Returns the file name of a generic icon that represents the MIME type.
+
+    This should be used if the icon returned by iconName() cannot be found on
+    the system. It is used for categories of similar types (like spreadsheets
+    or archives) that can use a common icon.
+    The freedesktop.org Icon Naming Specification lists a set of such icon names.
+
  */
 QString QMimeType::genericIconName() const
 {
     QMimeDatabasePrivate::instance()->provider()->loadGenericIcon(*d);
+    if (d->genericIconName.isEmpty()) {
+        // From the spec:
+        // If the generic icon name is empty (not specified by the mimetype definition)
+        // then the mimetype is used to generate the generic icon by using the top-level
+        // media type (e.g.  "video" in "video/ogg") and appending "-x-generic"
+        // (i.e. "video-x-generic" in the previous example).
+        QString group = name();
+        const int slashindex = group.indexOf(QLatin1Char('/'));
+        if (slashindex != -1)
+            group = group.left(slashindex);
+        return group + QLatin1String("-x-generic");
+    }
     return d->genericIconName;
 }
 

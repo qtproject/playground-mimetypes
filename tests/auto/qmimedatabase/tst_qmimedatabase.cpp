@@ -287,6 +287,7 @@ void tst_qmimedatabase::test_icons()
     QMimeType directory = db.findByFileName(QString::fromLatin1("/"));
     QCOMPARE(directory.name(), QString::fromLatin1("inode/directory"));
     QCOMPARE(directory.iconName(), QString::fromLatin1("inode-directory"));
+    QCOMPARE(directory.genericIconName(), QString::fromLatin1("inode-x-generic"));
 
     QMimeType pub = db.findByFileName(QString::fromLatin1("foo.epub"));
     QCOMPARE(pub.name(), QString::fromLatin1("application/epub+zip"));
