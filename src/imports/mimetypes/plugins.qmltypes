@@ -15,12 +15,12 @@ Module {
             Parameter { name: "nameOrAlias"; type: "string" }
         }
         Method {
-            name: "findByFileName"
+            name: "mimeTypeForFileName"
             type: "QDeclarativeMimeType*"
             Parameter { name: "fileName"; type: "string" }
         }
         Method {
-            name: "findByFile"
+            name: "mimeTypeForFile"
             type: "QDeclarativeMimeType*"
             Parameter { name: "fileName"; type: "string" }
         }

@@ -140,14 +140,14 @@ TestCase {
         return false;
     }
 
-    function test_findByFileName() {
+    function test_mimeTypeForFileName() {
         var ok = 0
 
         for (var listIx = 0; listIx < list().length; ++listIx) {
             //print(listValue(listIx).filePath)
 
-            var resultMimeTypeName = database.findByFileName(listValue(listIx).filePath).name
-            //print("findByFileName(" + listValue(listIx).filePath + ") returned", resultMimeTypeName)
+            var resultMimeTypeName = database.mimeTypeForFileName(listValue(listIx).filePath).name
+            //print("mimeTypeForFileName(" + listValue(listIx).filePath + ") returned", resultMimeTypeName)
 
             // Results are ambiguous when multiple MIME types have the same glob
             // -> accept the current result if the found MIME type actually
@@ -183,14 +183,14 @@ TestCase {
         compare(ok, list().length)
     }
     
-    function test_findByFile() {
+    function test_mimeTypeForFile() {
         var ok = 0
 
         for (var listIx = 0; listIx < list().length; ++listIx) {
             //print(listValue(listIx).filePath)
 
-            var resultMimeTypeName = database.findByFile(listValue(listIx).filePath).name
-            //print("findByFile(" + listValue(listIx).filePath + ") returned", resultMimeTypeName)
+            var resultMimeTypeName = database.mimeTypeForFile(listValue(listIx).filePath).name
+            //print("mimeTypeForFile(" + listValue(listIx).filePath + ") returned", resultMimeTypeName)
 
             // Expected to fail
             if (listValue(listIx).xFail.length >= 3 && listValue(listIx).xFail[2] == "x") {

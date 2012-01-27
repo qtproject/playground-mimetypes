@@ -81,11 +81,11 @@ public:
                                           const QString &nameOrAlias
                                       );
 
-    Q_INVOKABLE QDeclarativeMimeType *findByFileName (
+    Q_INVOKABLE QDeclarativeMimeType *mimeTypeForFileName (
                                           const QString &fileName
                                       );
 
-    Q_INVOKABLE QDeclarativeMimeType *findByFile (
+    Q_INVOKABLE QDeclarativeMimeType *mimeTypeForFile (
                                           const QString &fileName
                                       );
 

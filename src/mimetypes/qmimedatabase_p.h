@@ -59,9 +59,9 @@ struct QMimeDatabasePrivate
 
 
     QMimeType mimeTypeForName(const QString &nameOrAlias);
-    QMimeType findByFileNameAndData(const QString &fileName, QIODevice *device, int *priorityPtr);
+    QMimeType mimeTypeForNameAndData(const QString &fileName, QIODevice *device, int *priorityPtr);
     QMimeType findByData(const QByteArray &data, int *priorityPtr);
-    QStringList findByFileName(const QString &fileName, QString *foundSuffix = 0);
+    QStringList mimeTypeForFileName(const QString &fileName, QString *foundSuffix = 0);
 
     mutable QMimeProviderBase *m_provider;
     const QString m_defaultMimeType;

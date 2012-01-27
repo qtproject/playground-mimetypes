@@ -149,13 +149,13 @@ void tst_qmimedatabase::test_mimeTypeForName()
     else {
         const QString executableType = QString::fromLatin1("application/x-executable");
         //QTest::newRow("executable") << exePath << executableType;
-        QCOMPARE(db.findByFile(exePath).name(), executableType);
+        QCOMPARE(db.mimeTypeForFile(exePath).name(), executableType);
     }
 #endif
 
 }
 
-void tst_qmimedatabase::test_findByFileName_data()
+void tst_qmimedatabase::test_mimeTypeForFileName_data()
 {
     QTest::addColumn<QString>("fileName");
     QTest::addColumn<QString>("expectedMimeType");
@@ -190,12 +190,12 @@ void tst_qmimedatabase::test_findByFileName_data()
     QTest::newRow("doesn't exist but has known extension") << "IDontExist.txt" << "text/plain";
 }
 
-void tst_qmimedatabase::test_findByFileName()
+void tst_qmimedatabase::test_mimeTypeForFileName()
 {
     QFETCH(QString, fileName);
     QFETCH(QString, expectedMimeType);
     QMimeDatabase db;
-    QMimeType mime = db.findByFileName(fileName);
+    QMimeType mime = db.mimeTypeForFile(fileName, QMimeDatabase::MatchExtension);
     QVERIFY(mime.isValid());
     QCOMPARE(mime.name(), expectedMimeType);
 
@@ -320,12 +320,12 @@ void tst_qmimedatabase::test_aliases()
 void tst_qmimedatabase::test_icons()
 {
     QMimeDatabase db;
-    QMimeType directory = db.findByFileName(QString::fromLatin1("/"));
+    QMimeType directory = db.mimeTypeForFile(QString::fromLatin1("/"));
     QCOMPARE(directory.name(), QString::fromLatin1("inode/directory"));
     QCOMPARE(directory.iconName(), QString::fromLatin1("inode-directory"));
     QCOMPARE(directory.genericIconName(), QString::fromLatin1("inode-x-generic"));
 
-    QMimeType pub = db.findByFileName(QString::fromLatin1("foo.epub"));
+    QMimeType pub = db.mimeTypeForFile(QString::fromLatin1("foo.epub"), QMimeDatabase::MatchExtension);
     QCOMPARE(pub.name(), QString::fromLatin1("application/epub+zip"));
     QCOMPARE(pub.iconName(), QString::fromLatin1("application-epub+zip"));
     QCOMPARE(pub.genericIconName(), QString::fromLatin1("x-office-document"));
@@ -345,13 +345,13 @@ void tst_qmimedatabase::test_findByFileWithContent()
     QString tempFileName = tempFile.fileName();
     tempFile.write("%PDF-");
     tempFile.close();
-    mime = db.findByFile(tempFileName);
+    mime = db.mimeTypeForFile(tempFileName);
     QCOMPARE(mime.name(), QString::fromLatin1("application/pdf"));
     QFile file(tempFileName);
     mime = db.findByData(&file); // QIODevice ctor
     QCOMPARE(mime.name(), QString::fromLatin1("application/pdf"));
     // by name only, we cannot find the mimetype
-    mime = db.findByFileName(tempFileName);
+    mime = db.mimeTypeForFile(tempFileName, QMimeDatabase::MatchExtension);
     QVERIFY(mime.isValid());
     QVERIFY(mime.isDefault());
 
@@ -362,10 +362,10 @@ void tst_qmimedatabase::test_findByFileWithContent()
         txtTempFile.write("%PDF-");
         QString txtTempFileName = txtTempFile.fileName();
         txtTempFile.close();
-        mime = db.findByFile(txtTempFileName);
+        mime = db.mimeTypeForFile(txtTempFileName);
         QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
         // fast mode finds the same
-        mime = db.findByFileName(txtTempFileName);
+        mime = db.mimeTypeForFile(txtTempFileName, QMimeDatabase::MatchExtension);
         QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
     }
 
@@ -377,12 +377,12 @@ void tst_qmimedatabase::test_findByFileWithContent()
         txtTempFile.write("<smil");
         QString txtTempFileName = txtTempFile.fileName();
         txtTempFile.close();
-        mime = db.findByFile(txtTempFileName);
+        mime = db.mimeTypeForFile(txtTempFileName);
         QCOMPARE(mime.name(), QString::fromLatin1("text/plain"));
     }
 
     // Test what happens with an incorrect path
-    mime = db.findByFile(QString::fromLatin1("file:///etc/passwd" /* incorrect code, use a path instead */));
+    mime = db.mimeTypeForFile(QString::fromLatin1("file:///etc/passwd" /* incorrect code, use a path instead */));
     QVERIFY(mime.isDefault());
 
     // findByData when the device cannot be opened (e.g. a directory)
@@ -421,7 +421,7 @@ void tst_qmimedatabase::test_findByContent()
     QCOMPARE(db.findByData(&buffer).name(), expectedMimeTypeName);
 }
 
-void tst_qmimedatabase::test_findByFileNameAndContent_data()
+void tst_qmimedatabase::test_mimeTypeForFileAndContent_data()
 {
     QTest::addColumn<QString>("name");
     QTest::addColumn<QByteArray>("data");
@@ -440,14 +440,14 @@ void tst_qmimedatabase::test_findByFileNameAndContent_data()
     QTest::newRow("text.xls, found by extension, user is in control") << QString::fromLatin1("text.xls") << oleData << "application/vnd.ms-excel";
 }
 
-void tst_qmimedatabase::test_findByFileNameAndContent()
+void tst_qmimedatabase::test_mimeTypeForFileAndContent()
 {
     QFETCH(QString, name);
     QFETCH(QByteArray, data);
     QFETCH(QString, expectedMimeTypeName);
 
     QMimeDatabase db;
-    QCOMPARE(db.findByFileNameAndData(name, data).name(), expectedMimeTypeName);
+    QCOMPARE(db.mimeTypeForNameAndData(name, data).name(), expectedMimeTypeName);
 }
 
 void tst_qmimedatabase::test_allMimeTypes()
@@ -588,7 +588,7 @@ void tst_qmimedatabase::findByFileName()
 
     //qDebug() << Q_FUNC_INFO << filePath;
 
-    const QMimeType resultMimeType(database.findByFileName(filePath));
+    const QMimeType resultMimeType(database.mimeTypeForFile(filePath, QMimeDatabase::MatchExtension));
     if (resultMimeType.isValid()) {
         //qDebug() << Q_FUNC_INFO << "MIME type" << resultMimeType.name() << "has generic icon name" << resultMimeType.genericIconName() << "and icon name" << resultMimeType.iconName();
 
@@ -606,7 +606,7 @@ void tst_qmimedatabase::findByFileName()
 #endif
     }
     const QString resultMimeTypeName = resultMimeType.name();
-    //qDebug() << Q_FUNC_INFO << "findByFileName() returned" << resultMimeTypeName;
+    //qDebug() << Q_FUNC_INFO << "mimeTypeForFile() returned" << resultMimeTypeName;
 
     const bool failed = resultMimeTypeName != mimeTypeName;
     const bool shouldFail = (xFail.length() >= 1 && xFail.at(0) == QLatin1Char('x'));
@@ -630,6 +630,10 @@ void tst_qmimedatabase::findByFileName()
     } else {
         QCOMPARE(resultMimeTypeName, mimeTypeName);
     }
+
+    // Test QFileInfo overload
+    const QMimeType mimeForFileInfo = database.mimeTypeForFile(QFileInfo(filePath), QMimeDatabase::MatchExtension);
+    QCOMPARE(mimeForFileInfo.name(), resultMimeTypeName);
 }
 
 void tst_qmimedatabase::findByData_data()
@@ -655,6 +659,10 @@ void tst_qmimedatabase::findByData()
     } else {
         QCOMPARE(resultMimeTypeName, mimeTypeName);
     }
+
+    QFileInfo info(filePath);
+    QString mimeForInfo = database.mimeTypeForFile(info, QMimeDatabase::MatchContent).name();
+    QCOMPARE(mimeForInfo, resultMimeTypeName);
 }
 
 void tst_qmimedatabase::findByFile_data()
@@ -669,7 +677,7 @@ void tst_qmimedatabase::findByFile()
     QFETCH(QString, xFail);
 
     QMimeDatabase database;
-    const QString resultMimeTypeName = database.findByFile(QFileInfo(filePath)).name();
+    const QString resultMimeTypeName = database.mimeTypeForFile(filePath).name();
     //qDebug() << Q_FUNC_INFO << filePath << "->" << resultMimeTypeName;
     if (xFail.length() >= 3 && xFail.at(2) == QLatin1Char('x')) {
         // Expected to fail
@@ -677,6 +685,10 @@ void tst_qmimedatabase::findByFile()
     } else {
         QCOMPARE(resultMimeTypeName, mimeTypeName);
     }
+
+    // Test QFileInfo overload
+    const QMimeType mimeForFileInfo = database.mimeTypeForFile(QFileInfo(filePath));
+    QCOMPARE(mimeForFileInfo.name(), resultMimeTypeName);
 }
 
 
@@ -761,14 +773,16 @@ void tst_qmimedatabase::installNewGlobalMimeType()
     QVERIFY(QFile::copy(srcFile, destFile));
     waitAndRunUpdateMimeDatabase(mimeDir);
 
-    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("text/x-suse-ymu"));
+    QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
+             QString::fromLatin1("text/x-suse-ymu"));
     QVERIFY(db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
     checkHasMimeType("text/x-suse-ymp");
 
     // Now test removing it again
     QFile::remove(destFile);
     waitAndRunUpdateMimeDatabase(mimeDir);
-    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
+             QString::fromLatin1("application/octet-stream"));
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
 }
 
@@ -789,19 +803,22 @@ void tst_qmimedatabase::installNewLocalMimeType()
     QVERIFY(QFile::copy(srcFile, destFile));
     runUpdateMimeDatabase(mimeDir);
 
-    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("text/x-suse-ymu"));
+    QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
+             QString::fromLatin1("text/x-suse-ymu"));
     QVERIFY(db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
     checkHasMimeType("text/x-suse-ymp");
 
     // Now test removing it again (note, this leaves a mostly-empty mime.cache file)
     QFile::remove(destFile);
     waitAndRunUpdateMimeDatabase(mimeDir);
-    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
+             QString::fromLatin1("application/octet-stream"));
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
 
     // And now the user goes wild and uses rm -rf
     QFile::remove(mimeDir + QString::fromLatin1("/mime.cache"));
-    QCOMPARE(db.findByFileName(QLatin1String("foo.ymu")).name(), QString::fromLatin1("application/octet-stream"));
+    QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
+             QString::fromLatin1("application/octet-stream"));
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
 }
 

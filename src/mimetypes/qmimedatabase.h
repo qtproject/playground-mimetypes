@@ -47,17 +47,22 @@ public:
 
     QMimeType mimeTypeForName(const QString &nameOrAlias) const;
 
-    QMimeType findByFileName(const QString &fileName) const;
+    enum MatchFlags {
+        MatchDefault = 0x0,
+        MatchExtension = 0x1,
+        MatchContent = 0x2
+    };
+
+    QMimeType mimeTypeForFile(const QString &fileName, MatchFlags flags = MatchDefault) const;
+    QMimeType mimeTypeForFile(const QFileInfo &fileInfo, MatchFlags flags = MatchDefault) const;
     QList<QMimeType> findMimeTypesByFileName(const QString &fileName) const;
 
     QMimeType findByData(const QByteArray &data) const;
     QMimeType findByData(QIODevice *device) const;
 
-    QMimeType findByFile(const QString &fileName) const;
-    QMimeType findByFile(const QFileInfo &fileInfo) const;
     QMimeType findByUrl(const QUrl &url) const;
-    QMimeType findByFileNameAndData(const QString &fileName, QIODevice *device) const;
-    QMimeType findByFileNameAndData(const QString &fileName, const QByteArray &data) const;
+    QMimeType mimeTypeForNameAndData(const QString &fileName, QIODevice *device) const;
+    QMimeType mimeTypeForNameAndData(const QString &fileName, const QByteArray &data) const;
 
     QString suffixForFileName(const QString &fileName) const;
 

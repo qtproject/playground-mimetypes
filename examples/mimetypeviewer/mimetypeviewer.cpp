@@ -27,7 +27,7 @@ void MimeTypeViewer::onOpenFileButtonClicked()
         return;
 
     ui->fileLineEdit->setText(file);
-    QMimeType mimeType = dataBase->findByFile(QFileInfo(file));
+    QMimeType mimeType = dataBase->mimeTypeForFile(QFileInfo(file));
     if (mimeType.isValid())
         setMimeType(mimeType);
 }

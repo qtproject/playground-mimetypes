@@ -266,7 +266,7 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod MimeType MimeDatabase::findByFileName(string fileName)
+    \qmlmethod MimeType MimeDatabase::mimeTypeForFileName(string fileName)
     \brief Returns a MIME type for the file \a fileName.
 
     A valid MIME type is always returned. If the file name doesn't match any
@@ -274,14 +274,14 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForName (
     is returned.
 
     This function does not try to open the file. To also use the content
-    when determining the MIME type, use findByFile().
+    when determining the MIME type, use mimeTypeForFile().
 */
-QDeclarativeMimeType *QDeclarativeMimeDatabase::findByFileName (
+QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForFileName (
                                                     const QString &fileName
                                                 )
 {
     return new QDeclarativeMimeType (
-                   m_MimeDatabase.findByFileName(fileName),
+                   m_MimeDatabase.mimeTypeForFile(fileName, QMimeDatabase::MatchExtension),
                    this   // <- The new object will be released later
                           //    when this registry is released.
                );
@@ -290,7 +290,7 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::findByFileName (
 // ------------------------------------------------------------------------------------------------
 
 /*!
-    \qmlmethod MimeType MimeDatabase::findByFile(string fileName)
+    \qmlmethod MimeType MimeDatabase::mimeTypeForFile(string fileName)
     \brief Returns a MIME type for \a fileName.
 
     This method looks at both the file name and the file contents,
@@ -304,12 +304,12 @@ QDeclarativeMimeType *QDeclarativeMimeDatabase::findByFileName (
 
     The \a fileName can also include an absolute or relative path.
 */
-QDeclarativeMimeType *QDeclarativeMimeDatabase::findByFile (
+QDeclarativeMimeType *QDeclarativeMimeDatabase::mimeTypeForFile(
                                                     const QString &fileName
                                                 )
 {
     return new QDeclarativeMimeType (
-                   m_MimeDatabase.findByFile(fileName),
+                   m_MimeDatabase.mimeTypeForFile(fileName),
                    this   // <- The new object will be released later
                           //    when this registry is released.
                );

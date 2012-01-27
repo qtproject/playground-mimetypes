@@ -28,14 +28,11 @@ int main(int argc, char *argv[])
         //mime = QMimeType::findByContent(data, &accuracy);
         mime = db.findByData(data);
     } else if (option == QLatin1String("-c")) {
-        QFile file(fileName);
-        if (file.open(QIODevice::ReadOnly)) {
-            mime = db.findByData(file.read(32000));
-        }
+        mime = db.mimeTypeForFile(fileName, QMimeDatabase::MatchContent);
     } else if (option == QLatin1String("-f")) {
-        mime = db.findByFileName(fileName);
+        mime = db.mimeTypeForFile(fileName, QMimeDatabase::MatchExtension);
     } else {
-        mime = db.findByFile(fileName);
+        mime = db.mimeTypeForFile(fileName);
     }
     if ( mime.isValid() /*&& !mime.isDefault()*/ ) {
         printf("%s\n", mime.name().toLatin1().constData());
