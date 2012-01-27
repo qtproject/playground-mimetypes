@@ -25,8 +25,7 @@ int main(int argc, char *argv[])
         QFile qstdin;
         qstdin.open(stdin, QIODevice::ReadOnly);
         const QByteArray data = qstdin.readAll();
-        //mime = QMimeType::findByContent(data, &accuracy);
-        mime = db.findByData(data);
+        mime = db.mimeTypeForData(data);
     } else if (option == QLatin1String("-c")) {
         mime = db.mimeTypeForFile(fileName, QMimeDatabase::MatchContent);
     } else if (option == QLatin1String("-f")) {

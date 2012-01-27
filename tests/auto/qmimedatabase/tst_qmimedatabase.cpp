@@ -199,7 +199,7 @@ void tst_qmimedatabase::test_mimeTypeForFileName()
     QVERIFY(mime.isValid());
     QCOMPARE(mime.name(), expectedMimeType);
 
-    QList<QMimeType> mimes = db.findMimeTypesByFileName(fileName);
+    QList<QMimeType> mimes = db.mimeTypesForFileName(fileName);
     if (expectedMimeType == "application/octet-stream") {
         QVERIFY(mimes.isEmpty());
     } else {
@@ -209,7 +209,7 @@ void tst_qmimedatabase::test_mimeTypeForFileName()
     }
 }
 
-void tst_qmimedatabase::test_findMultipleByName_data()
+void tst_qmimedatabase::test_mimeTypesForFileName_data()
 {
     QTest::addColumn<QString>("fileName");
     QTest::addColumn<QStringList>("expectedMimeTypes");
@@ -220,12 +220,12 @@ void tst_qmimedatabase::test_findMultipleByName_data()
     QTest::newRow("sub, 3 hits") << "foo.sub" << (QStringList() << "text/x-microdvd" << "text/x-mpsub" << "text/x-subviewer");
 }
 
-void tst_qmimedatabase::test_findMultipleByName()
+void tst_qmimedatabase::test_mimeTypesForFileName()
 {
     QFETCH(QString, fileName);
     QFETCH(QStringList, expectedMimeTypes);
     QMimeDatabase db;
-    QList<QMimeType> mimes = db.findMimeTypesByFileName(fileName);
+    QList<QMimeType> mimes = db.mimeTypesForFileName(fileName);
     QStringList mimeNames;
     foreach (const QMimeType& mime, mimes)
         mimeNames.append(mime.name());
@@ -333,7 +333,7 @@ void tst_qmimedatabase::test_icons()
 
 // In here we do the tests that need some content in a temporary file.
 // This could also be added to shared-mime-info's testsuite...
-void tst_qmimedatabase::test_findByFileWithContent()
+void tst_qmimedatabase::test_mimeTypeForFileWithContent()
 {
     QMimeDatabase db;
     QMimeType mime;
@@ -348,7 +348,7 @@ void tst_qmimedatabase::test_findByFileWithContent()
     mime = db.mimeTypeForFile(tempFileName);
     QCOMPARE(mime.name(), QString::fromLatin1("application/pdf"));
     QFile file(tempFileName);
-    mime = db.findByData(&file); // QIODevice ctor
+    mime = db.mimeTypeForData(&file); // QIODevice ctor
     QCOMPARE(mime.name(), QString::fromLatin1("application/pdf"));
     // by name only, we cannot find the mimetype
     mime = db.mimeTypeForFile(tempFileName, QMimeDatabase::MatchExtension);
@@ -387,19 +387,19 @@ void tst_qmimedatabase::test_findByFileWithContent()
 
     // findByData when the device cannot be opened (e.g. a directory)
     QFile dir("/");
-    mime = db.findByData(&dir);
+    mime = db.mimeTypeForData(&dir);
     QVERIFY(mime.isDefault());
 }
 
-void tst_qmimedatabase::test_findByUrl()
+void tst_qmimedatabase::test_mimeTypeForUrl()
 {
     QMimeDatabase db;
-    QVERIFY(db.findByUrl(QUrl::fromEncoded("http://foo/bar.png")).isDefault()); // HTTP can't know before downloading
-    QCOMPARE(db.findByUrl(QUrl::fromEncoded("ftp://foo/bar.png")).name(), QString::fromLatin1("image/png"));
-    QCOMPARE(db.findByUrl(QUrl::fromEncoded("ftp://foo/bar")).name(), QString::fromLatin1("application/octet-stream")); // unknown extension
+    QVERIFY(db.mimeTypeForUrl(QUrl::fromEncoded("http://foo/bar.png")).isDefault()); // HTTP can't know before downloading
+    QCOMPARE(db.mimeTypeForUrl(QUrl::fromEncoded("ftp://foo/bar.png")).name(), QString::fromLatin1("image/png"));
+    QCOMPARE(db.mimeTypeForUrl(QUrl::fromEncoded("ftp://foo/bar")).name(), QString::fromLatin1("application/octet-stream")); // unknown extension
 }
 
-void tst_qmimedatabase::test_findByContent_data()
+void tst_qmimedatabase::test_mimeTypeForData_data()
 {
     QTest::addColumn<QByteArray>("data");
     QTest::addColumn<QString>("expectedMimeTypeName");
@@ -410,15 +410,15 @@ void tst_qmimedatabase::test_findByContent_data()
     QTest::newRow("unknown") << QByteArray("\001abc?}") << "application/octet-stream";
 }
 
-void tst_qmimedatabase::test_findByContent()
+void tst_qmimedatabase::test_mimeTypeForData()
 {
     QFETCH(QByteArray, data);
     QFETCH(QString, expectedMimeTypeName);
 
     QMimeDatabase db;
-    QCOMPARE(db.findByData(data).name(), expectedMimeTypeName);
+    QCOMPARE(db.mimeTypeForData(data).name(), expectedMimeTypeName);
     QBuffer buffer(&data);
-    QCOMPARE(db.findByData(&buffer).name(), expectedMimeTypeName);
+    QCOMPARE(db.mimeTypeForData(&buffer).name(), expectedMimeTypeName);
 }
 
 void tst_qmimedatabase::test_mimeTypeForFileAndContent_data()
@@ -652,7 +652,7 @@ void tst_qmimedatabase::findByData()
     QVERIFY(f.open(QIODevice::ReadOnly));
     QByteArray data = f.read(16384);
 
-    const QString resultMimeTypeName = database.findByData(data).name();
+    const QString resultMimeTypeName = database.mimeTypeForData(data).name();
     if (xFail.length() >= 2 && xFail.at(1) == QLatin1Char('x')) {
         // Expected to fail
         QVERIFY2(resultMimeTypeName != mimeTypeName, qPrintable(resultMimeTypeName));
@@ -705,7 +705,7 @@ void tst_qmimedatabase::test_fromThreads()
     futures << QtConcurrent::run(this, &tst_qmimedatabase::test_icons);
     futures << QtConcurrent::run(this, &tst_qmimedatabase::test_inheritance);
     futures << QtConcurrent::run(this, &tst_qmimedatabase::test_knownSuffix);
-    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_findByFileWithContent);
+    futures << QtConcurrent::run(this, &tst_qmimedatabase::test_mimeTypeForFileWithContent);
     futures << QtConcurrent::run(this, &tst_qmimedatabase::test_allMimeTypes); // a second time
     Q_FOREACH(QFuture<void> f, futures) // krazy:exclude=foreach
         f.waitForFinished();

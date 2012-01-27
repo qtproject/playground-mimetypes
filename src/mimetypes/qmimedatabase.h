@@ -55,12 +55,12 @@ public:
 
     QMimeType mimeTypeForFile(const QString &fileName, MatchFlags flags = MatchDefault) const;
     QMimeType mimeTypeForFile(const QFileInfo &fileInfo, MatchFlags flags = MatchDefault) const;
-    QList<QMimeType> findMimeTypesByFileName(const QString &fileName) const;
+    QList<QMimeType> mimeTypesForFileName(const QString &fileName) const;
 
-    QMimeType findByData(const QByteArray &data) const;
-    QMimeType findByData(QIODevice *device) const;
+    QMimeType mimeTypeForData(const QByteArray &data) const;
+    QMimeType mimeTypeForData(QIODevice *device) const;
 
-    QMimeType findByUrl(const QUrl &url) const;
+    QMimeType mimeTypeForUrl(const QUrl &url) const;
     QMimeType mimeTypeForNameAndData(const QString &fileName, QIODevice *device) const;
     QMimeType mimeTypeForNameAndData(const QString &fileName, const QByteArray &data) const;
 

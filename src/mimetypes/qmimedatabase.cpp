@@ -413,7 +413,7 @@ QMimeType QMimeDatabase::mimeTypeForFile(const QFileInfo &fileInfo, MatchFlags f
     } else { // MatchContent
         if (file.open(QIODevice::ReadOnly)) {
             locker.unlock();
-            return findByData(&file);
+            return mimeTypeForData(&file);
         } else
             return d->mimeTypeForName(d->defaultMimeType());
     }
@@ -458,12 +458,12 @@ QMimeType QMimeDatabase::mimeTypeForFile(const QString &fileName, MatchFlags fla
     If multiple MIME types match this file, they are all returned.
 
     This function does not try to open the file. To also use the content
-    when determining the MIME type, use findByFile() or
+    when determining the MIME type, use mimeTypeForFile() or
     mimeTypeForNameAndData() instead.
 
     \sa mimeTypeForFile
 */
-QList<QMimeType> QMimeDatabase::findMimeTypesByFileName(const QString &fileName) const
+QList<QMimeType> QMimeDatabase::mimeTypesForFileName(const QString &fileName) const
 {
     QMutexLocker locker(&d->mutex);
 
@@ -500,7 +500,7 @@ QString QMimeDatabase::suffixForFileName(const QString &fileName) const
     known MIME type data, the default MIME type (application/octet-stream)
     is returned.
 */
-QMimeType QMimeDatabase::findByData(const QByteArray &data) const
+QMimeType QMimeDatabase::mimeTypeForData(const QByteArray &data) const
 {
     QMutexLocker locker(&d->mutex);
 
@@ -517,7 +517,7 @@ QMimeType QMimeDatabase::findByData(const QByteArray &data) const
     known MIME type data, the default MIME type (application/octet-stream)
     is returned.
 */
-QMimeType QMimeDatabase::findByData(QIODevice* device) const
+QMimeType QMimeDatabase::mimeTypeForData(QIODevice* device) const
 {
     QMutexLocker locker(&d->mutex);
 
@@ -544,7 +544,7 @@ QMimeType QMimeDatabase::findByData(QIODevice* device) const
     known MIME type data, the default MIME type (application/octet-stream)
     is returned.
 */
-QMimeType QMimeDatabase::findByUrl(const QUrl &url) const
+QMimeType QMimeDatabase::mimeTypeForUrl(const QUrl &url) const
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     if (url.isLocalFile())
