@@ -77,7 +77,7 @@ public:
     QString iconName() const;
     QStringList globPatterns() const;
     QStringList parentMimeTypes() const;
-    QStringList allParentMimeTypes() const;
+    QStringList allAncestors() const;
     QStringList suffixes() const;
     QString preferredSuffix() const;
 

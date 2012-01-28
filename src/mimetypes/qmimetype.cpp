@@ -474,7 +474,7 @@ static void collectParentMimeTypes(const QString& mime, QStringList& allParents)
     Note that application/octet-stream is the ultimate parent for all types
     of files (but not directories).
 */
-QStringList QMimeType::allParentMimeTypes() const
+QStringList QMimeType::allAncestors() const
 {
     QStringList allParents;
     collectParentMimeTypes(d->name, allParents);

@@ -276,15 +276,15 @@ void tst_qmimedatabase::test_inheritance()
     QVERIFY(shellParents.contains(QLatin1String("text/plain")));
     QVERIFY(shellParents.contains(QLatin1String("application/x-executable")));
     QCOMPARE(shellParents.count(), 2); // only the above two
-    const QStringList allShellParents = shellscript.allParentMimeTypes();
-    QVERIFY(allShellParents.contains(QLatin1String("text/plain")));
-    QVERIFY(allShellParents.contains(QLatin1String("application/x-executable")));
-    QVERIFY(allShellParents.contains(QLatin1String("application/octet-stream")));
+    const QStringList allShellAncestors = shellscript.allAncestors();
+    QVERIFY(allShellAncestors.contains(QLatin1String("text/plain")));
+    QVERIFY(allShellAncestors.contains(QLatin1String("application/x-executable")));
+    QVERIFY(allShellAncestors.contains(QLatin1String("application/octet-stream")));
     // Must be least-specific last, i.e. breadth first.
-    QCOMPARE(allShellParents.last(), QString::fromLatin1("application/octet-stream"));
+    QCOMPARE(allShellAncestors.last(), QString::fromLatin1("application/octet-stream"));
 
-    const QStringList allSvgParents = db.mimeTypeForName(QString::fromLatin1("image/svg+xml")).allParentMimeTypes();
-    QCOMPARE(allSvgParents, QStringList() << QLatin1String("application/xml") << QLatin1String("text/plain") << QLatin1String("application/octet-stream"));
+    const QStringList allSvgAncestors = db.mimeTypeForName(QString::fromLatin1("image/svg+xml")).allAncestors();
+    QCOMPARE(allSvgAncestors, QStringList() << QLatin1String("application/xml") << QLatin1String("text/plain") << QLatin1String("application/octet-stream"));
 
     // Check that text/x-mrml knows that it inherits from text/plain (implicitly)
     const QMimeType mrml = db.mimeTypeForName(QString::fromLatin1("text/x-mrml"));
