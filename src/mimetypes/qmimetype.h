@@ -40,9 +40,7 @@ class QMIME_EXPORT QMimeType
 public:
     QMimeType();
     QMimeType(const QMimeType &other);
-#if !defined(Q_COMPILER_RVALUE_REFS) || TEST_COMPILER_RVALUE_REFS == 0
     QMimeType &operator=(const QMimeType &other);
-#endif
 #ifdef Q_COMPILER_RVALUE_REFS
     QMimeType(QMimeType &&other);
 

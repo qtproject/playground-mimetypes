@@ -29,8 +29,4 @@
 #  define QMIME_EXPORT Q_DECL_IMPORT
 #endif
 
-#ifndef TEST_COMPILER_RVALUE_REFS
-#define TEST_COMPILER_RVALUE_REFS 0
-#endif
-
 #endif // QMIME_GLOBAL_H

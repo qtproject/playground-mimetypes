@@ -173,7 +173,6 @@ QMimeType::QMimeType(const QMimeType &other) :
 
 // ------------------------------------------------------------------------------------------------
 
-#if !defined(Q_COMPILER_RVALUE_REFS) || TEST_COMPILER_RVALUE_REFS == 0
 /*!
     \fn QMimeType &QMimeType::operator=(const QMimeType &other);
     \brief Assigns the data of \a other to this QMimeType object, and returns a reference to this object.
@@ -184,7 +183,6 @@ QMimeType &QMimeType::operator=(const QMimeType &other)
         d = other.d;
     return *this;
 }
-#endif
 
 // ------------------------------------------------------------------------------------------------
 
