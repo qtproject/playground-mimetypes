@@ -72,7 +72,7 @@ public:
 #if 0
     QStringList aliases() const;
 #endif
-    QString comment(const QString &localeName = QString()) const;
+    QString comment() const;
     QString genericIconName() const;
     QString iconName() const;
     QStringList globPatterns() const;

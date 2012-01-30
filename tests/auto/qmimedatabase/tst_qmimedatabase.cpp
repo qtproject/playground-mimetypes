@@ -111,8 +111,6 @@ void tst_qmimedatabase::test_mimeTypeForName()
     QVERIFY(s0.isValid());
     QCOMPARE(s0.name(), QString::fromLatin1("application/x-zerosize"));
     QCOMPARE(s0.comment(), QString::fromLatin1("empty document"));
-    QCOMPARE(s0.comment(QLatin1String("fr")), QString::fromLatin1("document vide"));
-    QCOMPARE(s0.comment(QLatin1String("zz")), QString::fromLatin1("empty document")); // no such language
 
     QMimeType s0Again = db.mimeTypeForName(QString::fromLatin1("application/x-zerosize"));
     QCOMPARE(s0Again.name(), s0.name());
