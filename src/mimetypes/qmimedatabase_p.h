@@ -49,10 +49,6 @@ struct QMimeDatabasePrivate
 
     QString defaultMimeType() const { return m_defaultMimeType; }
 
-#if 0
-    QStringList filterStrings() const;
-#endif
-
     bool inherits(const QString &mime, const QString &parent);
 
     QList<QMimeType> allMimeTypes();

@@ -312,20 +312,6 @@ QString QMimeType::name() const
 
 // ------------------------------------------------------------------------------------------------
 
-#if 0
-/*!
-    \fn QStringList QMimeType::aliases() const;
-    \brief Returns the aliases of the MIME type.
- */
-// What is the use case for this? [apart from mimetypeviewer.cpp ...]
-QStringList QMimeType::aliases() const
-{
-    return d->aliases;
-}
-#endif
-
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \brief Returns the description of the MIME type to be displayed on user interfaces.
 

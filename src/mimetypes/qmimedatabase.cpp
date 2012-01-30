@@ -222,23 +222,6 @@ QMimeType QMimeDatabasePrivate::mimeTypeForNameAndData(const QString &fileName, 
 
 // ------------------------------------------------------------------------------------------------
 
-#if 0
-QStringList QMimeDatabasePrivate::filterStrings() const
-{
-    QStringList rc;
-
-    foreach (const MimeTypeMapEntry *entry, nameMimeTypeMap) {
-        const QString filterString = entry->type.filterString();
-        if (!filterString.isEmpty())
-            rc += filterString;
-    }
-
-    return rc;
-}
-#endif
-
-// ------------------------------------------------------------------------------------------------
-
 QList<QMimeType> QMimeDatabasePrivate::allMimeTypes()
 {
     return provider()->allMimeTypes();
@@ -633,48 +616,6 @@ QList<QMimeType> QMimeDatabase::allMimeTypes() const
 
 // ------------------------------------------------------------------------------------------------
 
-// TODO: needed?
-#if 0
-QStringList QMimeDatabase::filterStrings() const
-{
-    QMutexLocker locker(&d->mutex);
-
-    return d->filterStrings();
-}
-
-// ------------------------------------------------------------------------------------------------
-
-/*!
-    Returns a string with all the possible file filters, for use with file dialogs
-*/
-QString QMimeDatabase::allFiltersString(QString *allFilesFilter) const
-{
-    if (allFilesFilter)
-        allFilesFilter->clear();
-
-    // Compile list of filter strings, sort, and remove duplicates (different MIME types might
-    // generate the same filter).
-    QStringList filters = filterStrings();
-    if (filters.empty())
-        return QString();
-    filters.sort();
-    filters.erase(std::unique(filters.begin(), filters.end()), filters.end());
-
-    static const QString allFiles = QObject::tr("All Files (*)", "QMimeDatabase");
-    if (allFilesFilter)
-        *allFilesFilter = allFiles;
-
-    // Prepend all files filter (instead of appending to work around a bug in Qt/Mac).
-    filters.prepend(allFiles);
-
-    return filters.join(QLatin1String(";;"));
-}
-#endif
-
-// ------------------------------------------------------------------------------------------------
-
 #undef DBG
-
-// ------------------------------------------------------------------------------------------------
 
 QT_END_NAMESPACE

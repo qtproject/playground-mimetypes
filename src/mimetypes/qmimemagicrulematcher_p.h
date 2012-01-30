@@ -18,8 +18,8 @@
 **
 **************************************************************************/
 
-#ifndef MAGICMATCHER_H
-#define MAGICMATCHER_H
+#ifndef QMIMEMAGICRULEMATCHER_P_H
+#define QMIMEMAGICRULEMATCHER_P_H
 
 #include "qmime_global.h"
 
@@ -47,9 +47,6 @@ public:
     bool matches(const QByteArray &data) const;
 
     unsigned priority() const;
-#if 0
-    void setPriority(unsigned priority);
-#endif
 
     QString mimetype() const { return m_mimetype; }
 
@@ -61,4 +58,4 @@ private:
 
 QT_END_NAMESPACE
 
-#endif // MAGICMATCHER_H
+#endif // QMIMEMAGICRULEMATCHER_P_H

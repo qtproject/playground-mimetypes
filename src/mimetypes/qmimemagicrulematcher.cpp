@@ -84,11 +84,4 @@ unsigned QMimeMagicRuleMatcher::priority() const
     return m_priority;
 }
 
-#if 0 // unused
-void QMimeMagicRuleMatcher::setPriority(unsigned thePriority)
-{
-    m_priority = thePriority;
-}
-#endif
-
 QT_END_NAMESPACE
