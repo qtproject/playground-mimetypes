@@ -75,7 +75,7 @@ QMimeBinaryProvider::QMimeBinaryProvider(QMimeDatabasePrivate *db)
 
 struct QMimeBinaryProvider::CacheFile
 {
-    CacheFile(QFile *file);
+    CacheFile(const QString &fileName);
     ~CacheFile();
 
     bool isValid() const { return m_valid; }
@@ -91,32 +91,33 @@ struct QMimeBinaryProvider::CacheFile
     bool load();
     bool reload();
 
-    QFile *file;
+    QFile file;
     uchar *data;
     QDateTime m_mtime;
     bool m_valid;
 };
 
-QMimeBinaryProvider::CacheFile::CacheFile(QFile *f)
-    : file(f), m_valid(false)
+QMimeBinaryProvider::CacheFile::CacheFile(const QString &fileName)
+    : file(fileName), m_valid(false)
 {
     load();
 }
 
 QMimeBinaryProvider::CacheFile::~CacheFile()
 {
-    delete file;
 }
 
 bool QMimeBinaryProvider::CacheFile::load()
 {
-    data = file->map(0, file->size());
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+    data = file.map(0, file.size());
     if (data) {
         const int major = getUint16(0);
         const int minor = getUint16(2);
         m_valid = (major == 1 && minor >= 1 && minor <= 2);
     }
-    m_mtime = QFileInfo(*file).lastModified();
+    m_mtime = QFileInfo(file).lastModified();
     return m_valid;
 }
 
@@ -124,11 +125,8 @@ bool QMimeBinaryProvider::CacheFile::reload()
 {
     //qDebug() << "reload!" << file->fileName();
     m_valid = false;
-    if (file->isOpen()) {
-        file->close();
-        if (!file->open(QIODevice::ReadOnly)) {
-            return false;
-        }
+    if (file.isOpen()) {
+        file.close();
     }
     data = 0;
     return load();
@@ -137,7 +135,7 @@ bool QMimeBinaryProvider::CacheFile::reload()
 QMimeBinaryProvider::CacheFile* QMimeBinaryProvider::CacheFileList::findCacheFile(const QString& fileName) const
 {
     for (const_iterator it = begin(); it != end(); ++it) {
-        if ((*it)->file->fileName() == fileName)
+        if ((*it)->file.fileName() == fileName)
             return *it;
     }
     return 0;
@@ -176,7 +174,7 @@ bool QMimeBinaryProvider::isValid()
         return false;
 
     // We found exactly one file; is it the user-modified mimes, or a system file?
-    const QString foundFile = m_cacheFiles.first()->file->fileName();
+    const QString foundFile = m_cacheFiles.first()->file.fileName();
     const QString localCacheFile = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QLatin1String("/mime/mime.cache");
 
     return foundFile != localCacheFile;
@@ -191,7 +189,7 @@ bool QMimeBinaryProvider::CacheFileList::checkCacheChanged()
     QMutableListIterator<CacheFile *> it(*this);
     while (it.hasNext()) {
         CacheFile* cacheFile = it.next();
-        QFileInfo fileInfo(*cacheFile->file);
+        QFileInfo fileInfo(cacheFile->file);
         if (!fileInfo.exists()) { // This can't happen by just running update-mime-database. But the user could use rm -rf :-)
             delete cacheFile;
             it.remove();
@@ -223,16 +221,12 @@ void QMimeBinaryProvider::checkCache()
             CacheFile* cacheFile = m_cacheFiles.findCacheFile(cacheFileName);
             if (!cacheFile) {
                 //qDebug() << "new file:" << cacheFileName;
-                QFile *file = new QFile(cacheFileName);
-                if (file->open(QIODevice::ReadOnly)) {
-                    cacheFile = new CacheFile(file);
-                    if (cacheFile->isValid()) { // verify version
-                        m_cacheFiles.append(cacheFile);
-                    }
-                    else
-                        delete cacheFile;
-                } else
-                    delete file;
+                cacheFile = new CacheFile(cacheFileName);
+                if (cacheFile->isValid()) { // verify version
+                    m_cacheFiles.append(cacheFile);
+                }
+                else
+                    delete cacheFile;
             }
         }
         m_cacheFileNames = cacheFileNames;
@@ -285,7 +279,7 @@ QStringList QMimeBinaryProvider::findByFileName(const QString &fileName, QString
 void QMimeBinaryProvider::matchGlobList(QMimeGlobMatchResult& result, CacheFile *cacheFile, int off, const QString &fileName)
 {
     const int numGlobs = cacheFile->getUint32(off);
-    //qDebug() << "Loading" << numGlobs << "globs from" << cacheFile->file->fileName() << "at offset" << cacheFile->globListOffset;
+    //qDebug() << "Loading" << numGlobs << "globs from" << cacheFile->file.fileName() << "at offset" << cacheFile->globListOffset;
     for (int i = 0; i < numGlobs; ++i) {
         const int globOffset = cacheFile->getUint32(off + 4 + 12 * i);
         const int mimeTypeOffset = cacheFile->getUint32(off + 4 + 12 * i + 4);
