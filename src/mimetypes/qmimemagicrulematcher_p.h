@@ -33,7 +33,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class QMIME_EXPORT QMimeMagicRuleMatcher
+class QMimeMagicRuleMatcher
 {
 public:
     explicit QMimeMagicRuleMatcher(const QString &mime, unsigned priority = 65535);

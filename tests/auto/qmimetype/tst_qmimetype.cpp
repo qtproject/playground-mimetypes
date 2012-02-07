@@ -41,7 +41,6 @@
 
 #include "tst_qmimetype.h"
 
-#include <qmimemagicrulematcher_p.h>
 #include <qmimetype_p.h>
 
 #include <qmimetype.h>
