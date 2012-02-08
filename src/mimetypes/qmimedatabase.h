@@ -68,8 +68,6 @@ public:
 
     QList<QMimeType> allMimeTypes() const;
 
-    QMimeDatabasePrivate *data_ptr() { return d; }
-
 private:
     QMimeDatabasePrivate *d;
 };
