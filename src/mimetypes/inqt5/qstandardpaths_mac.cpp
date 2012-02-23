@@ -43,7 +43,6 @@
 
 #include "qstandardpaths.h"
 #include <qdir.h>
-#include <private/qcore_mac_p.h>
 #include <qcoreapplication.h>
 
 #include <ApplicationServices/ApplicationServices.h>
@@ -159,12 +158,14 @@ QString QStandardPaths::displayName(StandardLocation type)
     if (err)
         return QString();
 
-    QCFString displayName;
+    CFStringRef displayName = 0;
     err = LSCopyDisplayNameForRef(&ref, &displayName);
     if (err)
         return QString();
 
-    return static_cast<QString>(displayName);
+    QString result = QString::fromUtf16((ushort*)CFStringGetCharactersPtr(displayName), CFStringGetLength(displayName));
+    CFRelease(displayName);
+    return result;
 }
 
 QT_END_NAMESPACE
