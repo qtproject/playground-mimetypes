@@ -1,24 +1,46 @@
 /****************************************************************************
 **
-** This file is part of QMime
+** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
+** Contact: http://www.qt-project.org/
 **
-** Based on Qt Creator source code
+** This file is part of the QtCore module of the Qt Toolkit.
 **
-** Qt Creator Copyright (c) 2011 Nokia Corporation and/or its subsidiary(-ies).
-**
-**
+** $QT_BEGIN_LICENSE:LGPL$
 ** GNU Lesser General Public License Usage
-**
 ** This file may be used under the terms of the GNU Lesser General Public
 ** License version 2.1 as published by the Free Software Foundation and
-** appearing in the file LICENSE.LGPL included in the packaging of this file.
-** Please review the following information to ensure the GNU Lesser General
-** Public License version 2.1 requirements will be met:
+** appearing in the file LICENSE.LGPL included in the packaging of this
+** file. Please review the following information to ensure the GNU Lesser
+** General Public License version 2.1 requirements will be met:
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+** In addition, as a special exception, Nokia gives you certain additional
+** rights. These rights are described in the Nokia Qt LGPL Exception
+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+**
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU General
+** Public License version 3.0 as published by the Free Software Foundation
+** and appearing in the file LICENSE.GPL included in the packaging of this
+** file. Please review the following information to ensure the GNU General
+** Public License version 3.0 requirements will be met:
+** http://www.gnu.org/copyleft/gpl.html.
+**
+** Other Usage
+** Alternatively, this file may be used in accordance with the terms and
+** conditions contained in a signed written agreement between you and Nokia.
+**
+**
+**
+**
+**
+**
+** $QT_END_LICENSE$
 **
 ****************************************************************************/
 
-#include "qmimetype.h"   // Basis
+
+#include "qmimetype.h"
 
 #include "qmimetype_p.h"
 #include "qmimedatabase_p.h"
@@ -31,17 +53,13 @@
 
 QT_BEGIN_NAMESPACE
 
-// ------------------------------------------------------------------------------------------------
-
-bool isQMimeTypeDebuggingActivated (false);
+bool qt_isQMimeTypeDebuggingActivated (false);
 
 #ifndef QT_NO_DEBUG_OUTPUT
-#define DBG() if (isQMimeTypeDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
+#define DBG() if (qt_isQMimeTypeDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #else
 #define DBG() if (0) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #endif
-
-// ------------------------------------------------------------------------------------------------
 
 QMimeTypePrivate::QMimeTypePrivate()
         : name()
@@ -52,8 +70,6 @@ QMimeTypePrivate::QMimeTypePrivate()
         , globPatterns()
 {}
 
-// ------------------------------------------------------------------------------------------------
-
 QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
         : name(other.d->name)
         //, comment(other.d->comment)
@@ -62,8 +78,6 @@ QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
         , iconName(other.d->iconName)
         , globPatterns(other.d->globPatterns)
 {}
-
-// ------------------------------------------------------------------------------------------------
 
 void QMimeTypePrivate::clear()
 {
@@ -75,11 +89,9 @@ void QMimeTypePrivate::clear()
     globPatterns.clear();
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const;
-    \brief Returns true if \a other equals this QMimeTypePrivate object, otherwise returns false.
+    Returns true if \a other equals this QMimeTypePrivate object, otherwise returns false.
  */
 bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
 {
@@ -102,18 +114,16 @@ bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
     return false;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 void QMimeTypePrivate::addGlobPattern(const QString &pattern)
 {
     globPatterns.append(pattern);
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \class QMimeType
     \brief The QMimeType class describes types of file or data, represented by a MIME type string.
+
+    \since 5.0
 
     For instance a file named "readme.txt" has the MIME type "text/plain".
     The MIME type can be determined from the file name, or from the file
@@ -133,11 +143,9 @@ void QMimeTypePrivate::addGlobPattern(const QString &pattern)
     \sa QMimeDatabase
  */
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QMimeType::QMimeType();
-    \brief Constructs this QMimeType object initialized with default property values that indicate an invalid MIME type.
+    Constructs this QMimeType object initialized with default property values that indicate an invalid MIME type.
  */
 QMimeType::QMimeType() :
         d(new QMimeTypePrivate())
@@ -152,11 +160,9 @@ QMimeType::QMimeType() :
     DBG() << "preferredSuffix():" << preferredSuffix();
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QMimeType::QMimeType(const QMimeType &other);
-    \brief Constructs this QMimeType object as a copy of \a other.
+    Constructs this QMimeType object as a copy of \a other.
  */
 QMimeType::QMimeType(const QMimeType &other) :
         d(other.d)
@@ -171,11 +177,9 @@ QMimeType::QMimeType(const QMimeType &other) :
     DBG() << "preferredSuffix():" << preferredSuffix();
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QMimeType &QMimeType::operator=(const QMimeType &other);
-    \brief Assigns the data of \a other to this QMimeType object, and returns a reference to this object.
+    Assigns the data of \a other to this QMimeType object, and returns a reference to this object.
  */
 QMimeType &QMimeType::operator=(const QMimeType &other)
 {
@@ -184,12 +188,10 @@ QMimeType &QMimeType::operator=(const QMimeType &other)
     return *this;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 #ifdef Q_COMPILER_RVALUE_REFS
 /*!
     \fn QMimeType::QMimeType(QMimeType &&other);
-    \brief Constructs this QMimeType object by moving the data of the rvalue reference \a other.
+    Constructs this QMimeType object by moving the data of the rvalue reference \a other.
  */
 QMimeType::QMimeType(QMimeType &&other) :
         d(std::move(other.d))
@@ -205,11 +207,9 @@ QMimeType::QMimeType(QMimeType &&other) :
 }
 #endif
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QMimeType::QMimeType(const QMimeTypePrivate &dd);
-    \brief Assigns the data of the QMimeTypePrivate \a dd to this QMimeType object, and returns a reference to this object.
+    Assigns the data of the QMimeTypePrivate \a dd to this QMimeType object, and returns a reference to this object.
  */
 QMimeType::QMimeType(const QMimeTypePrivate &dd) :
         d(new QMimeTypePrivate(dd))
@@ -224,11 +224,9 @@ QMimeType::QMimeType(const QMimeTypePrivate &dd) :
     DBG() << "preferredSuffix():" << preferredSuffix();
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn void QMimeType::swap(QMimeType &other);
-    \brief Swaps QMimeType \a other with this QMimeType object.
+    Swaps QMimeType \a other with this QMimeType object.
 
     This operation is very fast and never fails.
 
@@ -238,11 +236,9 @@ QMimeType::QMimeType(const QMimeTypePrivate &dd) :
     {More C++ Idioms - Copy-and-swap}.
  */
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QMimeType::~QMimeType();
-    \brief Destroys the QMimeType object, and releases the d pointer.
+    Destroys the QMimeType object, and releases the d pointer.
  */
 QMimeType::~QMimeType()
 {
@@ -256,29 +252,23 @@ QMimeType::~QMimeType()
     DBG() << "preferredSuffix():" << preferredSuffix();
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn bool QMimeType::operator==(const QMimeType &other) const;
-    \brief Returns true if \a other equals this QMimeType object, otherwise returns false.
+    Returns true if \a other equals this QMimeType object, otherwise returns false.
  */
 bool QMimeType::operator==(const QMimeType &other) const
 {
     return d == other.d || *d == *other.d;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn bool QMimeType::operator!=(const QMimeType &other) const;
-    \brief Returns true if \a other does not equal this QMimeType object, otherwise returns false.
+    Returns true if \a other does not equal this QMimeType object, otherwise returns false.
  */
-
-// ------------------------------------------------------------------------------------------------
 
 /*!
     \fn bool QMimeType::isValid() const;
-    \brief Returns true if the QMimeType object contains valid data, otherwise returns false.
+    Returns true if the QMimeType object contains valid data, otherwise returns false.
     A valid MIME type has a non-empty name().
     The invalid MIME type is the default-constructed QMimeType.
  */
@@ -286,8 +276,6 @@ bool QMimeType::isValid() const
 {
     return !d->name.isEmpty();
 }
-
-// ------------------------------------------------------------------------------------------------
 
 /*!
     \fn bool QMimeType::isDefault() const;
@@ -299,21 +287,17 @@ bool QMimeType::isDefault() const
     return d->name == QMimeDatabasePrivate::instance()->defaultMimeType();
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QString QMimeType::name() const;
-    \brief Returns the name of the MIME type.
+    Returns the name of the MIME type.
  */
 QString QMimeType::name() const
 {
     return d->name;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
-    \brief Returns the description of the MIME type to be displayed on user interfaces.
+    Returns the description of the MIME type to be displayed on user interfaces.
 
     The system language (QLocale::system().name()) is used to select the appropriate translation.
     Another language can be specified by setting the \a localeName argument.
@@ -324,10 +308,8 @@ QString QMimeType::comment() const
 
     QStringList languageList;
     languageList << QLocale::system().name();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     languageList << QLocale::system().uiLanguages();
-#endif
-    Q_FOREACH(const QString& lang, languageList) {
+    Q_FOREACH (const QString &lang, languageList) {
         const QString comm = d->localeComments.value(lang);
         if (!comm.isEmpty())
             return comm;
@@ -345,11 +327,9 @@ QString QMimeType::comment() const
     return d->name;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QString QMimeType::genericIconName() const;
-    \brief Returns the file name of a generic icon that represents the MIME type.
+    Returns the file name of a generic icon that represents the MIME type.
 
     This should be used if the icon returned by iconName() cannot be found on
     the system. It is used for categories of similar types (like spreadsheets
@@ -376,11 +356,9 @@ QString QMimeType::genericIconName() const
     return d->genericIconName;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QString QMimeType::iconName() const;
-    \brief Returns the file name of an icon image that represents the MIME type.
+    Returns the file name of an icon image that represents the MIME type.
 
     The icon name can be given to QIcon::fromTheme() in order to load the icon.
  */
@@ -397,19 +375,15 @@ QString QMimeType::iconName() const
     return d->iconName;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QStringList QMimeType::globPatterns() const;
-    \brief Returns the list of glob matching patterns.
+    Returns the list of glob matching patterns.
  */
 QStringList QMimeType::globPatterns() const
 {
     QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
     return d->globPatterns;
 }
-
-// ------------------------------------------------------------------------------------------------
 
 /*!
     A type is a subclass of another type if any instance of the first type is
@@ -428,24 +402,20 @@ QStringList QMimeType::parentMimeTypes() const
     return QMimeDatabasePrivate::instance()->provider()->parents(d->name);
 }
 
-// ------------------------------------------------------------------------------------------------
-
-static void collectParentMimeTypes(const QString& mime, QStringList& allParents)
+static void collectParentMimeTypes(const QString &mime, QStringList &allParents)
 {
     QStringList parents = QMimeDatabasePrivate::instance()->provider()->parents(mime);
-    foreach(const QString& parent, parents) {
+    foreach (const QString &parent, parents) {
         // I would use QSet, but since order matters I better not
         if (!allParents.contains(parent))
             allParents.append(parent);
     }
     // We want a breadth-first search, so that the least-specific parent (octet-stream) is last
     // This means iterating twice, unfortunately.
-    foreach(const QString& parent, parents) {
+    foreach (const QString &parent, parents) {
         collectParentMimeTypes(parent, allParents);
     }
 }
-
-// ------------------------------------------------------------------------------------------------
 
 /*!
     Return all the parent mimetypes of this mimetype, direct and indirect.
@@ -464,18 +434,16 @@ QStringList QMimeType::allAncestors() const
     return allParents;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QStringList QMimeType::suffixes() const;
-    \brief Returns the known suffixes for the MIME type.
+    Returns the known suffixes for the MIME type.
  */
 QStringList QMimeType::suffixes() const
 {
     QMimeDatabasePrivate::instance()->provider()->loadMimeTypePrivate(*d);
 
     QStringList result;
-    foreach (const QString& pattern, d->globPatterns) {
+    foreach (const QString &pattern, d->globPatterns) {
         // Not a simple suffix if if looks like: README or *. or *.* or *.JP*G or *.JP?
         if (pattern.startsWith(QLatin1String("*.")) &&
             pattern.length() > 2 &&
@@ -488,19 +456,15 @@ QStringList QMimeType::suffixes() const
     return result;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn QString QMimeType::preferredSuffix() const;
-    \brief Returns the preferred suffix for the MIME type.
+    Returns the preferred suffix for the MIME type.
  */
 QString QMimeType::preferredSuffix() const
 {
     const QStringList suffixList = suffixes();
     return suffixList.isEmpty() ? QString() : suffixList.at(0);
 }
-
-// ------------------------------------------------------------------------------------------------
 
 /*!
     \fn QString QMimeType::filterString() const;
@@ -524,8 +488,6 @@ QString QMimeType::filterString() const
     return filter;
 }
 
-// ------------------------------------------------------------------------------------------------
-
 /*!
     \fn bool QMimeType::inherits(const QString &mimeTypeName) const;
     Returns true if this mimetype is \a mimeTypeName,
@@ -538,8 +500,6 @@ bool QMimeType::inherits(const QString &mimeTypeName) const
         return true;
     return QMimeDatabasePrivate::instance()->inherits(d->name, mimeTypeName);
 }
-
-// ------------------------------------------------------------------------------------------------
 
 #undef DBG
 

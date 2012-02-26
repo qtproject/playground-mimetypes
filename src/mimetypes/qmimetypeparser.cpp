@@ -1,24 +1,48 @@
-/**************************************************************************
+/****************************************************************************
 **
-** This file is part of QMime
+** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
+** Contact: http://www.qt-project.org/
 **
-** Based on Qt Creator source code
+** This file is part of the QtCore module of the Qt Toolkit.
 **
-** Qt Creator Copyright (c) 2011 Nokia Corporation and/or its subsidiary(-ies).
-**
-**
+** $QT_BEGIN_LICENSE:LGPL$
 ** GNU Lesser General Public License Usage
-**
 ** This file may be used under the terms of the GNU Lesser General Public
 ** License version 2.1 as published by the Free Software Foundation and
-** appearing in the file LICENSE.LGPL included in the packaging of this file.
-** Please review the following information to ensure the GNU Lesser General
-** Public License version 2.1 requirements will be met:
+** appearing in the file LICENSE.LGPL included in the packaging of this
+** file. Please review the following information to ensure the GNU Lesser
+** General Public License version 2.1 requirements will be met:
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
-**************************************************************************/
+** In addition, as a special exception, Nokia gives you certain additional
+** rights. These rights are described in the Nokia Qt LGPL Exception
+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+**
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU General
+** Public License version 3.0 as published by the Free Software Foundation
+** and appearing in the file LICENSE.GPL included in the packaging of this
+** file. Please review the following information to ensure the GNU General
+** Public License version 3.0 requirements will be met:
+** http://www.gnu.org/copyleft/gpl.html.
+**
+** Other Usage
+** Alternatively, this file may be used in accordance with the terms and
+** conditions contained in a signed written agreement between you and Nokia.
+**
+**
+**
+**
+**
+**
+** $QT_END_LICENSE$
+**
+****************************************************************************/
 
-#include "mimetypeparser_p.h"
+
+#define QT_NO_CAST_FROM_ASCII
+
+#include "qmimetypeparser_p.h"
 
 #include "qmimetype_p.h"
 #include "qmimemagicrulematcher_p.h"
@@ -34,57 +58,58 @@
 QT_BEGIN_NAMESPACE
 
 // XML tags in MIME files
-const char *const mimeInfoTagC = "mime-info";
-const char *const mimeTypeTagC = "mime-type";
-const char *const mimeTypeAttributeC = "type";
-const char *const subClassTagC = "sub-class-of";
-const char *const commentTagC = "comment";
-const char *const genericIconTagC = "generic-icon";
-const char *const iconTagC = "icon";
-const char *const nameAttributeC = "name";
-const char *const globTagC = "glob";
-const char *const aliasTagC = "alias";
-const char *const patternAttributeC = "pattern";
-const char *const weightAttributeC = "weight";
-const char *const caseSensitiveAttributeC = "case-sensitive";
-const char *const localeAttributeC = "xml:lang";
+static const char mimeInfoTagC[] = "mime-info";
+static const char mimeTypeTagC[] = "mime-type";
+static const char mimeTypeAttributeC[] = "type";
+static const char subClassTagC[] = "sub-class-of";
+static const char commentTagC[] = "comment";
+static const char genericIconTagC[] = "generic-icon";
+static const char iconTagC[] = "icon";
+static const char nameAttributeC[] = "name";
+static const char globTagC[] = "glob";
+static const char aliasTagC[] = "alias";
+static const char patternAttributeC[] = "pattern";
+static const char weightAttributeC[] = "weight";
+static const char caseSensitiveAttributeC[] = "case-sensitive";
+static const char localeAttributeC[] = "xml:lang";
 
-const char *const magicTagC = "magic";
-const char *const priorityAttributeC = "priority";
+static const char magicTagC[] = "magic";
+static const char priorityAttributeC[] = "priority";
 
-const char *const matchTagC = "match";
-const char *const matchValueAttributeC = "value";
-const char *const matchTypeAttributeC = "type";
-const char *const matchOffsetAttributeC = "offset";
-const char *const matchMaskAttributeC = "mask";
+static const char matchTagC[] = "match";
+static const char matchValueAttributeC[] = "value";
+static const char matchTypeAttributeC[] = "type";
+static const char matchOffsetAttributeC[] = "offset";
+static const char matchMaskAttributeC[] = "mask";
 
 /*!
-    \class MimeTypeParser
-    \brief The MimeTypeParser class parses MIME types, and builds a MIME database hierarchy by adding to QMimeDatabasePrivate.
+    \class QMimeTypeParser
+    \internal
+    \brief The QMimeTypeParser class parses MIME types, and builds a MIME database hierarchy by adding to QMimeDatabasePrivate.
 
-    Populates MimeDataBase
+    Populates QMimeDataBase
 
     \sa QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa MimeTypeParser
+    \sa QMimeTypeParser
 */
 
 
 /*!
-    \class BaseMimeTypeParser
-    \brief The BaseMimeTypeParser class parses for a sequence of <mime-type> in a generic way.
+    \class QMimeTypeParserBase
+    \brief The QMimeTypeParserBase class parses for a sequence of <mime-type> in a generic way.
 
     Calls abstract handler function process for QMimeType it finds.
 
     \sa QMimeDatabase, QMimeMagicRuleMatcher, MagicRule, MagicStringRule, MagicByteRule, GlobPattern
-    \sa MimeTypeParser
+    \sa QMimeTypeParser
 */
 
 /*!
-    \fn virtual bool BaseMimeTypeParser::process(const QMimeType &t, QString *errorMessage) = 0;
-    \brief Overwrite to process the sequence of parsed data
+    \fn virtual bool QMimeTypeParserBase::process(const QMimeType &t, QString *errorMessage) = 0;
+    Overwrite to process the sequence of parsed data
 */
 
-BaseMimeTypeParser::ParseState BaseMimeTypeParser::nextState(ParseState currentState, const QStringRef &startElement)
+QMimeTypeParserBase::ParseState QMimeTypeParserBase::nextState(ParseState currentState, const QStringRef &startElement)
 {
     switch (currentState) {
     case ParseBeginning:
@@ -177,7 +202,7 @@ static bool createMagicMatchRule(const QXmlStreamAttributes &atts,
     return true;
 }
 
-bool BaseMimeTypeParser::parse(QIODevice *dev, const QString &fileName, QString *errorMessage)
+bool QMimeTypeParserBase::parse(QIODevice *dev, const QString &fileName, QString *errorMessage)
 {
     QMimeTypePrivate data;
     int priority = 50;

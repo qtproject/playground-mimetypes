@@ -47,10 +47,10 @@
 
 // ------------------------------------------------------------------------------------------------
 
-extern bool isQMimeDatabaseDebuggingActivated;
+extern bool qt_isQMimeDatabaseDebuggingActivated;
 
 #ifndef QT_NO_DEBUG_OUTPUT
-#define DBG() if (isQMimeDatabaseDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
+#define DBG() if (qt_isQMimeDatabaseDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #else
 #define DBG() if (0) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #endif
@@ -206,14 +206,14 @@ QMimeDatabase &QDeclarativeMimeDatabase::mimeDatabase()
 
 bool QDeclarativeMimeDatabase::isDebuggingActivated() const
 {
-    return isQMimeDatabaseDebuggingActivated;
+    return qt_isQMimeDatabaseDebuggingActivated;
 }
 
 // ------------------------------------------------------------------------------------------------
 
 void QDeclarativeMimeDatabase::setIsDebuggingActivated(const bool newIsDebuggingActivated)
 {
-    isQMimeDatabaseDebuggingActivated = newIsDebuggingActivated;
+    qt_isQMimeDatabaseDebuggingActivated = newIsDebuggingActivated;
 }
 
 // ------------------------------------------------------------------------------------------------

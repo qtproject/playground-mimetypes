@@ -13,14 +13,12 @@ CONFIG += depend_includepath
 
 QT     = core
 
-DEFINES += QT_NO_CAST_FROM_ASCII
-
 QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
 
 SOURCES += qmimedatabase.cpp \
            qmimetype.cpp \
            qmimemagicrulematcher.cpp \
-           mimetypeparser.cpp \
+           qmimetypeparser.cpp \
            qmimemagicrule.cpp \
            qmimeglobpattern.cpp \
            qmimeprovider.cpp
@@ -32,7 +30,7 @@ the_includes.files += qmime_global.h \
 HEADERS += $$the_includes.files \
            qmimemagicrulematcher_p.h \
            qmimetype_p.h \
-           mimetypeparser_p.h \
+           qmimetypeparser_p.h \
            qmimedatabase_p.h \
            qmimemagicrule_p.h \
            qmimeglobpattern_p.h \

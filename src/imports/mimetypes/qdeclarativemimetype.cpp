@@ -46,10 +46,10 @@
 
 // ------------------------------------------------------------------------------------------------
 
-extern bool isQMimeTypeDebuggingActivated;
+extern bool qt_isQMimeTypeDebuggingActivated;
 
 #ifndef QT_NO_DEBUG_OUTPUT
-#define DBG() if (isQMimeTypeDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
+#define DBG() if (qt_isQMimeTypeDebuggingActivated) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #else
 #define DBG() if (0) qDebug() << static_cast<const void *>(this) << Q_FUNC_INFO
 #endif
@@ -406,14 +406,14 @@ bool QDeclarativeMimeType::isValid() const
 
 bool QDeclarativeMimeType::isDebuggingActivated() const
 {
-    return isQMimeTypeDebuggingActivated;
+    return qt_isQMimeTypeDebuggingActivated;
 }
 
 // ------------------------------------------------------------------------------------------------
 
 void QDeclarativeMimeType::setIsDebuggingActivated(const bool newIsDebuggingActivated)
 {
-    isQMimeTypeDebuggingActivated = newIsDebuggingActivated;
+    qt_isQMimeTypeDebuggingActivated = newIsDebuggingActivated;
 }
 
 // ------------------------------------------------------------------------------------------------
