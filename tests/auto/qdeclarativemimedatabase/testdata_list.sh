@@ -2,7 +2,7 @@
 
 #
 # Prepares the data from testfiles/list for tests in QML in the same way as
-# tst_qmimedatabase::findByFileName_data() for C++.
+# tst_QMimeDatabase::findByFileName_data() for C++.
 # For QML, instead of passing the data in QTest columns the data is passed
 # via the JavaScript include file testdata_list.js.
 #

@@ -76,7 +76,7 @@ QMimeProviderBase::QMimeProviderBase(QMimeDatabasePrivate *db)
 {
 }
 
-Q_CORE_EXPORT int qmime_secondsBetweenChecks = 5; // exported for the unit test
+QMIME_EXPORT int qmime_secondsBetweenChecks = 5; // exported for the unit test
 
 bool QMimeProviderBase::shouldCheck()
 {
@@ -283,6 +283,8 @@ QMimeType QMimeBinaryProvider::mimeTypeForName(const QString &name)
 QStringList QMimeBinaryProvider::findByFileName(const QString &fileName, QString *foundSuffix)
 {
     checkCache();
+    if (fileName.isEmpty())
+        return QStringList();
     const QString lowerFileName = fileName.toLower();
     QMimeGlobMatchResult result;
     // TODO this parses in the order (local, global). Check that it handles "NOGLOBS" correctly.
@@ -527,6 +529,9 @@ QList<QMimeType> QMimeBinaryProvider::allMimeTypes()
 
 void QMimeBinaryProvider::loadMimeTypePrivate(QMimeTypePrivate &data)
 {
+    if (data.loaded)
+        return;
+    data.loaded = true;
     // load comment and globPatterns
 
     const QString file = data.name + QLatin1String(".xml");

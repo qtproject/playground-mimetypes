@@ -31,7 +31,8 @@ test.pix image/x-pix xxx
 test.png image/png
 test.ppm image/x-portable-pixmap
 # Copied from http://bugs.freedesktop.org/show_bug.cgi?id=19811
-test2.ppm image/x-portable-pixmap ox
+test2.ppm image/x-portable-pixmap
+test-p6.ppm image/x-portable-pixmap
 test.ps  application/postscript
 test.psd image/vnd.adobe.photoshop
 test.sgi image/x-sgi ox
@@ -162,6 +163,8 @@ test.flac audio/flac
 live-streaming.m3u application/vnd.apple.mpegurl x
 # Copied from http://qthttp.apple.com.edgesuite.net/1006ad9g4hjk/all_w.m3u8
 all_w.m3u8 application/vnd.apple.mpegurl x
+# Copied from http://bugs.freedesktop.org/show_bug.cgi?id=42922
+test.vsd application/vnd.visio ox
 
 # text
 text-iso8859-15.txt text/plain
@@ -309,6 +312,10 @@ settopbox.ts video/mp2t xo
 # Bastien's hard drive
 bbc.ram application/ram oxo
 bbc.ram application/vnd.rn-realmedia xox
+# Converted from test.wav
+test-noid3.mp3 audio/mpeg
+# "Back to the 80s" by Aqua, as purchased on Amazon US
+xml-in-mp3.mp3 audio/mpeg
 
 # Video game ROMs
 genesis1.bin application/x-genesis-rom xox
@@ -352,7 +359,6 @@ test.h5 application/x-hdf
 # From http://wiki.wireshark.org/SampleCaptures (ancp.pcap.gz, dns.cap)
 ancp.pcap application/vnd.tcpdump.pcap
 dns.cap application/vnd.tcpdump.pcap
-# Case-insensitive glob -- needs uptodate shared-mime-info
+## Case-insensitive glob
 #testcompress.z application/x-compress
 one-file.tnef application/vnd.ms-tnef
-

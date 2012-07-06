@@ -39,7 +39,6 @@
 **
 ****************************************************************************/
 
-
 #ifndef QMIMETYPE_H
 #define QMIMETYPE_H
 
@@ -50,7 +49,7 @@
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #ifndef Q_CC_MSVC
-#error "Do not try to use this library with Qt5, use QtCore/QMimeType instead"
+// TODO #error "Do not try to use this library with Qt5, use QtCore/QMimeType instead"
 #endif
 #endif
 
@@ -67,8 +66,6 @@ public:
     QMimeType(const QMimeType &other);
     QMimeType &operator=(const QMimeType &other);
 #ifdef Q_COMPILER_RVALUE_REFS
-    QMimeType(QMimeType &&other);
-
     QMimeType &operator=(QMimeType &&other)
     {
         qSwap(d, other.d);

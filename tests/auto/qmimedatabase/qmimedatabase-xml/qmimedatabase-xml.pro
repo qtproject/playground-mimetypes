@@ -5,7 +5,7 @@ TEMPLATE = app
 
 TARGET = tst_qmimedatabase-xml
 
-QT       += testlib
+QT       += testlib concurrent
 
 QT       -= widgets gui
 
@@ -30,10 +30,12 @@ contains(QMAKE_CXX, --sysroot): {
 
     QMAKE_EXTRA_TARGETS += check
     check.depends = $$TARGET
-    check.commands = LD_LIBRARY_PATH=$$(LD_LIBRARY_PATH):$$OUT_PWD/../../../../src/mimetypes ./$$TARGET -xunitxml -o $${TARGET}.xml
+    check.commands = LD_LIBRARY_PATH=$$(LD_LIBRARY_PATH):$$OUT_PWD/../../../../src/mimetypes ./$$TARGET   # -xunitxml -o $${TARGET}.xml
 }
 
-QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
+DEFINES += CORE_SOURCES='"\\"$$PWD/../../../../src\\""'
+
+*-g++*:QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
 
 unix:!symbian {
     maemo5 {

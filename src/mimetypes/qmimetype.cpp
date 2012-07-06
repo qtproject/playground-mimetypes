@@ -39,7 +39,6 @@
 **
 ****************************************************************************/
 
-
 #include "qmimetype.h"
 
 #include "qmimetype_p.h"
@@ -62,31 +61,31 @@ bool qt_isQMimeTypeDebuggingActivated (false);
 #endif
 
 QMimeTypePrivate::QMimeTypePrivate()
-        : name()
-        //, comment()
-        , localeComments()
-        , genericIconName()
-        , iconName()
-        , globPatterns()
+        //name(),
+        //localeComments(),
+        //genericIconName(),
+        //iconName(),
+        //globPatterns()
+        : loaded(false)
 {}
 
 QMimeTypePrivate::QMimeTypePrivate(const QMimeType &other)
-        : name(other.d->name)
-        //, comment(other.d->comment)
-        , localeComments(other.d->localeComments)
-        , genericIconName(other.d->genericIconName)
-        , iconName(other.d->iconName)
-        , globPatterns(other.d->globPatterns)
+        : name(other.d->name),
+        localeComments(other.d->localeComments),
+        genericIconName(other.d->genericIconName),
+        iconName(other.d->iconName),
+        globPatterns(other.d->globPatterns),
+        loaded(other.d->loaded)
 {}
 
 void QMimeTypePrivate::clear()
 {
     name.clear();
-    //comment.clear();
     localeComments.clear();
     genericIconName.clear();
     iconName.clear();
     globPatterns.clear();
+    loaded = false;
 }
 
 /*!
@@ -97,7 +96,6 @@ bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
 {
     DBG();
     if (name == other.name &&
-            //comment == other.comment &&
             localeComments == other.localeComments &&
             genericIconName == other.genericIconName &&
             iconName == other.iconName &&
@@ -106,7 +104,6 @@ bool QMimeTypePrivate::operator==(const QMimeTypePrivate &other) const
     }
 
     DBG() << name << other.name << (name == other.name);
-    //DBG() << comment << other.comment << (comment == other.comment);
     DBG() << localeComments << other.localeComments << (localeComments == other.localeComments);
     DBG() << genericIconName << other.genericIconName << (genericIconName == other.genericIconName);
     DBG() << iconName << other.iconName << (iconName == other.iconName);
@@ -152,7 +149,6 @@ QMimeType::QMimeType() :
 {
     DBG() << "name():" << name();
     //DBG() << "aliases():" << aliases();
-    //DBG() << "comment():" << comment();
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
@@ -169,7 +165,6 @@ QMimeType::QMimeType(const QMimeType &other) :
 {
     DBG() << "name():" << name();
     //DBG() << "aliases():" << aliases();
-    //DBG() << "comment():" << comment();
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
@@ -188,25 +183,6 @@ QMimeType &QMimeType::operator=(const QMimeType &other)
     return *this;
 }
 
-#ifdef Q_COMPILER_RVALUE_REFS
-/*!
-    \fn QMimeType::QMimeType(QMimeType &&other);
-    Constructs this QMimeType object by moving the data of the rvalue reference \a other.
- */
-QMimeType::QMimeType(QMimeType &&other) :
-        d(std::move(other.d))
-{
-    DBG() << "name():" << name();
-    //DBG() << "aliases():" << aliases();
-    //DBG() << "comment():" << comment();
-    DBG() << "genericIconName():" << genericIconName();
-    DBG() << "iconName():" << iconName();
-    DBG() << "globPatterns():" << globPatterns();
-    DBG() << "suffixes():" << suffixes();
-    DBG() << "preferredSuffix():" << preferredSuffix();
-}
-#endif
-
 /*!
     \fn QMimeType::QMimeType(const QMimeTypePrivate &dd);
     Assigns the data of the QMimeTypePrivate \a dd to this QMimeType object, and returns a reference to this object.
@@ -216,7 +192,6 @@ QMimeType::QMimeType(const QMimeTypePrivate &dd) :
 {
     DBG() << "name():" << name();
     //DBG() << "aliases():" << aliases();
-    //DBG() << "comment():" << comment();
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
@@ -244,7 +219,6 @@ QMimeType::~QMimeType()
 {
     DBG() << "name():" << name();
     //DBG() << "aliases():" << aliases();
-    //DBG() << "comment():" << comment();
     DBG() << "genericIconName():" << genericIconName();
     DBG() << "iconName():" << iconName();
     DBG() << "globPatterns():" << globPatterns();
@@ -300,7 +274,6 @@ QString QMimeType::name() const
     Returns the description of the MIME type to be displayed on user interfaces.
 
     The system language (QLocale::system().name()) is used to select the appropriate translation.
-    Another language can be specified by setting the \a localeName argument.
  */
 QString QMimeType::comment() const
 {
@@ -308,8 +281,11 @@ QString QMimeType::comment() const
 
     QStringList languageList;
     languageList << QLocale::system().name();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     languageList << QLocale::system().uiLanguages();
-    Q_FOREACH (const QString &lang, languageList) {
+#endif
+    Q_FOREACH (const QString &language, languageList) {
+        const QString lang = language == QLatin1String("C") ? QLatin1String("en_US") : language;
         const QString comm = d->localeComments.value(lang);
         if (!comm.isEmpty())
             return comm;

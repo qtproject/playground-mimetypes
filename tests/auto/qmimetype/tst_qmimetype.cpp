@@ -1,10 +1,9 @@
 /****************************************************************************
 **
-** Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
-** All rights reserved.
-** Contact: Nokia Corporation (qt-info@nokia.com)
+** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
+** Contact: http://www.qt-project.org/
 **
-** This file is part of the QtMimeTypes addon of the Qt Toolkit.
+** This file is part of the test suite of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:LGPL$
 ** GNU Lesser General Public License Usage
@@ -30,6 +29,7 @@
 ** Other Usage
 ** Alternatively, this file may be used in accordance with the terms and
 ** conditions contained in a signed written agreement between you and Nokia.
+**
 **
 **
 **
@@ -62,13 +62,6 @@ static QString qMimeTypeName()
     static const QString result ("No name of the MIME type");
     return result;
 }
-
-#if 0
-static QString qMimeTypeDisplayName()
-{
-    return QString::fromLatin1("PNG File");
-}
-#endif
 
 static QString qMimeTypeGenericIconName()
 {
@@ -105,7 +98,7 @@ QMIMETYPE_BUILDER_FROM_RVALUE_REFS
 
 // ------------------------------------------------------------------------------------------------
 
-void tst_qmimetype::test_isValid()
+void tst_qmimetype::isValid()
 {
     QMimeType instantiatedQMimeType (
                   buildQMimeType (
@@ -130,7 +123,7 @@ void tst_qmimetype::test_isValid()
 
 // ------------------------------------------------------------------------------------------------
 
-void tst_qmimetype::test_name()
+void tst_qmimetype::name()
 {
     QMimeType instantiatedQMimeType (
                   buildQMimeType (
@@ -159,7 +152,7 @@ void tst_qmimetype::test_name()
 
 // ------------------------------------------------------------------------------------------------
 
-void tst_qmimetype::test_genericIconName()
+void tst_qmimetype::genericIconName()
 {
     QMimeType instantiatedQMimeType (
                   buildQMimeType (
@@ -188,7 +181,7 @@ void tst_qmimetype::test_genericIconName()
 
 // ------------------------------------------------------------------------------------------------
 
-void tst_qmimetype::test_iconName()
+void tst_qmimetype::iconName()
 {
     QMimeType instantiatedQMimeType (
                   buildQMimeType (
@@ -217,7 +210,7 @@ void tst_qmimetype::test_iconName()
 
 // ------------------------------------------------------------------------------------------------
 
-void tst_qmimetype::test_suffixes()
+void tst_qmimetype::suffixes()
 {
     QMimeType instantiatedQMimeType (
                   buildQMimeType (
@@ -247,9 +240,14 @@ void tst_qmimetype::test_suffixes()
 
 // ------------------------------------------------------------------------------------------------
 
-int main(int argc, char *argv[])
-{
-    QCoreApplication app(argc, argv);
-    tst_qmimetype tc;
-    return QTest::qExec(&tc, argc, argv);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+#define QTEST_GUILESS_MAIN(TestObject) \
+int main(int argc, char *argv[]) \
+{ \
+    QCoreApplication app(argc, argv); \
+    TestObject tc; \
+    return QTest::qExec(&tc, argc, argv); \
 }
+#endif
+
+QTEST_GUILESS_MAIN(tst_qmimetype)

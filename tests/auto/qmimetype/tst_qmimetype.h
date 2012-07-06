@@ -51,11 +51,11 @@ class tst_qmimetype : public QObject
 private slots:
     void initTestCase();
 
-    void test_isValid();
-    void test_name();
-    void test_genericIconName();
-    void test_iconName();
-    void test_suffixes();
+    void isValid();
+    void name();
+    void genericIconName();
+    void iconName();
+    void suffixes();
 };
 
 #endif   // TST_QMIMETYPE_H_INCLUDED

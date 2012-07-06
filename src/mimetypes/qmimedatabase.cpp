@@ -165,7 +165,7 @@ QMimeType QMimeDatabasePrivate::findByData(const QByteArray &data, int *accuracy
     return mimeTypeForName(defaultMimeType());
 }
 
-QMimeType QMimeDatabasePrivate::mimeTypeForNameAndData(const QString &fileName, QIODevice *device, int *accuracyPtr)
+QMimeType QMimeDatabasePrivate::mimeTypeForFileNameAndData(const QString &fileName, QIODevice *device, int *accuracyPtr)
 {
     // First, glob patterns are evaluated. If there is a match with max weight,
     // this one is selected and we are done. Otherwise, the file contents are
@@ -289,7 +289,7 @@ bool QMimeDatabasePrivate::inherits(const QString &mime, const QString &parent)
 
     \threadsafe
 
-    \snippet doc/src/snippets/code/src_corelib_mimetype_qmimedatabase.cpp 0
+    \snippet code/src_corelib_mimetype_qmimedatabase.cpp 0
 
     \sa QMimeType
  */
@@ -385,7 +385,7 @@ QMimeType QMimeDatabase::mimeTypeForFile(const QFileInfo &fileInfo, MatchMode mo
     switch (mode) {
     case MatchDefault:
         file.open(QIODevice::ReadOnly); // isOpen() will be tested by method below
-        return d->mimeTypeForNameAndData(fileInfo.absoluteFilePath(), &file, &priority);
+        return d->mimeTypeForFileNameAndData(fileInfo.absoluteFilePath(), &file, &priority);
     case MatchExtension:
         locker.unlock();
         return mimeTypeForFile(fileInfo.absoluteFilePath(), mode);
@@ -430,7 +430,7 @@ QMimeType QMimeDatabase::mimeTypeForFile(const QString &fileName, MatchMode mode
 }
 
 /*!
-    \fn QMimeType QMimeDatabase::findMimeTypesByFileName(const QString &fileName) const;
+    \fn QList<QMimeType> QMimeDatabase::mimeTypesForFileName(const QString &fileName) const;
     Returns the MIME types for the file name \a fileName.
 
     If the file name doesn't match any known pattern, an empty list is returned.
@@ -438,7 +438,7 @@ QMimeType QMimeDatabase::mimeTypeForFile(const QString &fileName, MatchMode mode
 
     This function does not try to open the file. To also use the content
     when determining the MIME type, use mimeTypeForFile() or
-    mimeTypeForNameAndData() instead.
+    mimeTypeForFileNameAndData() instead.
 
     \sa mimeTypeForFile
 */
@@ -523,8 +523,14 @@ QMimeType QMimeDatabase::mimeTypeForData(QIODevice *device) const
 */
 QMimeType QMimeDatabase::mimeTypeForUrl(const QUrl &url) const
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     if (url.isLocalFile())
         return mimeTypeForFile(url.toLocalFile());
+#else
+    QString localFile(url.toLocalFile());
+    if (!localFile.isEmpty())
+        return mimeTypeForFile(localFile);
+#endif
 
     const QString scheme = url.scheme();
     if (scheme.startsWith(QLatin1String("http")))
@@ -552,13 +558,13 @@ QMimeType QMimeDatabase::mimeTypeForUrl(const QUrl &url) const
     but the contents will be used if the file extension is unknown, or
     matches multiple MIME types.
 */
-QMimeType QMimeDatabase::mimeTypeForNameAndData(const QString &fileName, QIODevice *device) const
+QMimeType QMimeDatabase::mimeTypeForFileNameAndData(const QString &fileName, QIODevice *device) const
 {
     DBG() << "fileName" << fileName;
 
     int accuracy = 0;
     const bool openedByUs = !device->isOpen() && device->open(QIODevice::ReadOnly);
-    const QMimeType result = d->mimeTypeForNameAndData(fileName, device, &accuracy);
+    const QMimeType result = d->mimeTypeForFileNameAndData(fileName, device, &accuracy);
     if (openedByUs)
         device->close();
     return result;
@@ -580,14 +586,14 @@ QMimeType QMimeDatabase::mimeTypeForNameAndData(const QString &fileName, QIODevi
     but the contents will be used if the file extension is unknown, or
     matches multiple MIME types.
 */
-QMimeType QMimeDatabase::mimeTypeForNameAndData(const QString &fileName, const QByteArray &data) const
+QMimeType QMimeDatabase::mimeTypeForFileNameAndData(const QString &fileName, const QByteArray &data) const
 {
     DBG() << "fileName" << fileName;
 
     QBuffer buffer(const_cast<QByteArray *>(&data));
     buffer.open(QIODevice::ReadOnly);
     int accuracy = 0;
-    return d->mimeTypeForNameAndData(fileName, &buffer, &accuracy);
+    return d->mimeTypeForFileNameAndData(fileName, &buffer, &accuracy);
 }
 
 /*!

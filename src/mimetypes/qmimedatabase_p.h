@@ -39,7 +39,6 @@
 **
 ****************************************************************************/
 
-
 #ifndef QMIMEDATABASE_P_H
 #define QMIMEDATABASE_P_H
 
@@ -76,7 +75,7 @@ public:
 
 
     QMimeType mimeTypeForName(const QString &nameOrAlias);
-    QMimeType mimeTypeForNameAndData(const QString &fileName, QIODevice *device, int *priorityPtr);
+    QMimeType mimeTypeForFileNameAndData(const QString &fileName, QIODevice *device, int *priorityPtr);
     QMimeType findByData(const QByteArray &data, int *priorityPtr);
     QStringList mimeTypeForFileName(const QString &fileName, QString *foundSuffix = 0);
 

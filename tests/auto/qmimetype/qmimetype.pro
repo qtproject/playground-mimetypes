@@ -9,7 +9,7 @@ CONFIG   -= app_bundle
 
 DEPENDPATH += .
 
-QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
+*-g++*:QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
 
 CONFIG += depend_includepath
 
@@ -21,7 +21,7 @@ HEADERS += tst_qmimetype.h
 
 QMAKE_EXTRA_TARGETS += check
 check.depends = $$TARGET
-check.commands = LD_LIBRARY_PATH=$$(LD_LIBRARY_PATH):$$OUT_PWD/../../../src/mimetypes ./$$TARGET -xunitxml -o $${TARGET}.xml
+check.commands = LD_LIBRARY_PATH=$$(LD_LIBRARY_PATH):$$OUT_PWD/../../../src/mimetypes ./$$TARGET   # -xunitxml -o $${TARGET}.xml
 
 exists($${TARGET}.xml): {
     tests_results.files += $${TARGET}.xml
