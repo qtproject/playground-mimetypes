@@ -4,7 +4,7 @@
 **
 ** Based on Qt Creator source code
 **
-** Qt Creator Copyright (c) 2011 Nokia Corporation and/or its subsidiary(-ies).
+** Qt Creator Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 **
 **
 ** GNU Lesser General Public License Usage
