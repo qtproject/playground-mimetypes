@@ -49,7 +49,8 @@
 
 void tst_QMimeDatabase::init()
 {
-    const QString mimeDirName = m_globalXdgDir + QStringLiteral("/mime");
+    const QString mimeDirName = m_globalXdgDir + QLatin1String("/mime");
+
     runUpdateMimeDatabase(mimeDirName);
-    QVERIFY(QFile::exists(mimeDirName + QStringLiteral("/mime.cache")));
+    QVERIFY(QFile::exists(mimeDirName + QLatin1String("/mime.cache")));
 }

@@ -72,7 +72,7 @@ static inline QString testSuiteWarning()
     QTextStream str(&result);
     str << "\nCannot find the shared-mime-info test suite\nstarting from: "
         << QDir::toNativeSeparators(QDir::currentPath()) << "\n"
-           "cd " << QDir::toNativeSeparators(QStringLiteral("tests/auto/corelib/mimetypes/qmimedatabase")) << "\n"
+           "cd " << QDir::toNativeSeparators(QLatin1String("tests/auto/corelib/mimetypes/qmimedatabase")) << "\n"
            "wget http://cgit.freedesktop.org/xdg/shared-mime-info/snapshot/Release-1-0.zip\n"
            "unzip Release-1-0.zip\n";
 #ifdef Q_OS_WIN
@@ -99,10 +99,10 @@ void tst_QMimeDatabase::initTestCase()
 
     const QDir here = QDir(m_temporaryDir.path());
 
-    m_globalXdgDir = m_temporaryDir.path() + QStringLiteral("/global");
-    m_localXdgDir = m_temporaryDir.path() + QStringLiteral("/local");
+    m_globalXdgDir = m_temporaryDir.path() + QLatin1String("/global");
+    m_localXdgDir = m_temporaryDir.path() + QLatin1String("/local");
 
-    const QString globalPackageDir = m_globalXdgDir + QStringLiteral("/mime/packages");
+    const QString globalPackageDir = m_globalXdgDir + QLatin1String("/mime/packages");
     QVERIFY(here.mkpath(globalPackageDir) && here.mkpath(m_localXdgDir));
 
     qputenv("XDG_DATA_DIRS", QFile::encodeName(m_globalXdgDir));
@@ -110,11 +110,11 @@ void tst_QMimeDatabase::initTestCase()
     qDebug() << "\nLocal XDG_DATA_HOME: " << m_localXdgDir
              << "\nGlobal XDG_DATA_DIRS: " << m_globalXdgDir;
 
-    const QString freeDesktopXml = QStringLiteral("freedesktop.org.xml");
+    const QString freeDesktopXml = QLatin1String("freedesktop.org.xml");
     const QString xmlFileName = QLatin1String(CORE_SOURCES)
-                          + QStringLiteral("/mimetypes/mime/packages/")
+                          + QLatin1String("/mimetypes/mime/packages/")
                           + freeDesktopXml;
-    QVERIFY2(QFileInfo(xmlFileName).exists(), qPrintable(xmlFileName + QStringLiteral(" does not exist")));
+    QVERIFY2(QFileInfo(xmlFileName).exists(), qPrintable(xmlFileName + QLatin1String(" does not exist")));
     QFile xml(xmlFileName);
     QVERIFY(xml.copy(globalPackageDir + '/' + freeDesktopXml));
 
@@ -869,7 +869,7 @@ void tst_QMimeDatabase::installNewLocalMimeType()
     QFile::remove(destFile);
     QVERIFY(QFile::copy(m_yastMimeTypes, destFile));
     if (!runUpdateMimeDatabase(mimeDir)) {
-        const QString skipWarning = QStringLiteral("shared-mime-info not found, skipping mime.cache test (")
+        const QString skipWarning = QLatin1String("shared-mime-info not found, skipping mime.cache test (")
                                     + QDir::toNativeSeparators(mimeDir) + QLatin1Char(')');
         QSKIP(qPrintable(skipWarning));
     }
