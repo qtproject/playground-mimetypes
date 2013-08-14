@@ -92,12 +92,24 @@ tst_QMimeDatabase::tst_QMimeDatabase()
 
 void tst_QMimeDatabase::initTestCase()
 {
-    QVERIFY(m_temporaryDir.isValid());
+    QTemporaryFile _name;
+    QString _dirName;
+    if (_name.open()) {
+        _dirName = _name.fileName();
+        _name.remove();
+
+        QFileInfo _fi(_dirName);
+        _dirName = _fi.absoluteFilePath();
+        m_temporaryDir.setPath(QDir::tempPath());
+     }
+    QVERIFY(QDir().mkdir(_dirName));
+
+    m_temporaryDir.setPath(_dirName);
 
     // Create a "global" and a "local" XDG data dir, right here.
     // The local dir will be empty initially, while the global dir will contain a copy of freedesktop.org.xml
 
-    const QDir here = QDir(m_temporaryDir.path());
+    const QDir here = QDir(_dirName);
 
     m_globalXdgDir = m_temporaryDir.path() + QLatin1String("/global");
     m_localXdgDir = m_temporaryDir.path() + QLatin1String("/local");

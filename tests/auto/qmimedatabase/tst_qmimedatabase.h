@@ -43,7 +43,8 @@
 #define TST_QMIMEDATABASE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QTemporaryDir>
+#include <QtCore/QTemporaryFile>
+#include <QtCore/QDir>
 
 class tst_QMimeDatabase : public QObject
 {
@@ -98,7 +99,7 @@ private:
     QString m_globalXdgDir;
     QString m_localXdgDir;
     QString m_yastMimeTypes;
-    QTemporaryDir m_temporaryDir;
+    QDir m_temporaryDir;
     QString m_testSuite;
 };
 
