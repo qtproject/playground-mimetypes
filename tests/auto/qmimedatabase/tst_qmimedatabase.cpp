@@ -130,11 +130,17 @@ void tst_QMimeDatabase::initTestCase()
     QFile xml(xmlFileName);
     QVERIFY(xml.copy(globalPackageDir + '/' + freeDesktopXml));
 
-    m_testSuite = QFINDTESTDATA("testfiles");
+    m_testSuite = QLatin1String(SRCDIR "testfiles");
+    QDir _srcDir(m_testSuite);
+    QVERIFY2(_srcDir.exists(), qPrintable(m_testSuite + QLatin1String(" does not exist.")));
+
     if (m_testSuite.isEmpty())
         qWarning("%s", qPrintable(testSuiteWarning()));
 
-    m_yastMimeTypes = QFINDTESTDATA(yastFileName);
+    m_yastMimeTypes = QLatin1String(SRCDIR) + yastFileName;
+    QFile _file(m_yastMimeTypes);
+    QVERIFY2(_file.exists(), qPrintable(m_testSuite + QLatin1String(" does not exist.")));
+
     QVERIFY2(!m_yastMimeTypes.isEmpty(),
              qPrintable(QString::fromLatin1("Cannot find '%1' starting from '%2'").
                         arg(yastFileName, QDir::currentPath())));
