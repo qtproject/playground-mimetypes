@@ -623,7 +623,7 @@ void tst_QMimeDatabase::findByFileName_data()
     QTest::addColumn<QString>("xFail");
 
     if (m_testSuite.isEmpty())
-        QSKIP("shared-mime-info test suite not available.");
+        QSKIP("shared-mime-info test suite not available.", SkipSingle);
 
     const QString prefix = m_testSuite + QLatin1Char('/');
     const QString fileName = prefix + QLatin1String("list");
@@ -857,7 +857,7 @@ void tst_QMimeDatabase::installNewGlobalMimeType()
         QVERIFY(QDir(m_globalXdgDir).mkpath(destDir));
     QVERIFY(QFile::copy(m_yastMimeTypes, destFile));
     if (!waitAndRunUpdateMimeDatabase(mimeDir))
-        QSKIP("shared-mime-info not found, skipping mime.cache test");
+        QSKIP("shared-mime-info not found, skipping mime.cache test", SkipSingle);
 
     QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
              QString::fromLatin1("text/x-suse-ymu"));
@@ -867,7 +867,7 @@ void tst_QMimeDatabase::installNewGlobalMimeType()
     // Now test removing it again
     QFile::remove(destFile);
     if (!waitAndRunUpdateMimeDatabase(mimeDir))
-        QSKIP("shared-mime-info not found, skipping mime.cache test");
+        QSKIP("shared-mime-info not found, skipping mime.cache test", SkipSingle);
     QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
              QString::fromLatin1("application/octet-stream"));
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
@@ -889,7 +889,7 @@ void tst_QMimeDatabase::installNewLocalMimeType()
     if (!runUpdateMimeDatabase(mimeDir)) {
         const QString skipWarning = QLatin1String("shared-mime-info not found, skipping mime.cache test (")
                                     + QDir::toNativeSeparators(mimeDir) + QLatin1Char(')');
-        QSKIP(qPrintable(skipWarning));
+        QSKIP(qPrintable(skipWarning), SkipSingle);
     }
 
     QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
@@ -900,7 +900,7 @@ void tst_QMimeDatabase::installNewLocalMimeType()
     // Now test removing it again (note, this leaves a mostly-empty mime.cache file)
     QFile::remove(destFile);
     if (!waitAndRunUpdateMimeDatabase(mimeDir))
-        QSKIP("shared-mime-info not found, skipping mime.cache test");
+        QSKIP("shared-mime-info not found, skipping mime.cache test", SkipSingle);
     QCOMPARE(db.mimeTypeForFile(QLatin1String("foo.ymu"), QMimeDatabase::MatchExtension).name(),
              QString::fromLatin1("application/octet-stream"));
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
