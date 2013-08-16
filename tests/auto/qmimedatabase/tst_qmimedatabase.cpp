@@ -912,4 +912,12 @@ void tst_QMimeDatabase::installNewLocalMimeType()
     QVERIFY(!db.mimeTypeForName(QLatin1String("text/x-suse-ymp")).isValid());
 }
 
+#define QTEST_GUILESS_MAIN(TestObject) \
+int main(int argc, char *argv[]) \
+{ \
+    QCoreApplication app(argc, argv); \
+    TestObject tc; \
+    return QTest::qExec(&tc, argc, argv); \
+}
+
 QTEST_GUILESS_MAIN(tst_QMimeDatabase)
