@@ -58,11 +58,12 @@
 
 static const char yastFileName[] ="yast2-metapackage-handler-mimetypes.xml";
 
-void initializeLang()
+static int initializeLang()
 {
     qputenv("LC_ALL", "");
     qputenv("LANG", "C");
     QCoreApplication::setApplicationName("tst_qmimedatabase"); // temporary directory pattern
+    return 1;
 }
 
 static inline QString testSuiteWarning()
@@ -84,6 +85,11 @@ static inline QString testSuiteWarning()
 }
 
 // Set LANG before QCoreApplication is created
+#ifndef Q_CONSTRUCTOR_FUNCTION
+#define Q_CONSTRUCTOR_FUNCTION0(initalizeLang) \
+ static const void initalizeLang ## __init_lang__ = initializeLang();
+#define Q_CONSTRUCTOR_FUNCTION(initalizeLang) Q_CONSTRUCTOR_FUNCTION0(initalizeLang)
+#endif
 Q_CONSTRUCTOR_FUNCTION(initializeLang)
 
 tst_QMimeDatabase::tst_QMimeDatabase()
