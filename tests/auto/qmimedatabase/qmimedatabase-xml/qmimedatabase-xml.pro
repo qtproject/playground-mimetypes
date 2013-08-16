@@ -35,7 +35,7 @@ contains(QMAKE_CXX, --sysroot): {
 
 DEFINES += CORE_SOURCES='"\\"$$PWD/../../../../src\\""'
 
-*-g++*:QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
+*-g++*:QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wno-long-long -Wnon-virtual-dtor
 
 unix:!symbian {
     maemo5 {
