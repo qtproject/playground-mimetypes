@@ -47,12 +47,6 @@
 #include <QtCore/qshareddata.h>
 #include <QtCore/qstring.h>
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#ifndef Q_CC_MSVC
-// TODO #error "Do not try to use this library with Qt5, use QtCore/QMimeType instead"
-#endif
-#endif
-
 QT_BEGIN_NAMESPACE
 
 class QMimeTypePrivate;

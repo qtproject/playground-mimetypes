@@ -1,5 +1,12 @@
 include(doc/doc.pri)
 
+# check qt version
+greaterThan(QT_MAJOR_VERSION, 4) {
+    message("Cannot build with Qt version $${QT_VERSION}.")
+    message("With Qt5 use QtCore/QMimeType instead")
+    error("Qt $${QT_VERSION} not supported")
+}
+
 TEMPLATE = subdirs
 
 module_include.subdir = include
