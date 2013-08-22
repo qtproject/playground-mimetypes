@@ -8,8 +8,6 @@ TARGET = tst_qdeclarativemimetype
 #CONFIG += warn_on qmltestcase
 CONFIG -= app_bundle
 
-QT += qmltest
-
 CONFIG += depend_includepath
 
 SOURCES += tst_qdeclarativemimetype.cpp

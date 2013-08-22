@@ -5,7 +5,7 @@ TEMPLATE = app
 
 TARGET = tst_qmimedatabase-xml
 
-QT       += testlib concurrent
+QT       += testlib
 
 QT       -= widgets gui
 

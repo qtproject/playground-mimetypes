@@ -6,8 +6,6 @@
 
 QT       += core gui
 
-QT += widgets
-
 TARGET = MimeTypeViewer
 TEMPLATE = app
 

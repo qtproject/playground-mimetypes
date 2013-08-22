@@ -5,7 +5,7 @@ TEMPLATE = app
 
 TARGET = tst_qmimedatabase-cache
 
-QT       += testlib concurrent
+QT       += testlib
 
 QT       -= widgets gui
 
