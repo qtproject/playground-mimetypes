@@ -46,13 +46,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QTextStream>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtConcurrent/QtConcurrentRun>
-#include <QtConcurrent/QFuture>
-#else
 #include <QtCore/QtConcurrentRun>
 #include <QtCore/QFuture>
-#endif
 
 #include <QtTest/QtTest>
 

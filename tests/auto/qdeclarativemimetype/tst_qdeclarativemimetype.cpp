@@ -41,13 +41,7 @@
 
 #include <QtCore/qglobal.h>
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtQuickTest/quicktest.h>
-
-QUICK_TEST_MAIN(mytest)
-#else
 int main()
 {
     return 1;
 }
-#endif
