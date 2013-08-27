@@ -1,3 +1,4 @@
+include(mimetypes-nolibs.pri)
 include(doc/doc.pri)
 
 # check qt version

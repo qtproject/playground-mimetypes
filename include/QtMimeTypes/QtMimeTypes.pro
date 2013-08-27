@@ -1,3 +1,5 @@
+include(../../mimetypes-nolibs.pri)
+
 contains($$list($$[QT_VERSION]),4.[6-9].*) {
     TEMPLATE = subdirs
 } else {
@@ -8,10 +10,6 @@ the_includes.files += QMimeDatabase \
                       QMimeType \
 
 unix:!symbian {
-    maemo5 {
-        the_includes.path = /opt/usr/include/qt5/QtMimeTypes
-    } else {
-        the_includes.path = /usr/include/qt5/QtMimeTypes
-    }
+    the_includes.path = $${INCLUDEDIR}/QtMimeTypes
     INSTALLS += the_includes
 }

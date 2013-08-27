@@ -61,12 +61,7 @@ symbian {
 }
 
 unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-        the_includes.path = /opt/usr/include/qt5/QtMimeTypes
-    } else {
-        target.path = /usr/lib
-        the_includes.path = /usr/include/qt5/QtMimeTypes
-    }
+    target.path = ${{LIBDIR}
+    the_includes.path = $${INCLUDEDIR}/QtMimeTypes
     INSTALLS += target the_includes
 }
