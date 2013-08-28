@@ -19,5 +19,5 @@ unix {
     }
 
     INCLUDEDIR = $${PREFIX}/include
-    LIBDIR = ${{PREFIX}/lib
+    LIBDIR = $${PREFIX}/lib
 }
