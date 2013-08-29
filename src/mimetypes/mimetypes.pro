@@ -73,7 +73,7 @@ symbian {
 }
 
 unix:!symbian {
-    target.path = ${{LIBDIR}
+    target.path = $${LIBDIR}
     the_includes.path = $${INCLUDEDIR}/QtMimeTypes
     INSTALLS += target the_includes
 }
