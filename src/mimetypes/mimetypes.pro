@@ -9,7 +9,19 @@ DEFINES += QMIME_LIBRARY
 
 DEPENDPATH  *= $$PWD
 
-CONFIG += depend_includepath
+CONFIG += depend_includepath create_pc create_prl no_install_prl
+
+unix {
+    CONFIG += create_pc create_prl no_install_prl
+    QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+
+    QMAKE_PKGCONFIG_NAME = QtMimeTypes
+    QMAKE_PKGCONFIG_DESCRIPTION = A Qt4 backport of the Qt5 mimetypes API
+    QMAKE_PKGCONFIG_PREFIX = $${PREFIX}
+    QMAKE_PKGCONFIG_LIBDIR = $${LIBDIR}
+    QMAKE_PKGCONFIG_INCDIR = $${INCLUDEDIR}/QtMimeTypes
+    QMAKE_PKGCONFIG_REQUIRES = QtCore
+}
 
 QT     = core
 
