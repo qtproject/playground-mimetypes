@@ -32,12 +32,7 @@ qmldir.files += $$PWD/qmldir plugins.qmltypes
 
 
 unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib/qt5/imports/QtMimeTypes
-        qmldir.path = /opt/usr/lib/qt5/imports/QtMimeTypes
-    } else {
-        target.path = /usr/lib/qt5/imports/QtMimeTypes
-        qmldir.path = /usr/lib/qt5/imports/QtMimeTypes
-    }
+    target.path = $$[QT_INSTALL_IMPORTS]/QtMimeTypes
+    qmldir.path = $$[QT_INSTALL_IMPORTS]/QtMimeTypes
     INSTALLS += qmldir target
 }
