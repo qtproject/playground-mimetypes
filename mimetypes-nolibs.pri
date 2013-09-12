@@ -3,7 +3,7 @@ MIMETYPES_PRI_INCLUDED = 1
 
 INCLUDEPATH += $$PWD/include/QtMimeTypes
 INCLUDEPATH += $$PWD/src/mimetypes/inqt5
-INCLUDEPATH += $$PWD/src/mimetypes $$PWD/src/imports/mimetypes
+INCLUDEPATH += $$PWD/src/mimetypes
 
 mac|darwin: {
     QMAKE_CXXFLAGS += -ansi

@@ -3,8 +3,6 @@ TEMPLATE = subdirs
 SUBDIRS += \
     qmimetype \
     qmimedatabase \
-    qdeclarativemimetype \
-    qdeclarativemimedatabase
 
 testrunner_config.files += tests.xml
 
