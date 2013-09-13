@@ -17,31 +17,12 @@ CONFIG += depend_includepath
 SOURCES = tst_qmimedatabase-cache.cpp
 HEADERS = ../tst_qmimedatabase.h
 
-contains(QMAKE_CXX, --sysroot): {
-    unix:!symbian {
-        maemo5 {
-            DEFINES += SRCDIR='"\\"/opt/usr/lib/QtMimeTypes-tests/\\""'
-        } else {
-            DEFINES += SRCDIR='"\\"/usr/lib/QtMimeTypes-tests/\\""'
-        }
-    }
-} else {
-    DEFINES += SRCDIR='"\\"$$PWD/../\\""'
+DEFINES += SRCDIR='"\\"$$PWD/../\\""'
 
-    QMAKE_EXTRA_TARGETS += check
-    check.depends = $$TARGET
-    check.commands = LD_LIBRARY_PATH=$$(LD_LIBRARY_PATH):$$OUT_PWD/../../../../src/mimetypes ./$$TARGET   # -xunitxml -o $${TARGET}.xml
-}
+QMAKE_EXTRA_TARGETS += check
+check.depends = $$TARGET
+check.commands = LD_LIBRARY_PATH=$$(LD_LIBRARY_PATH):$$OUT_PWD/../../../../src/mimetypes ./$$TARGET
 
 DEFINES += CORE_SOURCES='"\\"$$PWD/../../../../src\\""'
 
 *-g++*:QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wno-long-long -Wnon-virtual-dtor
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib/QtMimeTypes-tests/qmimedatabase-cache
-    } else {
-        target.path = /usr/lib/QtMimeTypes-tests/qmimedatabase-cache
-    }
-    INSTALLS += target
-}
