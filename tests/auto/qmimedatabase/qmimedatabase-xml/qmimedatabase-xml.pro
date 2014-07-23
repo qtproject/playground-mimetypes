@@ -25,4 +25,4 @@ check.commands = LD_LIBRARY_PATH=$$(LD_LIBRARY_PATH):$$OUT_PWD/../../../../src/m
 
 DEFINES += CORE_SOURCES='"\\"$$PWD/../../../../src\\""'
 
-*-g++*:QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wno-long-long -Wnon-virtual-dtor
+*-g++*:QMAKE_CXXFLAGS += -W -Wall -Wextra -Wno-long-long -Wnon-virtual-dtor

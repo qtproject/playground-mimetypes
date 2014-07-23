@@ -25,7 +25,7 @@ unix {
 
 QT     = core
 
-QMAKE_CXXFLAGS += -W -Wall -Wextra -Werror -Wshadow -Wno-long-long -Wnon-virtual-dtor
+QMAKE_CXXFLAGS += -W -Wall -Wextra -Wshadow -Wno-long-long -Wnon-virtual-dtor
 
 SOURCES += qmimedatabase.cpp \
            qmimetype.cpp \
