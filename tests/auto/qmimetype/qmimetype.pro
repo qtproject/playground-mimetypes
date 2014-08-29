@@ -9,7 +9,7 @@ CONFIG   -= app_bundle
 
 DEPENDPATH += .
 
-*-g++*:QMAKE_CXXFLAGS += -W -Wall -Wshadow -Wno-long-long -Wnon-virtual-dtor
+*-g++*:QMAKE_CXXFLAGS += -W -Wall -Wshadow -Wnon-virtual-dtor
 
 CONFIG += depend_includepath
 
