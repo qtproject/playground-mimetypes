@@ -1,6 +1,8 @@
 !isEmpty(MIMETYPES_PRI_INCLUDED):error("mimetypes-no-libs.pri already included")
 MIMETYPES_PRI_INCLUDED = 1
 
+VERSION = 1.0.1
+
 INCLUDEPATH += $$PWD/include/QtMimeTypes
 INCLUDEPATH += $$PWD/src/mimetypes/inqt5
 INCLUDEPATH += $$PWD/src/mimetypes
